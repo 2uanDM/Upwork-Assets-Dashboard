@@ -50,6 +50,12 @@ class BaseGUI(QWidget):
         self.filter_label_font.setBold(True)
         self.filter_label_font.setWeight(70)
 
+        self.font_for_table_header = QFont()
+        self.font_for_table_header.setFamily(u"Segoe UI")
+        self.font_for_table_header.setPointSize(13)
+        self.font_for_table_header.setBold(True)
+        self.font_for_table_header.setWeight(68)
+
         # ------------------- Menu Frame -------------------
         self.menu_frame = QFrame(self)
         self.menu_frame.setObjectName(u"menu_frame")
@@ -117,6 +123,34 @@ class BaseGUI(QWidget):
         self.apply_filter_button.setLayoutDirection(Qt.LeftToRight)
         self.apply_filter_button.setStyleSheet(self.css.get('apply_filter_button'))
 
+        # ------------------- Master Table -------------------
+        self.master_table = QTableWidget(self.content_frame)
+        self.master_table.setColumnCount(4)
+        __qtablewidgetitem = QTableWidgetItem()
+        self.master_table.setHorizontalHeaderItem(0, __qtablewidgetitem)
+        __qtablewidgetitem1 = QTableWidgetItem()
+        self.master_table.setHorizontalHeaderItem(1, __qtablewidgetitem1)
+        __qtablewidgetitem2 = QTableWidgetItem()
+        self.master_table.setHorizontalHeaderItem(2, __qtablewidgetitem2)
+        __qtablewidgetitem3 = QTableWidgetItem()
+        self.master_table.setHorizontalHeaderItem(3, __qtablewidgetitem3)
+
+        self.master_table.setObjectName(u"master_table")
+        self.master_table.setGeometry(QRect(20, 160, 681, 701))
+        self.master_table.setStyleSheet(self.css.get('master_table'))
+
+        # CSS for the header
+        header = self.master_table.horizontalHeader()
+        header.setStyleSheet(
+            "background-color: rgb(231, 231, 231); border: 1px solid black; color: rgb(69, 119, 185)")
+        header.setDefaultSectionSize(150)
+        header.setDefaultAlignment(Qt.AlignLeft)
+        header.setFont(self.font_for_table_header)
+        header.setFixedHeight(35)
+
+        # Set the width of the columns
+        self.master_table.setColumnWidth(2, 228)
+
         # Retranslate Ui
         self.retranslate_base_ui()
 
@@ -129,3 +163,16 @@ class BaseGUI(QWidget):
         self.number_input.setText(QCoreApplication.translate("Form", u"11", None))
         self.search_input.setText(QCoreApplication.translate("Form", u"office", None))
         self.apply_filter_button.setText(QCoreApplication.translate("Form", u"Apply Filter", None))
+
+        # -- Master Table --
+        ___qtablewidgetitem = self.master_table.horizontalHeaderItem(0)
+        ___qtablewidgetitem.setText(QCoreApplication.translate("Form", u"Image", None))
+        ___qtablewidgetitem = self.master_table.horizontalHeaderItem(1)
+        ___qtablewidgetitem.setText(QCoreApplication.translate("Form", u"Asset#", None))
+        ___qtablewidgetitem1 = self.master_table.horizontalHeaderItem(2)
+        ___qtablewidgetitem1.setText(QCoreApplication.translate("Form", u"Asset name", None))
+        ___qtablewidgetitem2 = self.master_table.horizontalHeaderItem(3)
+        ___qtablewidgetitem2.setText(QCoreApplication.translate("Form", u"Category", None))
+
+    def add_to_master_table(self, row, column, item):
+        self.master_table.setItem(row, column, item)
