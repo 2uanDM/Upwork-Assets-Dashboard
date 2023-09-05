@@ -1,7 +1,7 @@
 {
     "asset_catalogue_button": "color:rgb(69, 119, 185);border: none;text-align: right;padding-right: 20px;background-color:rgb(241, 241, 241);",
-    "number_input" : "text-align:center;font-weight:500;color:rgb(69, 119, 185);border: 2px solid black;",
-    "search_input" : "text-align:center;font-weight:500;color:rgb(69, 119, 185);border: 2px solid black;padding-left: 10px;",
+    "number_input" : "text-align:center;font-weight:500;color:rgb(69, 119, 185);border: 1px solid black;",
+    "search_input" : "text-align:center;font-weight:500;color:rgb(69, 119, 185);border: 1px solid black;padding-left: 10px;",
     "apply_filter_button" : "QPushButton {color: rgb(69, 119, 185);border: 2px solid rgb(241, 241, 241);border-radius: 10px;background-color: rgb(241, 241, 241);} QPushButton:hover {color: white;background-color: darkgray;}",
-    "master_table" : "QTableView {color: rgb(69, 119, 185);font-size: 12px;font-family: Segoe UI;border: 1px solid black;gridline-color: black;}"
+    "master_table" : "QTableView {color: rgb(89, 89, 89);font-size: 14px;font-family: Segoe UI;border: 2px solid black} QTableView QAbstractItemView::item {padding-left: 10px;}"
 }

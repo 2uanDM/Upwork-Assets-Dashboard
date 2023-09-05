@@ -138,21 +138,33 @@ class BaseGUI(QWidget):
         self.master_table.setObjectName(u"master_table")
         self.master_table.setGeometry(QRect(20, 160, 681, 701))
         self.master_table.setStyleSheet(self.css.get('master_table'))
+        self.master_table.verticalHeader().setVisible(False)
+        # Add below line of the horizontal header
 
         # CSS for the header
         header = self.master_table.horizontalHeader()
         header.setStyleSheet(
-            "background-color: rgb(231, 231, 231); border: 1px solid black; color: rgb(69, 119, 185)")
+            "QHeaderView::section {background-color: rgb(231, 231, 231); color: rgb(69, 119, 185); border: 1px solid black; border-top: none; border-left: none; border-right: none;padding: 3px;}"
+        )
+
         header.setDefaultSectionSize(150)
         header.setDefaultAlignment(Qt.AlignLeft)
         header.setFont(self.font_for_table_header)
         header.setFixedHeight(35)
-
-        # Set the width of the columns
-        self.master_table.setColumnWidth(2, 228)
+        self.master_table.setColumnWidth(2, 227)
+        # Set border to the table
+        self.master_table.setFrameShape(QFrame.StyledPanel)
+        self.master_table.setFrameShadow(QFrame.Raised)
+        self.master_table.setLineWidth(1)
+        self.master_table.setMidLineWidth(0)
 
         # Retranslate Ui
         self.retranslate_base_ui()
+
+        self.add_to_master_table('image', 'asset_id', 'asset_name', 'category')
+        self.add_to_master_table('image', 'asset_id', 'asset_name', 'category')
+        self.add_to_master_table('image', 'asset_id', 'asset_name', 'category')
+        self.add_to_master_table('image', 'asset_id', 'asset_name', 'category')
 
     def retranslate_base_ui(self):
         self.app_name.setText(QCoreApplication.translate("Form", u"ROCKET\nPROJECT", None))
@@ -174,5 +186,23 @@ class BaseGUI(QWidget):
         ___qtablewidgetitem2 = self.master_table.horizontalHeaderItem(3)
         ___qtablewidgetitem2.setText(QCoreApplication.translate("Form", u"Category", None))
 
-    def add_to_master_table(self, image, , item):
-        self.master_table.setItem(row, column, item)
+    def add_to_master_table(self, image, asset_id: str, asset_name: str, category: str):
+        # Add these to the master table
+        row_count = self.master_table.rowCount()
+        self.master_table.insertRow(row_count)
+        self.master_table.setRowHeight(row_count, 40)
+
+        # Set the image
+        # image_item = QTableWidgetItem()
+        # image_item.setData(Qt.DecorationRole, image)
+        # self.master_table.setItem(row_count, 0, image_item)
+
+        image_item = QTableWidgetItem()
+        image_item.setText(image)
+        self.master_table.setItem(row_count, 0, image_item)
+        # Set the asset id
+        self.master_table.setItem(row_count, 1, QTableWidgetItem(asset_id))
+        # Set the asset name
+        self.master_table.setItem(row_count, 2, QTableWidgetItem(asset_name))
+        # Set the category
+        self.master_table.setItem(row_count, 3, QTableWidgetItem(category))
