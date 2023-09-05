@@ -174,5 +174,5 @@ class BaseGUI(QWidget):
         ___qtablewidgetitem2 = self.master_table.horizontalHeaderItem(3)
         ___qtablewidgetitem2.setText(QCoreApplication.translate("Form", u"Category", None))
 
-    def add_to_master_table(self, row, column, item):
+    def add_to_master_table(self, image, , item):
         self.master_table.setItem(row, column, item)
