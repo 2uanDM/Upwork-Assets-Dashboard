@@ -348,7 +348,40 @@ class BaseGUI(QWidget):
         self.attribute_table.setColumnWidth(3, 410)
 
     def setup_shape_table(self):
-        pass
+        self.shape_table = QTableWidget(self.content_frame)
+        self.shape_table.setColumnCount(3)
+        self.shape_table.verticalHeader().hide()
+
+        shape_order_number_item = QTableWidgetItem()
+        shape_order_number_item.setText("#")
+        self.shape_table.setHorizontalHeaderItem(0, shape_order_number_item)
+
+        shape_name_item = QTableWidgetItem()
+        shape_name_item.setText("Shape")
+        self.shape_table.setHorizontalHeaderItem(1, shape_name_item)
+
+        shape_description_item = QTableWidgetItem()
+        shape_description_item.setText("Description")
+        self.shape_table.setHorizontalHeaderItem(2, shape_description_item)
+
+        # Other properties
+        self.shape_table.setObjectName(u"shape_table")
+        self.shape_table.setGeometry(QRect(720, 540, 801, 151))
+        self.shape_table.setStyleSheet(self.css.get('master_table'))
+
+        # CSS for the header
+        header = self.shape_table.horizontalHeader()
+        header.setStyleSheet(
+            "QHeaderView::section {background-color: rgb(231, 231, 231); color: rgb(69, 119, 185); border: 1.5px solid rgb(89, 89, 89); border-top: none; border-left: none;border-right: 1px solid rgb(89, 89, 89); padding: 3px;}"
+        )
+        header.setDefaultSectionSize(150)
+        header.setDefaultAlignment(Qt.AlignLeft)
+        header.setFont(self.font_for_table_header)
+        header.setFixedHeight(35)
+        # Change the width of the columns
+        self.shape_table.setColumnWidth(0, 67)
+        self.shape_table.setColumnWidth(1, 150)
+        self.shape_table.setColumnWidth(2, 580)
 
     def setup_media_frame(self):
         pass
