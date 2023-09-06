@@ -20,5 +20,6 @@
   "sqltools.format": {
     "uppercase": true,
     "printWidth": 120
-  }
+  },
+  "hediet.vscode-drawio.theme": "Kennedy"
 }
