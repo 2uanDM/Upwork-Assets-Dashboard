@@ -77,6 +77,12 @@ class BaseGUI(QWidget):
         self.asset_catalogue_button.setLayoutDirection(Qt.LeftToRight)
         self.asset_catalogue_button.setStyleSheet(self.css.get('asset_catalogue_button'))
 
+        self.catalogue_icon = QLabel(self.menu_frame)
+        self.catalogue_icon.setObjectName(u"catalogue_icon")
+        self.catalogue_icon.setGeometry(QRect(20, 160, 41, 41))
+        self.catalogue_icon.setStyleSheet(u"background-color:rgb(241, 241, 241)")
+        self.catalogue_icon.setPixmap(QPixmap(os.path.join(os.getcwd(), "assets", "catalogue.png")))
+
         # ------------------- Content Frame -------------------
         self.content_frame = QFrame(self)
         self.content_frame.setObjectName(u"content_frame")

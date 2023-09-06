@@ -86,6 +86,25 @@ background-color:rgb(241, 241, 241)
      <string>Asset catalogue</string>
     </property>
    </widget>
+   <widget class="QLabel" name="label">
+    <property name="geometry">
+     <rect>
+      <x>20</x>
+      <y>160</y>
+      <width>41</width>
+      <height>41</height>
+     </rect>
+    </property>
+    <property name="styleSheet">
+     <string notr="true">background-color:rgb(241, 241, 241)</string>
+    </property>
+    <property name="text">
+     <string/>
+    </property>
+    <property name="pixmap">
+     <pixmap>../assets/catalogue.png</pixmap>
+    </property>
+   </widget>
   </widget>
   <widget class="QFrame" name="content_frame">
    <property name="geometry">
