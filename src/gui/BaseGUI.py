@@ -187,7 +187,7 @@ class BaseGUI(QWidget):
         # CSS for the header
         header = self.master_table.horizontalHeader()
         header.setStyleSheet(
-            "QHeaderView::section {background-color: rgb(231, 231, 231); color: rgb(69, 119, 185); border: 1.5px solid rgb(89, 89, 89); border-top: none; border-left: none; border-right: none;padding: 3px;}"
+            "QHeaderView::section {background-color: rgb(231, 231, 231); color: rgb(69, 119, 185); border: 1.5px solid rgb(89, 89, 89); border-top: none; border-left: none; border-right: 1px solid rgb(89, 89, 89); padding: 3px;}"
         )
 
         header.setDefaultSectionSize(150)
@@ -307,7 +307,45 @@ class BaseGUI(QWidget):
         self.asset_detail_table.setStyleSheet(self.css.get('master_table'))
 
     def setup_attribute_table(self):
-        pass
+        self.attribute_table = QTableWidget(self.content_frame)
+        self.attribute_table.setColumnCount(4)
+        self.attribute_table.verticalHeader().hide()
+
+        attribute_order_number_item = QTableWidgetItem()
+        attribute_order_number_item.setText("#")
+        self.attribute_table.setHorizontalHeaderItem(0, attribute_order_number_item)
+
+        attribute_name_item = QTableWidgetItem()
+        attribute_name_item.setText("Attribute")
+        self.attribute_table.setHorizontalHeaderItem(1, attribute_name_item)
+
+        attribute_date_type_item = QTableWidgetItem()
+        attribute_date_type_item.setText("Datatype")
+        self.attribute_table.setHorizontalHeaderItem(2, attribute_date_type_item)
+
+        attribute_remarks_item = QTableWidgetItem()
+        attribute_remarks_item.setText("Remarks")
+        self.attribute_table.setHorizontalHeaderItem(3, attribute_remarks_item)
+
+        # Other properties
+        self.attribute_table.setObjectName(u"attribute_table")
+        self.attribute_table.setGeometry(QRect(720, 340, 801, 191))
+        self.attribute_table.setStyleSheet(self.css.get('master_table'))
+
+        # CSS for the header
+        header = self.attribute_table.horizontalHeader()
+        header.setStyleSheet(
+            "QHeaderView::section {background-color: rgb(231, 231, 231); color: rgb(69, 119, 185); border: 1.5px solid rgb(89, 89, 89); border-top: none; border-left: none;border-right: 1px solid rgb(89, 89, 89); padding: 3px;}"
+        )
+        header.setDefaultSectionSize(150)
+        header.setDefaultAlignment(Qt.AlignLeft)
+        header.setFont(self.font_for_table_header)
+        header.setFixedHeight(35)
+        # Change the width of the columns
+        self.attribute_table.setColumnWidth(0, 67)
+        self.attribute_table.setColumnWidth(1, 200)
+        self.attribute_table.setColumnWidth(2, 120)
+        self.attribute_table.setColumnWidth(3, 410)
 
     def setup_shape_table(self):
         pass
