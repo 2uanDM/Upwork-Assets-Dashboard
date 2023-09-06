@@ -27,6 +27,9 @@ class AssetCatelogueGUI(BaseGUI):
         self.crud_save_shape_button.clicked.connect(self.test_action)
         self.crud_delete_shape_button.clicked.connect(self.test_action)
 
+        self.crud_add_media_button.clicked.connect(self.test_action)
+        self.crud_delete_media_button.clicked.connect(self.test_action)
+
     def add_to_master_table(self, image, asset_id: str, asset_name: str, category: str):
         # Add these to the master table
         row_count = self.master_table.rowCount()

@@ -57,6 +57,7 @@ class BaseGUI(QWidget):
         self.setup_crud_asset_detail_buttons()
         self.setup_crud_attribute_buttons()
         self.setup_crud_shape_buttons()
+        self.setup_crud_media_buttons()
 
         # Retranslate Ui
         self.retranslate_base_ui()
