@@ -44,29 +44,17 @@ class BaseGUI(QWidget):
         # ------------------- Setup Master Table -------------------
         self.setup_master_table()
         # ------------------- Setup Detail Table -------------------
-
+        self.setup_detail_table()
+        # ------------------- Setup Attribute Table -------------------
+        self.setup_attribute_table()
+        # ------------------- Setup Shape Table -------------------
+        self.setup_shape_table()
+        # ------------------- Setup Media Frame -------------------
+        self.setup_media_frame()
+        # ------------------- Setup CRUD buttons -------------------
+        self.setup_crud_buttons()
         # Retranslate Ui
         self.retranslate_base_ui()
-
-    def retranslate_base_ui(self):
-        self.app_name.setText(QCoreApplication.translate("Form", u"ROCKET\nPROJECT", None))
-        self.asset_catalogue_button.setText(QCoreApplication.translate("Form", u"Asset catalogue", None))
-        self.main_label.setText(QCoreApplication.translate("Form", u"ASSET CATALOGUE", None))
-        self.asset_list_label.setText(QCoreApplication.translate("Form", u"ASSET LIST", None))
-        self.filter_label.setText(QCoreApplication.translate("Form", u"Filter", None))
-        self.number_input.setText(QCoreApplication.translate("Form", u"11", None))
-        self.search_input.setText(QCoreApplication.translate("Form", u"office", None))
-        self.apply_filter_button.setText(QCoreApplication.translate("Form", u"Apply Filter", None))
-
-        # -- Master Table --
-        ___qtablewidgetitem = self.master_table.horizontalHeaderItem(0)
-        ___qtablewidgetitem.setText(QCoreApplication.translate("Form", u"Image", None))
-        ___qtablewidgetitem = self.master_table.horizontalHeaderItem(1)
-        ___qtablewidgetitem.setText(QCoreApplication.translate("Form", u"Asset#", None))
-        ___qtablewidgetitem1 = self.master_table.horizontalHeaderItem(2)
-        ___qtablewidgetitem1.setText(QCoreApplication.translate("Form", u"Asset name", None))
-        ___qtablewidgetitem2 = self.master_table.horizontalHeaderItem(3)
-        ___qtablewidgetitem2.setText(QCoreApplication.translate("Form", u"Category", None))
 
     def setup_fonts(self):
         # ------------------- Font -------------------
@@ -135,7 +123,7 @@ class BaseGUI(QWidget):
     def setup_content_frame(self):
         self.content_frame = QFrame(self)
         self.content_frame.setObjectName(u"content_frame")
-        self.content_frame.setGeometry(QRect(240, 0, 1571, 901))
+        self.content_frame.setGeometry(QRect(240, 0, 1591, 901))
         self.content_frame.setStyleSheet(u"background-color:rgb(255, 255, 255)")
         self.content_frame.setFrameShape(QFrame.StyledPanel)
         self.content_frame.setFrameShadow(QFrame.Raised)
@@ -195,7 +183,6 @@ class BaseGUI(QWidget):
         self.master_table.setGeometry(QRect(20, 160, 681, 701))
         self.master_table.setStyleSheet(self.css.get('master_table'))
         self.master_table.verticalHeader().setVisible(False)
-        # Add below line of the horizontal header
 
         # CSS for the header
         header = self.master_table.horizontalHeader()
@@ -208,11 +195,148 @@ class BaseGUI(QWidget):
         header.setFont(self.font_for_table_header)
         header.setFixedHeight(35)
         self.master_table.setColumnWidth(2, 227)
-        # Set border to the table
-        self.master_table.setFrameShape(QFrame.StyledPanel)
-        self.master_table.setFrameShadow(QFrame.Raised)
-        self.master_table.setLineWidth(1)
-        self.master_table.setMidLineWidth(0)
 
     def setup_detail_table(self):
+        self.asset_detail_label = QLabel(self.content_frame)
+        self.asset_detail_label.setObjectName(u"asset_detail_label")
+        self.asset_detail_label.setGeometry(QRect(720, 10, 171, 41))
+        self.asset_detail_label.setFont(self.sub_header_font)
+        self.asset_detail_label.setStyleSheet(u"color:rgb(69, 119, 185)")
+
+        self.asset_detail_table = QTableWidget(self.content_frame)
+        self.asset_detail_table.setColumnCount(2)
+        self.asset_detail_table.setRowCount(7)
+
+        # Hide the horizontal header
+        self.asset_detail_table.horizontalHeader().hide()
+        self.asset_detail_table.verticalHeader().hide()
+
+        # Set the width of column
+        self.asset_detail_table.setColumnWidth(0, 150)
+        self.asset_detail_table.setColumnWidth(1, 630)
+
+        # First row: Asset number and Asset Name
+        asset_number_item = QTableWidgetItem()
+        asset_number_item.setBackground(QColor(231, 231, 231))  # Set your desired background color
+        asset_number_item.setFont(QFont('Segoe UI', 14, 68))
+        asset_number_item.setTextAlignment(Qt.AlignCenter)
+        asset_number_item.setForeground(QColor(69, 119, 185))
+        asset_number_item.setText("1104")
+        self.asset_detail_table.setItem(0, 0, asset_number_item)
+
+        asset_name_item = QTableWidgetItem()
+        asset_name_item.setBackground(QColor(231, 231, 231))
+        asset_name_item.setFont(QFont('Segoe UI', 14, 68))
+        asset_name_item.setTextAlignment(Qt.AlignCenter)
+        asset_name_item.setForeground(QColor(69, 119, 185))
+        asset_name_item.setText("Office chair")
+        self.asset_detail_table.setItem(0, 1, asset_name_item)
+
+        # Second row: Asset variant and its value
+        asset_variant_item = QTableWidgetItem()
+        asset_variant_item.setText("Asset variant")
+        asset_variant_item.setTextAlignment(Qt.AlignCenter)
+        asset_variant_item.setFlags(asset_variant_item.flags() & ~Qt.ItemIsEditable)
+        self.asset_detail_table.setItem(1, 0, asset_variant_item)
+
+        asset_variant_value_item = QTableWidgetItem()
+        asset_variant_value_item.setText("")
+        self.asset_detail_table.setItem(1, 1, asset_variant_value_item)
+
+        # Third row: Asset category and its value
+        asset_category_item = QTableWidgetItem()
+        asset_category_item.setText("Asset category")
+        asset_category_item.setTextAlignment(Qt.AlignCenter)
+        asset_category_item.setFlags(asset_category_item.flags() & ~Qt.ItemIsEditable)
+        self.asset_detail_table.setItem(2, 0, asset_category_item)
+
+        asset_category_value_item = QTableWidgetItem()
+        asset_category_value_item.setText("")
+        self.asset_detail_table.setItem(2, 1, asset_category_value_item)
+
+        # Fourth row: Description and its value
+        asset_description_item = QTableWidgetItem()
+        asset_description_item.setText("Description")
+        asset_description_item.setTextAlignment(Qt.AlignCenter)
+        asset_description_item.setFlags(asset_description_item.flags() & ~Qt.ItemIsEditable)
+        self.asset_detail_table.setItem(3, 0, asset_description_item)
+
+        asset_description_value_item = QTableWidgetItem()
+        asset_description_value_item.setText("")
+        self.asset_detail_table.setItem(3, 1, asset_description_value_item)
+
+        # Change the height of the fourth row
+        self.asset_detail_table.setRowHeight(3, 120)
+
+        # Fifth row: Importlist header and its value
+        import_list_header_item = QTableWidgetItem()
+        import_list_header_item.setText("Importlist header")
+        import_list_header_item.setTextAlignment(Qt.AlignCenter)
+        import_list_header_item.setFlags(import_list_header_item.flags() & ~Qt.ItemIsEditable)
+        self.asset_detail_table.setItem(4, 0, import_list_header_item)
+
+        import_list_header_value_item = QTableWidgetItem()
+        import_list_header_value_item.setText("")
+        self.asset_detail_table.setItem(4, 1, import_list_header_value_item)
+
+        # Sixth row: Importlist 2nd row and its value
+        import_list_2nd_row_item = QTableWidgetItem()
+        import_list_2nd_row_item.setText("Importlist 2nd row")
+        import_list_2nd_row_item.setTextAlignment(Qt.AlignCenter)
+        import_list_2nd_row_item.setFlags(import_list_2nd_row_item.flags() & ~Qt.ItemIsEditable)
+        self.asset_detail_table.setItem(5, 0, import_list_2nd_row_item)
+
+        import_list_2nd_row_value_item = QTableWidgetItem()
+        import_list_2nd_row_value_item.setText("")
+        self.asset_detail_table.setItem(5, 1, import_list_2nd_row_value_item)
+
+        # Seventh row: Importlist 3rd row and its value
+        import_list_3rd_row_item = QTableWidgetItem()
+        import_list_3rd_row_item.setText("Importlist 3rd row")
+        import_list_3rd_row_item.setTextAlignment(Qt.AlignCenter)
+        import_list_3rd_row_item.setFlags(import_list_3rd_row_item.flags() & ~Qt.ItemIsEditable)
+        self.asset_detail_table.setItem(6, 0, import_list_3rd_row_item)
+
+        import_list_3rd_row_value_item = QTableWidgetItem()
+        import_list_3rd_row_value_item.setText("")
+        self.asset_detail_table.setItem(6, 1, import_list_3rd_row_value_item)
+
+        # Other properties
+        self.asset_detail_table.setObjectName(u"asset_detail_table")
+        self.asset_detail_table.setGeometry(QRect(720, 60, 801, 271))
+        self.asset_detail_table.setStyleSheet(self.css.get('master_table'))
+
+    def setup_attribute_table(self):
         pass
+
+    def setup_shape_table(self):
+        pass
+
+    def setup_media_frame(self):
+        pass
+
+    def setup_crud_buttons(self):
+        pass
+
+    def retranslate_base_ui(self):
+        self.app_name.setText(QCoreApplication.translate("Form", u"ROCKET\nPROJECT", None))
+        self.asset_catalogue_button.setText(QCoreApplication.translate("Form", u"Asset catalogue", None))
+        self.main_label.setText(QCoreApplication.translate("Form", u"ASSET CATALOGUE", None))
+        self.asset_list_label.setText(QCoreApplication.translate("Form", u"ASSET LIST", None))
+        self.filter_label.setText(QCoreApplication.translate("Form", u"Filter", None))
+        self.number_input.setText(QCoreApplication.translate("Form", u"11", None))
+        self.search_input.setText(QCoreApplication.translate("Form", u"office", None))
+        self.apply_filter_button.setText(QCoreApplication.translate("Form", u"Apply Filter", None))
+
+        # -- Master Table --
+        ___qtablewidgetitem = self.master_table.horizontalHeaderItem(0)
+        ___qtablewidgetitem.setText(QCoreApplication.translate("Form", u"Image", None))
+        ___qtablewidgetitem = self.master_table.horizontalHeaderItem(1)
+        ___qtablewidgetitem.setText(QCoreApplication.translate("Form", u"Asset#", None))
+        ___qtablewidgetitem1 = self.master_table.horizontalHeaderItem(2)
+        ___qtablewidgetitem1.setText(QCoreApplication.translate("Form", u"Asset name", None))
+        ___qtablewidgetitem2 = self.master_table.horizontalHeaderItem(3)
+        ___qtablewidgetitem2.setText(QCoreApplication.translate("Form", u"Category", None))
+
+        # -- Detail Table --
+        self.asset_detail_label.setText(QCoreApplication.translate("Form", u"ASSET DETAIL", None))

@@ -35,7 +35,7 @@ if __name__ == "__main__":
 
         # Set the main window size
         main_window.setFixedHeight(900)
-        main_window.setFixedWidth(1800)
+        main_window.setFixedWidth(1820)
         main_window.setWindowTitle(config['window_title'])
         main_window.setCurrentIndex(0)
         main_window.setWindowIcon(QIcon('./assets/logo.jpg'))
