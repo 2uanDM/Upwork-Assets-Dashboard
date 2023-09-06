@@ -14,6 +14,19 @@ class AssetCatelogueGUI(BaseGUI):
         self.add_to_master_table('image', 'asset_id', 'asset_name', 'category')
         self.add_to_master_table('image', 'asset_id', 'asset_name', 'category')
 
+        # Connect for buttons
+        self.crud_add_asset_button.clicked.connect(self.test_action)
+        self.crud_save_asset_button.clicked.connect(self.test_action)
+        self.crud_delete_asset_button.clicked.connect(self.test_action)
+
+        self.crud_add_attribute_button.clicked.connect(self.test_action)
+        self.crud_save_attribute_button.clicked.connect(self.test_action)
+        self.crud_delete_attribute_button.clicked.connect(self.test_action)
+
+        self.crud_add_shape_button.clicked.connect(self.test_action)
+        self.crud_save_shape_button.clicked.connect(self.test_action)
+        self.crud_delete_shape_button.clicked.connect(self.test_action)
+
     def add_to_master_table(self, image, asset_id: str, asset_name: str, category: str):
         # Add these to the master table
         row_count = self.master_table.rowCount()

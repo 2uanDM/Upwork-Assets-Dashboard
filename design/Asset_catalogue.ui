@@ -641,7 +641,7 @@ QFrame QLabel {
      </layout>
     </widget>
    </widget>
-   <widget class="QLabel" name="label_6">
+   <widget class="QLabel" name="crud_add_asset_button">
     <property name="geometry">
      <rect>
       <x>1529</x>
@@ -657,7 +657,7 @@ QFrame QLabel {
      <pixmap>../assets/buttons/1x/add.png</pixmap>
     </property>
    </widget>
-   <widget class="QLabel" name="label_7">
+   <widget class="QLabel" name="crud_save_asset_button">
     <property name="geometry">
      <rect>
       <x>1526</x>
@@ -673,7 +673,7 @@ QFrame QLabel {
      <pixmap>../assets/buttons/1x/update.png</pixmap>
     </property>
    </widget>
-   <widget class="QLabel" name="label_8">
+   <widget class="QLabel" name="crud_delete_asset_button">
     <property name="geometry">
      <rect>
       <x>1530</x>
@@ -689,7 +689,7 @@ QFrame QLabel {
      <pixmap>../assets/buttons/1x/delete.png</pixmap>
     </property>
    </widget>
-   <widget class="QLabel" name="label_9">
+   <widget class="QLabel" name="crud_add_attribute_button">
     <property name="geometry">
      <rect>
       <x>1529</x>
@@ -705,7 +705,7 @@ QFrame QLabel {
      <pixmap>../assets/buttons/1x/add.png</pixmap>
     </property>
    </widget>
-   <widget class="QLabel" name="label_10">
+   <widget class="QLabel" name="crud_save_attribute_button">
     <property name="geometry">
      <rect>
       <x>1526</x>
@@ -721,7 +721,7 @@ QFrame QLabel {
      <pixmap>../assets/buttons/1x/update.png</pixmap>
     </property>
    </widget>
-   <widget class="QLabel" name="label_11">
+   <widget class="QLabel" name="crud_delete_attribute_button">
     <property name="geometry">
      <rect>
       <x>1530</x>
@@ -737,7 +737,7 @@ QFrame QLabel {
      <pixmap>../assets/buttons/1x/delete.png</pixmap>
     </property>
    </widget>
-   <widget class="QLabel" name="label_12">
+   <widget class="QLabel" name="crud_add_shape_button">
     <property name="geometry">
      <rect>
       <x>1529</x>
@@ -753,7 +753,7 @@ QFrame QLabel {
      <pixmap>../assets/buttons/1x/add.png</pixmap>
     </property>
    </widget>
-   <widget class="QLabel" name="label_13">
+   <widget class="QLabel" name="crud_save_shape_button">
     <property name="geometry">
      <rect>
       <x>1526</x>
@@ -769,7 +769,7 @@ QFrame QLabel {
      <pixmap>../assets/buttons/1x/update.png</pixmap>
     </property>
    </widget>
-   <widget class="QLabel" name="label_14">
+   <widget class="QLabel" name="crud_delete_shape_button">
     <property name="geometry">
      <rect>
       <x>1530</x>
@@ -785,7 +785,7 @@ QFrame QLabel {
      <pixmap>../assets/buttons/1x/delete.png</pixmap>
     </property>
    </widget>
-   <widget class="QLabel" name="label_15">
+   <widget class="QLabel" name="crud_add_media_button">
     <property name="geometry">
      <rect>
       <x>1529</x>
@@ -801,7 +801,7 @@ QFrame QLabel {
      <pixmap>../assets/buttons/1x/add.png</pixmap>
     </property>
    </widget>
-   <widget class="QLabel" name="label_17">
+   <widget class="QLabel" name="crud_delete_media_button">
     <property name="geometry">
      <rect>
       <x>1530</x>
@@ -829,17 +829,17 @@ QFrame QLabel {
    <zorder>asset_detail_table</zorder>
    <zorder>attribute_table</zorder>
    <zorder>shape_table</zorder>
-   <zorder>label_6</zorder>
-   <zorder>label_7</zorder>
-   <zorder>label_8</zorder>
-   <zorder>label_9</zorder>
-   <zorder>label_10</zorder>
-   <zorder>label_11</zorder>
-   <zorder>label_12</zorder>
-   <zorder>label_13</zorder>
-   <zorder>label_14</zorder>
-   <zorder>label_15</zorder>
-   <zorder>label_17</zorder>
+   <zorder>crud_add_asset_button</zorder>
+   <zorder>crud_save_asset_button</zorder>
+   <zorder>crud_delete_asset_button</zorder>
+   <zorder>crud_add_attribute_button</zorder>
+   <zorder>crud_save_attribute_button</zorder>
+   <zorder>crud_delete_attribute_button</zorder>
+   <zorder>crud_add_shape_button</zorder>
+   <zorder>crud_save_shape_button</zorder>
+   <zorder>crud_delete_shape_button</zorder>
+   <zorder>crud_add_media_button</zorder>
+   <zorder>crud_delete_media_button</zorder>
   </widget>
  </widget>
  <resources/>

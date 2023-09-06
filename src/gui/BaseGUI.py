@@ -25,6 +25,8 @@ class ClickableLabel(QLabel):
 
 
 class BaseGUI(QWidget):
+    buttons_path = os.path.join(os.getcwd(), 'assets', 'buttons')
+
     def __init__(self, MainWindow) -> None:
         """
             The setup function must be called sequentially, or else the UI will not be setup properly
@@ -52,7 +54,10 @@ class BaseGUI(QWidget):
         # ------------------- Setup Media Frame -------------------
         self.setup_media_frame()
         # ------------------- Setup CRUD buttons -------------------
-        self.setup_crud_buttons()
+        self.setup_crud_asset_detail_buttons()
+        self.setup_crud_attribute_buttons()
+        self.setup_crud_shape_buttons()
+
         # Retranslate Ui
         self.retranslate_base_ui()
 
@@ -384,10 +389,85 @@ class BaseGUI(QWidget):
         self.shape_table.setColumnWidth(2, 580)
 
     def setup_media_frame(self):
-        pass
+        self.media_frame = QFrame(self.content_frame)
+        self.media_frame.setObjectName(u"media_frame")
+        self.media_frame.setGeometry(QRect(720, 700, 801, 161))
+        self.media_frame.setStyleSheet(self.css.get('media_frame'))
 
-    def setup_crud_buttons(self):
-        pass
+        # Horizontal layout
+        self.horizontalLayoutWidget = QWidget(self.media_frame)
+        self.horizontalLayoutWidget.setObjectName(u"horizontalLayoutWidget")
+        self.horizontalLayoutWidget.setGeometry(QRect(9, 10, 781, 141))
+
+        self.horizontalLayout = QHBoxLayout(self.horizontalLayoutWidget)
+        self.horizontalLayout.setSpacing(6)
+        self.horizontalLayout.setObjectName(u"horizontalLayout")
+        self.horizontalLayout.setContentsMargins(2, 0, 0, 0)
+
+    def setup_crud_asset_detail_buttons(self):
+        # Add asset button
+        self.crud_add_asset_button = ClickableLabel(self.content_frame)
+        self.crud_add_asset_button.setObjectName(u"crud_add_asset_button")
+        self.crud_add_asset_button.setGeometry(QRect(1529, 80, 21, 21))
+        self.crud_add_asset_button.setPixmap(QPixmap(os.path.join(self.buttons_path, 'add.png')))
+
+        # Save/Update asset button
+        self.crud_save_asset_button = ClickableLabel(self.content_frame)
+        self.crud_save_asset_button.setObjectName(u"crud_save_asset_button")
+        self.crud_save_asset_button.setGeometry(QRect(1526, 115, 26, 21))
+        self.crud_save_asset_button.setPixmap(QPixmap(os.path.join(self.buttons_path, 'update.png')))
+
+        # Delete asset button
+        self.crud_delete_asset_button = ClickableLabel(self.content_frame)
+        self.crud_delete_asset_button.setObjectName(u"crud_delete_asset_button")
+        self.crud_delete_asset_button.setGeometry(QRect(1530, 150, 19, 21))
+        self.crud_delete_asset_button.setPixmap(QPixmap(os.path.join(self.buttons_path, 'delete.png')))
+
+    def setup_crud_attribute_buttons(self):
+        # Add attribute button
+        self.crud_add_attribute_button = ClickableLabel(self.content_frame)
+        self.crud_add_attribute_button.setObjectName(u"crud_add_attribute_button")
+        self.crud_add_attribute_button.setGeometry(QRect(1529, 350, 21, 21))
+        self.crud_add_attribute_button.setPixmap(QPixmap(os.path.join(self.buttons_path, 'add.png')))
+
+        # Save/Update attribute button
+        self.crud_save_attribute_button = ClickableLabel(self.content_frame)
+        self.crud_save_attribute_button.setObjectName(u"crud_save_attribute_button")
+        self.crud_save_attribute_button.setGeometry(QRect(1526, 385, 26, 21))
+        self.crud_save_attribute_button.setPixmap(QPixmap(os.path.join(self.buttons_path, 'update.png')))
+
+        # Delete attribute button
+        self.crud_delete_attribute_button = ClickableLabel(self.content_frame)
+        self.crud_delete_attribute_button.setObjectName(u"crud_delete_attribute_button")
+        self.crud_delete_attribute_button.setGeometry(QRect(1530, 420, 19, 21))
+        self.crud_delete_attribute_button.setPixmap(QPixmap(os.path.join(self.buttons_path, 'delete.png')))
+
+    def setup_crud_shape_buttons(self):
+        self.crud_add_shape_button = ClickableLabel(self.content_frame)
+        self.crud_add_shape_button.setObjectName(u"crud_add_shape_button")
+        self.crud_add_shape_button.setGeometry(QRect(1529, 540, 21, 21))
+        self.crud_add_shape_button.setPixmap(QPixmap(QPixmap(os.path.join(self.buttons_path, 'add.png'))))
+
+        self.crud_save_shape_button = ClickableLabel(self.content_frame)
+        self.crud_save_shape_button.setObjectName(u"crud_save_shape_button")
+        self.crud_save_shape_button.setGeometry(QRect(1526, 575, 26, 21))
+        self.crud_save_shape_button.setPixmap(QPixmap(QPixmap(os.path.join(self.buttons_path, 'update.png'))))
+
+        self.crud_delete_shape_button = ClickableLabel(self.content_frame)
+        self.crud_delete_shape_button.setObjectName(u"crud_delete_shape_button")
+        self.crud_delete_shape_button.setGeometry(QRect(1530, 610, 19, 21))
+        self.crud_delete_shape_button.setPixmap(QPixmap(QPixmap(os.path.join(self.buttons_path, 'delete.png'))))
+
+    def setup_crud_media_buttons(self):
+        self.crud_add_media_button = ClickableLabel(self.content_frame)
+        self.crud_add_media_button.setObjectName(u"crud_add_media_button")
+        self.crud_add_media_button.setGeometry(QRect(1529, 720, 21, 21))
+        self.crud_add_media_button.setPixmap(QPixmap(os.path.join(self.buttons_path, 'add.png')))
+
+        self.crud_delete_media_button = ClickableLabel(self.content_frame)
+        self.crud_delete_media_button.setObjectName(u"crud_delete_media_button")
+        self.crud_delete_media_button.setGeometry(QRect(1530, 760, 19, 21))
+        self.crud_delete_media_button.setPixmap(QPixmap(os.path.join(self.buttons_path, 'delete.png')))
 
     def retranslate_base_ui(self):
         self.app_name.setText(QCoreApplication.translate("Form", u"ROCKET\nPROJECT", None))
@@ -411,3 +491,6 @@ class BaseGUI(QWidget):
 
         # -- Detail Table --
         self.asset_detail_label.setText(QCoreApplication.translate("Form", u"ASSET DETAIL", None))
+
+    def test_action(self):
+        print('Button clicked')
