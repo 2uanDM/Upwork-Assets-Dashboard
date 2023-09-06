@@ -2,7 +2,6 @@
 from PyQt5.QtGui import *
 from PyQt5.QtWidgets import *
 from PyQt5.QtCore import *
-from abc import abstractmethod
 
 from PyQt5.QtWidgets import QWidget
 import json
@@ -14,12 +13,62 @@ with open(css_path, "r", encoding='utf8') as f:
     css_dict = json.load(f)
 
 
+class ClickableLabel(QLabel):
+    clicked = pyqtSignal()
+
+    def __init__(self, parent=None):
+        super().__init__(parent)
+
+    def mousePressEvent(self, event):
+        if event.button() == Qt.LeftButton:
+            self.clicked.emit()
+
+
 class BaseGUI(QWidget):
     def __init__(self, MainWindow) -> None:
+        """
+            The setup function must be called sequentially, or else the UI will not be setup properly
+        Args:
+            MainWindow (QStackedWidget): The main window
+        """
         super(BaseGUI, self).__init__()
         self.main_window = MainWindow
         self.css = css_dict
 
+        # ------------------- Setup Fonts -------------------
+        self.setup_fonts()
+        # ------------------- Setup Main Frame -------------------
+        self.setup_main_frame()
+        # ------------------- Setup Content Frame -------------------
+        self.setup_content_frame()
+        # ------------------- Setup Master Table -------------------
+        self.setup_master_table()
+        # ------------------- Setup Detail Table -------------------
+
+        # Retranslate Ui
+        self.retranslate_base_ui()
+
+    def retranslate_base_ui(self):
+        self.app_name.setText(QCoreApplication.translate("Form", u"ROCKET\nPROJECT", None))
+        self.asset_catalogue_button.setText(QCoreApplication.translate("Form", u"Asset catalogue", None))
+        self.main_label.setText(QCoreApplication.translate("Form", u"ASSET CATALOGUE", None))
+        self.asset_list_label.setText(QCoreApplication.translate("Form", u"ASSET LIST", None))
+        self.filter_label.setText(QCoreApplication.translate("Form", u"Filter", None))
+        self.number_input.setText(QCoreApplication.translate("Form", u"11", None))
+        self.search_input.setText(QCoreApplication.translate("Form", u"office", None))
+        self.apply_filter_button.setText(QCoreApplication.translate("Form", u"Apply Filter", None))
+
+        # -- Master Table --
+        ___qtablewidgetitem = self.master_table.horizontalHeaderItem(0)
+        ___qtablewidgetitem.setText(QCoreApplication.translate("Form", u"Image", None))
+        ___qtablewidgetitem = self.master_table.horizontalHeaderItem(1)
+        ___qtablewidgetitem.setText(QCoreApplication.translate("Form", u"Asset#", None))
+        ___qtablewidgetitem1 = self.master_table.horizontalHeaderItem(2)
+        ___qtablewidgetitem1.setText(QCoreApplication.translate("Form", u"Asset name", None))
+        ___qtablewidgetitem2 = self.master_table.horizontalHeaderItem(3)
+        ___qtablewidgetitem2.setText(QCoreApplication.translate("Form", u"Category", None))
+
+    def setup_fonts(self):
         # ------------------- Font -------------------
         self.project_name_font = QFont()
         self.project_name_font = QFont()
@@ -56,7 +105,7 @@ class BaseGUI(QWidget):
         self.font_for_table_header.setBold(True)
         self.font_for_table_header.setWeight(68)
 
-        # ------------------- Menu Frame -------------------
+    def setup_main_frame(self):
         self.menu_frame = QFrame(self)
         self.menu_frame.setObjectName(u"menu_frame")
         self.menu_frame.setGeometry(QRect(0, 0, 241, 901))
@@ -83,7 +132,7 @@ class BaseGUI(QWidget):
         self.catalogue_icon.setStyleSheet(u"background-color:rgb(241, 241, 241)")
         self.catalogue_icon.setPixmap(QPixmap(os.path.join(os.getcwd(), "assets", "catalogue.png")))
 
-        # ------------------- Content Frame -------------------
+    def setup_content_frame(self):
         self.content_frame = QFrame(self)
         self.content_frame.setObjectName(u"content_frame")
         self.content_frame.setGeometry(QRect(240, 0, 1571, 901))
@@ -97,6 +146,7 @@ class BaseGUI(QWidget):
         self.main_label.setFont(self.main_label_font)
         self.main_label.setStyleSheet(u"color:rgb(69, 119, 185)")
 
+    def setup_master_table(self):
         self.asset_list_label = QLabel(self.content_frame)
         self.asset_list_label.setObjectName(u"asset_list_label")
         self.asset_list_label.setGeometry(QRect(30, 60, 131, 41))
@@ -150,7 +200,7 @@ class BaseGUI(QWidget):
         # CSS for the header
         header = self.master_table.horizontalHeader()
         header.setStyleSheet(
-            "QHeaderView::section {background-color: rgb(231, 231, 231); color: rgb(69, 119, 185); border: 1px solid black; border-top: none; border-left: none; border-right: none;padding: 3px;}"
+            "QHeaderView::section {background-color: rgb(231, 231, 231); color: rgb(69, 119, 185); border: 1.5px solid rgb(89, 89, 89); border-top: none; border-left: none; border-right: none;padding: 3px;}"
         )
 
         header.setDefaultSectionSize(150)
@@ -164,51 +214,5 @@ class BaseGUI(QWidget):
         self.master_table.setLineWidth(1)
         self.master_table.setMidLineWidth(0)
 
-        # Retranslate Ui
-        self.retranslate_base_ui()
-
-        self.add_to_master_table('image', 'asset_id', 'asset_name', 'category')
-        self.add_to_master_table('image', 'asset_id', 'asset_name', 'category')
-        self.add_to_master_table('image', 'asset_id', 'asset_name', 'category')
-        self.add_to_master_table('image', 'asset_id', 'asset_name', 'category')
-
-    def retranslate_base_ui(self):
-        self.app_name.setText(QCoreApplication.translate("Form", u"ROCKET\nPROJECT", None))
-        self.asset_catalogue_button.setText(QCoreApplication.translate("Form", u"Asset catalogue", None))
-        self.main_label.setText(QCoreApplication.translate("Form", u"ASSET CATALOGUE", None))
-        self.asset_list_label.setText(QCoreApplication.translate("Form", u"ASSET LIST", None))
-        self.filter_label.setText(QCoreApplication.translate("Form", u"Filter", None))
-        self.number_input.setText(QCoreApplication.translate("Form", u"11", None))
-        self.search_input.setText(QCoreApplication.translate("Form", u"office", None))
-        self.apply_filter_button.setText(QCoreApplication.translate("Form", u"Apply Filter", None))
-
-        # -- Master Table --
-        ___qtablewidgetitem = self.master_table.horizontalHeaderItem(0)
-        ___qtablewidgetitem.setText(QCoreApplication.translate("Form", u"Image", None))
-        ___qtablewidgetitem = self.master_table.horizontalHeaderItem(1)
-        ___qtablewidgetitem.setText(QCoreApplication.translate("Form", u"Asset#", None))
-        ___qtablewidgetitem1 = self.master_table.horizontalHeaderItem(2)
-        ___qtablewidgetitem1.setText(QCoreApplication.translate("Form", u"Asset name", None))
-        ___qtablewidgetitem2 = self.master_table.horizontalHeaderItem(3)
-        ___qtablewidgetitem2.setText(QCoreApplication.translate("Form", u"Category", None))
-
-    def add_to_master_table(self, image, asset_id: str, asset_name: str, category: str):
-        # Add these to the master table
-        row_count = self.master_table.rowCount()
-        self.master_table.insertRow(row_count)
-        self.master_table.setRowHeight(row_count, 40)
-
-        # Set the image
-        # image_item = QTableWidgetItem()
-        # image_item.setData(Qt.DecorationRole, image)
-        # self.master_table.setItem(row_count, 0, image_item)
-
-        image_item = QTableWidgetItem()
-        image_item.setText(image)
-        self.master_table.setItem(row_count, 0, image_item)
-        # Set the asset id
-        self.master_table.setItem(row_count, 1, QTableWidgetItem(asset_id))
-        # Set the asset name
-        self.master_table.setItem(row_count, 2, QTableWidgetItem(asset_name))
-        # Set the category
-        self.master_table.setItem(row_count, 3, QTableWidgetItem(category))
+    def setup_detail_table(self):
+        pass
