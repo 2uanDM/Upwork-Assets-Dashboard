@@ -476,8 +476,6 @@ class BaseGUI(QWidget):
         self.main_label.setText(QCoreApplication.translate("Form", u"ASSET CATALOGUE", None))
         self.asset_list_label.setText(QCoreApplication.translate("Form", u"ASSET LIST", None))
         self.filter_label.setText(QCoreApplication.translate("Form", u"Filter", None))
-        self.number_input.setText(QCoreApplication.translate("Form", u"11", None))
-        self.search_input.setText(QCoreApplication.translate("Form", u"office", None))
         self.apply_filter_button.setText(QCoreApplication.translate("Form", u"Apply Filter", None))
 
         # -- Master Table --
