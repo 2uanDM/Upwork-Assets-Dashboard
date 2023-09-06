@@ -124,7 +124,7 @@ class BaseGUI(QWidget):
         self.catalogue_icon.setObjectName(u"catalogue_icon")
         self.catalogue_icon.setGeometry(QRect(20, 160, 41, 41))
         self.catalogue_icon.setStyleSheet(u"background-color:rgb(241, 241, 241)")
-        self.catalogue_icon.setPixmap(QPixmap(os.path.join(os.getcwd(), "assets", "catalogue.png")))
+        self.catalogue_icon.setPixmap(QPixmap(os.path.join(os.getcwd(), "assets", "icon", "catalogue.png")))
 
     def setup_content_frame(self):
         self.content_frame = QFrame(self)
