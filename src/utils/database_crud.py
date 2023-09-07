@@ -13,6 +13,37 @@ class CrudDB():
         self.conn = sqlite3.connect(self.DATABSE_PATH)
         self.cursor = self.conn.cursor()
 
+    def get_category_id(self, category_name: str) -> int:
+        return self.cursor.execute(f"""
+            select AssetCategoryID
+            from AssetCategory
+            where CategoryName = '{category_name}';
+        """).fetchone()[0]
+
+    def get_asset_id(self, asset_number: int, asset_name: str, asset_category_name: str) -> int:
+        """
+        Get the asset id from the database
+        Args:
+            asset_number (int)
+            asset_name (str)
+            asset_category_name (str)
+
+        Returns:
+            int: The asset id
+        """
+        return self.cursor.execute(f"""
+            select AssetID
+            from Asset
+            where 1 = 1
+            and AssetNumber = {asset_number}
+            and AssetName = '{asset_name}'
+            and AssetCategoryID = (
+                select AssetCategoryID
+                from AssetCategory
+                where CategoryName = '{asset_category_name}'
+            );
+        """).fetchone()[0]
+
     def get_list_of_asset_categories(self) -> list:
         """
         Return a list of asset categories
@@ -88,7 +119,59 @@ class CrudDB():
                                       """)
         return command.fetchone()
 
-    def delete_asset(self, asset_number: int, asset_name: str, asset_category_name: str) -> None:
+    def update_asset_table(self,
+                           asset_id: int,
+                           asset_number: int,
+                           asset_name: str,
+                           asset_variant: str,
+                           asset_category_id: int,
+                           asset_description: str,
+                           ) -> bool:
+        operation = self.cursor.execute(f"""
+            update Asset 
+            set 
+                AssetName = '{asset_name}', 
+                AssetNumber = {asset_number},
+                AssetVariant = '{asset_variant}',
+                AssetDescription = '{asset_description}',
+                AssetCategoryID = {asset_category_id}
+            where AssetID = {asset_id};                    
+                                        """)
+
+        # Check if the operation is successful
+        if operation.rowcount == 0:
+            return False
+        else:
+            self.conn.commit()
+            return True
+
+    def update_asset_import_list(self,
+                                 asset_id: int,
+                                 import_list_header: str,
+                                 import_list_2nd_row: str,
+                                 import_list_3nd_row: str) -> bool:
+
+        opearation = self.cursor.execute(f"""
+            update AssetImportList 
+            set 
+                ImportlistHeader = '{import_list_header}',
+                Importlist_2ndRow = '{import_list_2nd_row}',
+                Importlist_3ndRow = '{import_list_3nd_row}'
+            where AssetImportListID = (
+                select AssetImportListID
+                from Asset
+                where AssetID = {asset_id}
+            );    
+                                         """)
+
+        # Check if the operation is successful
+        if opearation.rowcount == 0:
+            return False
+        else:
+            self.conn.commit()
+            return True
+
+    def delete_asset(self, asset_number: int, asset_name: str, asset_category_name: str) -> bool:
         """
         Delete an asset from the database
         Args:
