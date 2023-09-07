@@ -58,6 +58,8 @@ class BaseGUI(QWidget):
         self.setup_crud_attribute_buttons()
         self.setup_crud_shape_buttons()
         self.setup_crud_media_buttons()
+        # ------------------- Setup sort buttons -------------------
+        self.setup_sort_button()
 
         # Retranslate Ui
         self.retranslate_base_ui()
@@ -99,6 +101,12 @@ class BaseGUI(QWidget):
         self.font_for_table_header.setBold(True)
         self.font_for_table_header.setWeight(68)
 
+        self.font_for_page_label = QFont()
+        self.font_for_page_label.setFamily(u"Segoe UI")
+        self.font_for_page_label.setPointSize(14)
+        self.font_for_page_label.setBold(False)
+        self.font_for_page_label.setWeight(50)
+
     def setup_main_frame(self):
         self.menu_frame = QFrame(self)
         self.menu_frame.setObjectName(u"menu_frame")
@@ -124,7 +132,7 @@ class BaseGUI(QWidget):
         self.catalogue_icon.setObjectName(u"catalogue_icon")
         self.catalogue_icon.setGeometry(QRect(20, 160, 41, 41))
         self.catalogue_icon.setStyleSheet(u"background-color:rgb(241, 241, 241)")
-        self.catalogue_icon.setPixmap(QPixmap(os.path.join(os.getcwd(), "assets", "catalogue.png")))
+        self.catalogue_icon.setPixmap(QPixmap(os.path.join(os.getcwd(), "assets", "icon", "catalogue.png")))
 
     def setup_content_frame(self):
         self.content_frame = QFrame(self)
@@ -159,12 +167,14 @@ class BaseGUI(QWidget):
         self.number_input.setFont(self.filter_label_font)
         self.number_input.setStyleSheet(self.css.get('number_input'))
         self.number_input.setAlignment(Qt.AlignCenter)
+        self.number_input.setPlaceholderText("Asset #")
 
         self.search_input = QLineEdit(self.content_frame)
         self.search_input.setObjectName(u"search_input")
         self.search_input.setGeometry(QRect(260, 120, 241, 31))
         self.search_input.setFont(self.filter_label_font)
         self.search_input.setStyleSheet(self.css.get('search_input'))
+        self.search_input.setPlaceholderText("Asset name")
 
         self.apply_filter_button = QPushButton(self.content_frame)
         self.apply_filter_button.setObjectName(u"apply_filter_button")
@@ -176,6 +186,8 @@ class BaseGUI(QWidget):
         # ------------------- Master Table -------------------
         self.master_table = QTableWidget(self.content_frame)
         self.master_table.setColumnCount(4)
+        self.master_table.setRowCount(10)
+
         __qtablewidgetitem = QTableWidgetItem()
         self.master_table.setHorizontalHeaderItem(0, __qtablewidgetitem)
         __qtablewidgetitem1 = QTableWidgetItem()
@@ -186,7 +198,7 @@ class BaseGUI(QWidget):
         self.master_table.setHorizontalHeaderItem(3, __qtablewidgetitem3)
 
         self.master_table.setObjectName(u"master_table")
-        self.master_table.setGeometry(QRect(20, 160, 681, 701))
+        self.master_table.setGeometry(QRect(20, 160, 681, 691))
         self.master_table.setStyleSheet(self.css.get('master_table'))
         self.master_table.verticalHeader().setVisible(False)
 
@@ -200,7 +212,45 @@ class BaseGUI(QWidget):
         header.setDefaultAlignment(Qt.AlignLeft)
         header.setFont(self.font_for_table_header)
         header.setFixedHeight(35)
+
+        # Other properties
         self.master_table.setColumnWidth(2, 227)
+        for i in range(10):
+            self.master_table.setRowHeight(i, 65)  # Set the height of the rows
+        # When click on a cell of a row in the master table, it will choose the whole row
+        self.master_table.setSelectionBehavior(QAbstractItemView.SelectRows)
+        # Cannot edit the cells
+        self.master_table.setEditTriggers(QAbstractItemView.NoEditTriggers)
+
+        # --================== Pagination ==================--
+        self.page_label = QLabel(self.content_frame)
+        self.page_label.setObjectName(u"page_label")
+        self.page_label.setGeometry(QRect(160, 859, 191, 31))
+        self.page_label.setText("Page 1/1")
+        self.page_label.setFont(self.font_for_page_label)
+        self.page_label.setStyleSheet(u"color:rgb(89, 89, 89)")
+        self.page_label.setAlignment(Qt.AlignCenter)
+
+        # --================== Previous button ==================--
+        self.previous_page_button = ClickableLabel(self.content_frame)
+        self.previous_page_button.setObjectName(u"previous_page_button")
+        self.previous_page_button.setGeometry(QRect(130, 860, 31, 31))
+        self.previous_page_button.setPixmap(QPixmap(os.path.join(self.buttons_path, "previous.png")))
+
+        # --================== Next button ==================--
+        self.next_page_button = ClickableLabel(self.content_frame)
+        self.next_page_button.setObjectName(u"next_page_button")
+        self.next_page_button.setGeometry(QRect(350, 860, 31, 31))
+        self.next_page_button.setPixmap(QPixmap(os.path.join(self.buttons_path, "next.png")))
+
+        # --================== Download catalogue button ==================--
+        self.download_catalogue_button = QPushButton(self.content_frame)
+        self.download_catalogue_button.setObjectName(u"download_catalogue_button")
+        self.download_catalogue_button.setGeometry(QRect(500, 860, 201, 31))
+        self.download_catalogue_button.setFont(self.filter_label_font)
+        self.download_catalogue_button.setLayoutDirection(Qt.LeftToRight)
+        self.download_catalogue_button.setStyleSheet(self.css.get('apply_filter_button'))
+        self.download_catalogue_button.setText("Download catalogue")
 
     def setup_detail_table(self):
         self.asset_detail_label = QLabel(self.content_frame)
@@ -222,90 +272,88 @@ class BaseGUI(QWidget):
         self.asset_detail_table.setColumnWidth(1, 630)
 
         # First row: Asset number and Asset Name
-        asset_number_item = QTableWidgetItem()
-        asset_number_item.setBackground(QColor(231, 231, 231))  # Set your desired background color
-        asset_number_item.setFont(QFont('Segoe UI', 14, 68))
-        asset_number_item.setTextAlignment(Qt.AlignCenter)
-        asset_number_item.setForeground(QColor(69, 119, 185))
-        asset_number_item.setText("1104")
-        self.asset_detail_table.setItem(0, 0, asset_number_item)
+        self.asset_number_item = QTableWidgetItem()
+        self.asset_number_item.setBackground(QColor(231, 231, 231))  # Set your desired background color
+        self.asset_number_item.setFont(QFont('Segoe UI', 14, 68))
+        self.asset_number_item.setTextAlignment(Qt.AlignCenter)
+        self.asset_number_item.setForeground(QColor(69, 119, 185))
+        self.asset_detail_table.setItem(0, 0, self.asset_number_item)
 
-        asset_name_item = QTableWidgetItem()
-        asset_name_item.setBackground(QColor(231, 231, 231))
-        asset_name_item.setFont(QFont('Segoe UI', 14, 68))
-        asset_name_item.setTextAlignment(Qt.AlignCenter)
-        asset_name_item.setForeground(QColor(69, 119, 185))
-        asset_name_item.setText("Office chair")
-        self.asset_detail_table.setItem(0, 1, asset_name_item)
+        self.asset_name_item = QTableWidgetItem()
+        self.asset_name_item.setBackground(QColor(231, 231, 231))
+        self.asset_name_item.setFont(QFont('Segoe UI', 14, 68))
+        self.asset_name_item.setTextAlignment(Qt.AlignCenter)
+        self.asset_name_item.setForeground(QColor(69, 119, 185))
+        self.asset_detail_table.setItem(0, 1, self.asset_name_item)
 
         # Second row: Asset variant and its value
-        asset_variant_item = QTableWidgetItem()
-        asset_variant_item.setText("Asset variant")
-        asset_variant_item.setTextAlignment(Qt.AlignCenter)
-        asset_variant_item.setFlags(asset_variant_item.flags() & ~Qt.ItemIsEditable)
-        self.asset_detail_table.setItem(1, 0, asset_variant_item)
+        self.asset_variant_item = QTableWidgetItem()
+        self.asset_variant_item.setText("Asset variant")
+        self.asset_variant_item.setTextAlignment(Qt.AlignCenter)
+        self.asset_variant_item.setFlags(self.asset_variant_item.flags() & ~Qt.ItemIsEditable)
+        self.asset_detail_table.setItem(1, 0, self.asset_variant_item)
 
-        asset_variant_value_item = QTableWidgetItem()
-        asset_variant_value_item.setText("")
-        self.asset_detail_table.setItem(1, 1, asset_variant_value_item)
+        self.asset_variant_value_item = QTableWidgetItem()
+        self.asset_variant_value_item.setText("")
+        self.asset_detail_table.setItem(1, 1, self.asset_variant_value_item)
 
         # Third row: Asset category and its value
-        asset_category_item = QTableWidgetItem()
-        asset_category_item.setText("Asset category")
-        asset_category_item.setTextAlignment(Qt.AlignCenter)
-        asset_category_item.setFlags(asset_category_item.flags() & ~Qt.ItemIsEditable)
-        self.asset_detail_table.setItem(2, 0, asset_category_item)
+        self.asset_category_item = QTableWidgetItem()
+        self.asset_category_item.setText("Asset category")
+        self.asset_category_item.setTextAlignment(Qt.AlignCenter)
+        self.asset_category_item.setFlags(self.asset_category_item.flags() & ~Qt.ItemIsEditable)
+        self.asset_detail_table.setItem(2, 0, self.asset_category_item)
 
-        asset_category_value_item = QTableWidgetItem()
-        asset_category_value_item.setText("")
-        self.asset_detail_table.setItem(2, 1, asset_category_value_item)
+        self.asset_category_value_item = QTableWidgetItem()
+        self.asset_category_value_item.setText("")
+        self.asset_detail_table.setItem(2, 1, self.asset_category_value_item)
 
         # Fourth row: Description and its value
-        asset_description_item = QTableWidgetItem()
-        asset_description_item.setText("Description")
-        asset_description_item.setTextAlignment(Qt.AlignCenter)
-        asset_description_item.setFlags(asset_description_item.flags() & ~Qt.ItemIsEditable)
-        self.asset_detail_table.setItem(3, 0, asset_description_item)
+        self.asset_description_item = QTableWidgetItem()
+        self.asset_description_item.setText("Description")
+        self.asset_description_item.setTextAlignment(Qt.AlignCenter)
+        self.asset_description_item.setFlags(self.asset_description_item.flags() & ~Qt.ItemIsEditable)
+        self.asset_detail_table.setItem(3, 0, self.asset_description_item)
 
-        asset_description_value_item = QTableWidgetItem()
-        asset_description_value_item.setText("")
-        self.asset_detail_table.setItem(3, 1, asset_description_value_item)
+        self.asset_description_value_item = QTableWidgetItem()
+        self.asset_description_value_item.setText("")
+        self.asset_detail_table.setItem(3, 1, self.asset_description_value_item)
 
         # Change the height of the fourth row
         self.asset_detail_table.setRowHeight(3, 120)
 
         # Fifth row: Importlist header and its value
-        import_list_header_item = QTableWidgetItem()
-        import_list_header_item.setText("Importlist header")
-        import_list_header_item.setTextAlignment(Qt.AlignCenter)
-        import_list_header_item.setFlags(import_list_header_item.flags() & ~Qt.ItemIsEditable)
-        self.asset_detail_table.setItem(4, 0, import_list_header_item)
+        self.import_list_header_item = QTableWidgetItem()
+        self.import_list_header_item.setText("Importlist header")
+        self.import_list_header_item.setTextAlignment(Qt.AlignCenter)
+        self.import_list_header_item.setFlags(self.import_list_header_item.flags() & ~Qt.ItemIsEditable)
+        self.asset_detail_table.setItem(4, 0, self.import_list_header_item)
 
-        import_list_header_value_item = QTableWidgetItem()
-        import_list_header_value_item.setText("")
-        self.asset_detail_table.setItem(4, 1, import_list_header_value_item)
+        self.import_list_header_value_item = QTableWidgetItem()
+        self.import_list_header_value_item.setText("")
+        self.asset_detail_table.setItem(4, 1, self.import_list_header_value_item)
 
         # Sixth row: Importlist 2nd row and its value
-        import_list_2nd_row_item = QTableWidgetItem()
-        import_list_2nd_row_item.setText("Importlist 2nd row")
-        import_list_2nd_row_item.setTextAlignment(Qt.AlignCenter)
-        import_list_2nd_row_item.setFlags(import_list_2nd_row_item.flags() & ~Qt.ItemIsEditable)
-        self.asset_detail_table.setItem(5, 0, import_list_2nd_row_item)
+        self.import_list_2nd_row_item = QTableWidgetItem()
+        self.import_list_2nd_row_item.setText("Importlist 2nd row")
+        self.import_list_2nd_row_item.setTextAlignment(Qt.AlignCenter)
+        self.import_list_2nd_row_item.setFlags(self.import_list_2nd_row_item.flags() & ~Qt.ItemIsEditable)
+        self.asset_detail_table.setItem(5, 0, self.import_list_2nd_row_item)
 
-        import_list_2nd_row_value_item = QTableWidgetItem()
-        import_list_2nd_row_value_item.setText("")
-        self.asset_detail_table.setItem(5, 1, import_list_2nd_row_value_item)
+        self.import_list_2nd_row_value_item = QTableWidgetItem()
+        self.import_list_2nd_row_value_item.setText("")
+        self.asset_detail_table.setItem(5, 1, self.import_list_2nd_row_value_item)
 
         # Seventh row: Importlist 3rd row and its value
-        import_list_3rd_row_item = QTableWidgetItem()
-        import_list_3rd_row_item.setText("Importlist 3rd row")
-        import_list_3rd_row_item.setTextAlignment(Qt.AlignCenter)
-        import_list_3rd_row_item.setFlags(import_list_3rd_row_item.flags() & ~Qt.ItemIsEditable)
-        self.asset_detail_table.setItem(6, 0, import_list_3rd_row_item)
+        self.import_list_3rd_row_item = QTableWidgetItem()
+        self.import_list_3rd_row_item.setText("Importlist 3rd row")
+        self.import_list_3rd_row_item.setTextAlignment(Qt.AlignCenter)
+        self.import_list_3rd_row_item.setFlags(self.import_list_3rd_row_item.flags() & ~Qt.ItemIsEditable)
+        self.asset_detail_table.setItem(6, 0, self.import_list_3rd_row_item)
 
-        import_list_3rd_row_value_item = QTableWidgetItem()
-        import_list_3rd_row_value_item.setText("")
-        self.asset_detail_table.setItem(6, 1, import_list_3rd_row_value_item)
+        self.import_list_3rd_row_value_item = QTableWidgetItem()
+        self.import_list_3rd_row_value_item.setText("")
+        self.asset_detail_table.setItem(6, 1, self.import_list_3rd_row_value_item)
 
         # Other properties
         self.asset_detail_table.setObjectName(u"asset_detail_table")
@@ -392,18 +440,27 @@ class BaseGUI(QWidget):
     def setup_media_frame(self):
         self.media_frame = QFrame(self.content_frame)
         self.media_frame.setObjectName(u"media_frame")
-        self.media_frame.setGeometry(QRect(720, 700, 801, 161))
+        self.media_frame.setGeometry(QRect(720, 700, 801, 151))
         self.media_frame.setStyleSheet(self.css.get('media_frame'))
 
         # Horizontal layout
         self.horizontalLayoutWidget = QWidget(self.media_frame)
         self.horizontalLayoutWidget.setObjectName(u"horizontalLayoutWidget")
-        self.horizontalLayoutWidget.setGeometry(QRect(9, 10, 781, 141))
+        self.horizontalLayoutWidget.setGeometry(QRect(9, 10, 781, 131))
 
         self.horizontalLayout = QHBoxLayout(self.horizontalLayoutWidget)
         self.horizontalLayout.setSpacing(6)
         self.horizontalLayout.setObjectName(u"horizontalLayout")
         self.horizontalLayout.setContentsMargins(2, 0, 0, 0)
+
+        # --================== Download dataset button ==================--
+        self.download_dataset_button = QPushButton(self.content_frame)
+        self.download_dataset_button.setObjectName(u"download_dataset_button")
+        self.download_dataset_button.setGeometry(QRect(1320, 860, 201, 31))
+        self.download_dataset_button.setFont(self.filter_label_font)
+        self.download_dataset_button.setLayoutDirection(Qt.LeftToRight)
+        self.download_dataset_button.setStyleSheet(self.css.get('apply_filter_button'))
+        self.download_dataset_button.setText("Download dataset")
 
     def setup_crud_asset_detail_buttons(self):
         # Add asset button
@@ -470,14 +527,67 @@ class BaseGUI(QWidget):
         self.crud_delete_media_button.setGeometry(QRect(1530, 760, 19, 21))
         self.crud_delete_media_button.setPixmap(QPixmap(os.path.join(self.buttons_path, 'delete.png')))
 
+    def setup_sort_button(self):
+        # ------------------- Master Table -------------------
+
+        # --================== Sort by asset number button ==================--
+        self.sort_asc_asset_number_button = ClickableLabel(self.content_frame)
+        self.sort_asc_asset_number_button.setObjectName(u"sort_asc_asset_number_button")
+        self.sort_asc_asset_number_button.setGeometry(QRect(306, 170, 13, 14))
+        self.sort_asc_asset_number_button.setStyleSheet(u"background-color: rgb(231, 231, 231);")
+        self.sort_asc_asset_number_button.setPixmap(QPixmap(os.path.join(self.buttons_path, 'asc.png')))
+
+        self.sort_desc_asset_number_button = ClickableLabel(self.content_frame)
+        self.sort_desc_asset_number_button.setObjectName(u"sort_desc_asset_number_button")
+        self.sort_desc_asset_number_button.setGeometry(QRect(290, 170, 13, 14))
+        self.sort_desc_asset_number_button.setStyleSheet(u"background-color: rgb(231, 231, 231);")
+        self.sort_desc_asset_number_button.setPixmap(QPixmap(os.path.join(self.buttons_path, 'desc.png')))
+
+        # --================== Sort by asset name button ==================--
+        self.sort_desc_asset_name_button = ClickableLabel(self.content_frame)
+        self.sort_desc_asset_name_button.setObjectName(u"sort_desc_asset_name_button")
+        self.sort_desc_asset_name_button.setGeometry(QRect(514, 170, 13, 14))
+        self.sort_desc_asset_name_button.setStyleSheet(u"background-color: rgb(231, 231, 231);")
+        self.sort_desc_asset_name_button.setPixmap(QPixmap(os.path.join(self.buttons_path, 'desc.png')))
+
+        self.sort_asc_asset_name_button = ClickableLabel(self.content_frame)
+        self.sort_asc_asset_name_button.setObjectName(u"sort_asc_asset_name_button")
+        self.sort_asc_asset_name_button.setGeometry(QRect(530, 170, 13, 14))
+        self.sort_asc_asset_name_button.setStyleSheet(u"background-color: rgb(231, 231, 231);")
+        self.sort_asc_asset_name_button.setPixmap(QPixmap(os.path.join(self.buttons_path, 'asc.png')))
+
+        # --================== Sort by category button ==================--
+        self.sort_desc_asset_category_button = ClickableLabel(self.content_frame)
+        self.sort_desc_asset_category_button.setObjectName(u"sort_desc_asset_category_button")
+        self.sort_desc_asset_category_button.setGeometry(QRect(664, 170, 13, 14))
+        self.sort_desc_asset_category_button.setStyleSheet(u"background-color: rgb(231, 231, 231);")
+        self.sort_desc_asset_category_button.setPixmap(QPixmap(os.path.join(self.buttons_path, 'desc.png')))
+
+        self.sort_asc_asset_category_button = ClickableLabel(self.content_frame)
+        self.sort_asc_asset_category_button.setObjectName(u"sort_asc_asset_category_button")
+        self.sort_asc_asset_category_button.setGeometry(QRect(680, 170, 13, 14))
+        self.sort_asc_asset_category_button.setStyleSheet(u"background-color: rgb(231, 231, 231);")
+        self.sort_asc_asset_category_button.setPixmap(QPixmap(os.path.join(self.buttons_path, 'asc.png')))
+
+        # ------------------- Attribute Table -------------------
+        self.sort_asc_att_number_button = ClickableLabel(self.content_frame)
+        self.sort_asc_att_number_button.setObjectName(u"sort_asc_att_number_button")
+        self.sort_asc_att_number_button.setGeometry(QRect(806 - 40, 350, 13, 14))
+        self.sort_asc_att_number_button.setStyleSheet(u"background-color: rgb(231, 231, 231);")
+        self.sort_asc_att_number_button.setPixmap(QPixmap(os.path.join(self.buttons_path, 'asc.png')))
+
+        self.sort_desc_att_number_button = ClickableLabel(self.content_frame)
+        self.sort_desc_att_number_button.setObjectName(u"sort_desc_att_number_button")
+        self.sort_desc_att_number_button.setGeometry(QRect(790 - 40, 350, 13, 14))
+        self.sort_desc_att_number_button.setStyleSheet(u"background-color: rgb(231, 231, 231);")
+        self.sort_desc_att_number_button.setPixmap(QPixmap(os.path.join(self.buttons_path, 'desc.png')))
+
     def retranslate_base_ui(self):
         self.app_name.setText(QCoreApplication.translate("Form", u"ROCKET\nPROJECT", None))
         self.asset_catalogue_button.setText(QCoreApplication.translate("Form", u"Asset catalogue", None))
         self.main_label.setText(QCoreApplication.translate("Form", u"ASSET CATALOGUE", None))
         self.asset_list_label.setText(QCoreApplication.translate("Form", u"ASSET LIST", None))
         self.filter_label.setText(QCoreApplication.translate("Form", u"Filter", None))
-        self.number_input.setText(QCoreApplication.translate("Form", u"11", None))
-        self.search_input.setText(QCoreApplication.translate("Form", u"office", None))
         self.apply_filter_button.setText(QCoreApplication.translate("Form", u"Apply Filter", None))
 
         # -- Master Table --

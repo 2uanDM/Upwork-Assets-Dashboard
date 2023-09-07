@@ -1,0 +1,76 @@
+CREATE TABLE IF NOT EXISTS DataType (
+    DataTypeID INTEGER PRIMARY KEY AUTOINCREMENT,
+    DataTypeName TEXT NOT NULL UNIQUE
+);
+CREATE TABLE IF NOT EXISTS Attribute (
+    AttributeID INTEGER PRIMARY KEY AUTOINCREMENT,
+    AttributeOrderNumber INTEGER NOT NULL,
+    AttributeName TEXT NOT NULL UNIQUE,
+    DataTypeID INTEGER NOT NULL,
+    FOREIGN KEY (DataTypeID) REFERENCES DataType (DataTypeID)
+);
+CREATE TABLE IF NOT EXISTS ShapeType (
+    ShapeTypeID INTEGER PRIMARY KEY AUTOINCREMENT,
+    TypeName TEXT NOT NULL UNIQUE
+);
+CREATE TABLE IF NOT EXISTS Shape (
+    ShapeID INTEGER PRIMARY KEY AUTOINCREMENT,
+    ShapeDescription TEXT,
+    ShapeTypeID INTEGER NOT NULL,
+    FOREIGN KEY (ShapeTypeID) REFERENCES ShapeType (ShapeTypeID)
+);
+CREATE TABLE IF NOT EXISTS ImageCategory (
+    ImageCategoryID INTEGER PRIMARY KEY AUTOINCREMENT,
+    CategoryName TEXT NOT NULL
+);
+CREATE TABLE IF NOT EXISTS Image (
+    ImageID INTEGER PRIMARY KEY AUTOINCREMENT,
+    ImageFileName TEXT NOT NULL UNIQUE,
+    ImageCategoryID INTEGER NOT NULL,
+    FOREIGN KEY (ImageCategoryID) REFERENCES ImageCategory (ImageCategoryID)
+);
+CREATE TABLE IF NOT EXISTS AssetCategory (
+    AssetCategoryID INTEGER PRIMARY KEY AUTOINCREMENT,
+    CategoryNumber INTEGER NOT NULL UNIQUE,
+    CategoryName TEXT NOT NULL
+);
+CREATE TABLE IF NOT EXISTS AssetImportList (
+    AssetImportListID INTEGER PRIMARY KEY AUTOINCREMENT,
+    ImportlistHeader TEXT NOT NULL,
+    Importlist_2ndRow TEXT NOT NULL,
+    Importlist_3ndRow TEXT NOT NULL
+);
+CREATE TABLE IF NOT EXISTS Asset (
+    AssetID INTEGER PRIMARY KEY AUTOINCREMENT,
+    AssetName TEXT NOT NULL,
+    AssetNumber INTEGER NOT NULL,
+    AssetVariant TEXT,
+    AssetDescription TEXT,
+    AssetCategoryID INTEGER NOT NULL,
+    AssetImportListID INTEGER NOT NULL,
+    FOREIGN KEY (AssetCategoryID) REFERENCES AssetCategory (AssetCategoryID),
+    FOREIGN KEY (AssetImportListID) REFERENCES AssetImportList (AssetImportListID)
+);
+CREATE TABLE AssetAttribute (
+    AssetID INTEGER NOT NULL,
+    AttributeID INTEGER NOT NULL,
+    FOREIGN KEY (AssetID) REFERENCES Asset (AssetID),
+    FOREIGN KEY (AttributeID) REFERENCES Attribute (AttributeID)
+);
+CREATE TABLE AssetShape(
+    AssetID INTEGER NOT NULL,
+    ShapeID INTEGER NOT NULL,
+    FOREIGN KEY (AssetID) REFERENCES Asset (AssetID),
+    FOREIGN KEY (ShapeID) REFERENCES Shape (ShapeID)
+);
+CREATE TABLE AssetImage(
+    AssetID INTEGER NOT NULL,
+    ImageID INTEGER NOT NULL,
+    FOREIGN KEY (AssetID) REFERENCES Asset (AssetID),
+    FOREIGN KEY (ImageID) REFERENCES Image (ImageID)
+);
+CREATE TABLE Project (
+    ProjectID INTEGER PRIMARY KEY AUTOINCREMENT,
+    ProjectName TEXT NOT NULL,
+    PathMedia TEXT NOT NULL
+);
