@@ -24,21 +24,59 @@ class CrudDB():
         total_assets = self.cursor.execute("SELECT COUNT(*) FROM Asset").fetchall()[0][0]
 
         # Since the table can hold maximum 10 rows, we have to count the number of pages
-        total_pages = total_assets // 10 + 1 if total_assets % 10 != 0 else total_assets // 10
+        if total_assets == 0:
+            total_pages = 1
+            return {
+                "total_assets": total_assets,
+                "total_pages": total_pages,
+                "data": [],
+            }
+        else:
+            total_pages = total_assets // 10 + 1 if total_assets % 10 != 0 else total_assets // 10
 
-        all_assets = self.cursor.execute("""
-        SELECT AssetNumber, AssetName, ac.CategoryName
-        FROM Asset AS a
-        JOIN AssetCategory AS ac
-        ON a.AssetCategoryID = ac.AssetCategoryID
-        ORDER BY AssetNumber
-        """).fetchall()
+            all_assets = self.cursor.execute("""
+            SELECT AssetNumber, AssetName, ac.CategoryName
+            FROM Asset AS a
+            JOIN AssetCategory AS ac
+            ON a.AssetCategoryID = ac.AssetCategoryID
+            ORDER BY AssetNumber
+            """).fetchall()
 
-        return {
-            "total_assets": total_assets,
-            "total_pages": total_pages,
-            "data": all_assets,
-        }
+            return {
+                "total_assets": total_assets,
+                "total_pages": total_pages,
+                "data": all_assets,
+            }
+
+    def load_asset_detail_table(self, asset_number: int, asset_name: str, asset_category_name: str) -> tuple:
+        """
+        Call whenever click on a row in master tabel to query the detail of that asset
+        Args:
+            asset_number (int)
+            asset_name (str)
+            asset_category (str)
+
+        Returns:
+            tuple: (AssetVariant, AssetDescription, ImportlistHeader, Importlist_2ndRow, Importlist_3ndRow)
+        """
+        command = self.cursor.execute(f"""
+            select 
+                    a.AssetVariant,
+                    a.AssetDescription,
+                    ImportlistHeader,
+                    Importlist_2ndRow,
+                    Importlist_3ndRow
+            from Asset as a 
+            join AssetCategory as ac 
+                on ac.AssetCategoryID = a.AssetCategoryID
+            join AssetImportList as ail 
+                on ail.AssetImportListID = a.AssetImportListID
+            where 1 = 1 
+            and a.AssetNumber = {asset_number}
+            and a.AssetName = '{asset_name}'
+            and ac.CategoryName = '{asset_category_name}';                                  
+                                      """)
+        return command.fetchone()
 
     def __del__(self):
         self.conn.commit()
@@ -48,4 +86,5 @@ class CrudDB():
 
 # if __name__ == '__main__':
 #     crud = CrudDB()
-#     print(crud.load_master_table())
+#     # print(crud.load_master_table())
+#     print(crud.load_asset_detail_table(1103, 'Pencil Sharpener', 'Office Supplies'))
