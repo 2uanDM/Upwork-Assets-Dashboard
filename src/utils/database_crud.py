@@ -13,6 +13,12 @@ class CrudDB():
         self.conn = sqlite3.connect(self.DATABSE_PATH)
         self.cursor = self.conn.cursor()
 
+    def get_list_of_asset_categories(self) -> list:
+        """
+        Return a list of asset categories
+        """
+        return [category[0] for category in self.cursor.execute("SELECT CategoryName FROM AssetCategory").fetchall()]
+
     def load_master_table(self) -> dict:
         """
         return {
@@ -121,4 +127,4 @@ class CrudDB():
 # if __name__ == '__main__':
 #     crud = CrudDB()
 #     # print(crud.load_master_table())
-#     print(crud.load_asset_detail_table(1103, 'Pencil Sharpener', 'Office Supplies'))
+#     print(crud.get_list_of_asset_categories())

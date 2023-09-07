@@ -1,9 +1,11 @@
 
+import typing
+from PyQt5 import QtCore
 from PyQt5.QtGui import *
 from PyQt5.QtWidgets import *
 from PyQt5.QtCore import *
-
-from PyQt5.QtWidgets import QWidget
+from PyQt5.QtWidgets import QStyleOptionViewItem, QWidget
+from src.utils.database_crud import CrudDB
 import json
 import os
 
@@ -24,6 +26,48 @@ class ClickableLabel(QLabel):
             self.clicked.emit()
 
 
+class QComboBoxDelegate(QStyledItemDelegate):
+    """
+        This class is used to create a combobox in a specific cell of the table
+    Args:
+        options (list): The list of options for the combobox
+        target_row (int): The row where the combobox should be applied
+        target_column (int): The column where the combobox should be applied
+    """
+
+    def __init__(self, options: list, target_row: int, target_column: int, parent):
+        super().__init__(parent)
+        self.options = options
+        self.target_row = target_row
+        self.target_column = target_column
+
+    def createEditor(self, parent, option, index) -> QWidget:
+        row = index.row()
+        column = index.column()
+
+        # Specify the desired cell where the delegate should be applied
+        if row == self.target_row and column == self.target_column:
+            editor = QComboBox(parent)
+            editor.addItems(self.options)
+            return editor
+        else:
+            return super().createEditor(parent, option, index)  # Use the default editor for other cells
+
+    def setEditorData(self, editor, index) -> None:
+        current_text = index.model().data(index, Qt.EditRole)
+        # If the editor is a QComboBox, this will select the current text
+        if isinstance(editor, QComboBox):
+            editor.setCurrentText(current_text)
+        else:
+            super().setEditorData(editor, index)
+
+    def setModelData(self, editor, model, index) -> None:
+        if isinstance(editor, QComboBox):
+            model.setData(index, editor.currentText(), Qt.EditRole)
+        else:
+            super().setModelData(editor, model, index)
+
+
 class BaseGUI(QWidget):
     buttons_path = os.path.join(os.getcwd(), 'assets', 'buttons')
 
@@ -36,6 +80,9 @@ class BaseGUI(QWidget):
         super(BaseGUI, self).__init__()
         self.main_window = MainWindow
         self.css = css_dict
+
+        # ------------------- Connect the database -------------------
+        self.db = CrudDB()
 
         # ------------------- Setup Fonts -------------------
         self.setup_fonts()
@@ -304,9 +351,13 @@ class BaseGUI(QWidget):
         self.asset_category_item.setFlags(self.asset_category_item.flags() & ~Qt.ItemIsEditable)
         self.asset_detail_table.setItem(2, 0, self.asset_category_item)
 
-        self.asset_category_value_item = QTableWidgetItem()
-        self.asset_category_value_item.setText("")
-        self.asset_detail_table.setItem(2, 1, self.asset_category_value_item)
+        self.asset_category_value_item = QComboBoxDelegate(
+            options=self.db.get_list_of_asset_categories(),
+            target_row=2,
+            target_column=1,
+            parent=self.asset_detail_table
+        )
+        self.asset_detail_table.setItemDelegateForRow(2, self.asset_category_value_item)
 
         # Fourth row: Description and its value
         self.asset_description_item = QTableWidgetItem()

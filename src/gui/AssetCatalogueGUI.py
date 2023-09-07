@@ -7,7 +7,6 @@ sys.path.append(os.path.join(os.getcwd()))
 
 from src.gui.BaseGUI import BaseGUI
 from src.gui.MessageBoxDialog import MessageBox as msg
-from src.utils.database_crud import CrudDB
 
 
 class AssetCatelogueGUI(BaseGUI):
@@ -15,8 +14,7 @@ class AssetCatelogueGUI(BaseGUI):
         super().__init__(MainWindow)
         self.current_page = 1
 
-        # Init the database
-        self.db = CrudDB()
+        # Initial data from the database
         self.reload_master_table_data_after_crud()
         # Initially, the data in the table is the assets data when the filter is not applied
         self.table_data = self.assets_data
@@ -70,11 +68,13 @@ class AssetCatelogueGUI(BaseGUI):
         self.asset_number_item.setText("")
         self.asset_name_item.setText("")
         self.asset_variant_value_item.setText("")
-        self.asset_category_value_item.setText("")
         self.asset_description_value_item.setText("")
         self.import_list_header_value_item.setText("")
         self.import_list_2nd_row_value_item.setText("")
         self.import_list_3rd_row_value_item.setText("")
+
+        # Qcombobox
+        self.asset_detail_table.setItem(2, 1, QTableWidgetItem(""))
 
     def reload_master_table_data_after_crud(self):
         data: dict = self.db.load_master_table()
@@ -135,7 +135,7 @@ class AssetCatelogueGUI(BaseGUI):
             # Set the asset variant
             self.asset_variant_value_item.setText(asset_detail[0])
             # Set the asset category
-            self.asset_category_value_item.setText(asset_category_name)
+            self.asset_detail_table.setItem(2, 1, QTableWidgetItem(asset_category_name))
             # Set the asset description
             self.asset_description_value_item.setText(asset_detail[1])
             # Set the import list header
