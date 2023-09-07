@@ -329,6 +329,9 @@ QTableView {
 }
 </string>
     </property>
+    <attribute name="horizontalHeaderDefaultSectionSize">
+     <number>150</number>
+    </attribute>
     <column>
      <property name="text">
       <string>Image</string>
@@ -956,6 +959,158 @@ QPushButton:hover {
      <string>Download Dataset</string>
     </property>
    </widget>
+   <widget class="QLabel" name="sort_asc_asset_number_button">
+    <property name="geometry">
+     <rect>
+      <x>306</x>
+      <y>170</y>
+      <width>13</width>
+      <height>14</height>
+     </rect>
+    </property>
+    <property name="styleSheet">
+     <string notr="true">background-color: rgb(231, 231, 231);</string>
+    </property>
+    <property name="text">
+     <string/>
+    </property>
+    <property name="pixmap">
+     <pixmap>../assets/buttons/asc.png</pixmap>
+    </property>
+   </widget>
+   <widget class="QLabel" name="sort_desc_asset_number_button">
+    <property name="geometry">
+     <rect>
+      <x>290</x>
+      <y>170</y>
+      <width>13</width>
+      <height>14</height>
+     </rect>
+    </property>
+    <property name="styleSheet">
+     <string notr="true">background-color: rgb(231, 231, 231);</string>
+    </property>
+    <property name="text">
+     <string/>
+    </property>
+    <property name="pixmap">
+     <pixmap>../assets/buttons/desc.png</pixmap>
+    </property>
+   </widget>
+   <widget class="QLabel" name="sort_desc_asset_name_button">
+    <property name="geometry">
+     <rect>
+      <x>514</x>
+      <y>170</y>
+      <width>13</width>
+      <height>14</height>
+     </rect>
+    </property>
+    <property name="styleSheet">
+     <string notr="true">background-color: rgb(231, 231, 231);</string>
+    </property>
+    <property name="text">
+     <string/>
+    </property>
+    <property name="pixmap">
+     <pixmap>../assets/buttons/desc.png</pixmap>
+    </property>
+   </widget>
+   <widget class="QLabel" name="sort_asc_asset_name_button">
+    <property name="geometry">
+     <rect>
+      <x>530</x>
+      <y>170</y>
+      <width>13</width>
+      <height>14</height>
+     </rect>
+    </property>
+    <property name="styleSheet">
+     <string notr="true">background-color: rgb(231, 231, 231);</string>
+    </property>
+    <property name="text">
+     <string/>
+    </property>
+    <property name="pixmap">
+     <pixmap>../assets/buttons/asc.png</pixmap>
+    </property>
+   </widget>
+   <widget class="QLabel" name="sort_desc_asset_category_button">
+    <property name="geometry">
+     <rect>
+      <x>664</x>
+      <y>170</y>
+      <width>13</width>
+      <height>14</height>
+     </rect>
+    </property>
+    <property name="styleSheet">
+     <string notr="true">background-color: rgb(231, 231, 231);</string>
+    </property>
+    <property name="text">
+     <string/>
+    </property>
+    <property name="pixmap">
+     <pixmap>../assets/buttons/desc.png</pixmap>
+    </property>
+   </widget>
+   <widget class="QLabel" name="sort_asc_asset_category_button">
+    <property name="geometry">
+     <rect>
+      <x>680</x>
+      <y>170</y>
+      <width>13</width>
+      <height>14</height>
+     </rect>
+    </property>
+    <property name="styleSheet">
+     <string notr="true">background-color: rgb(231, 231, 231);</string>
+    </property>
+    <property name="text">
+     <string/>
+    </property>
+    <property name="pixmap">
+     <pixmap>../assets/buttons/asc.png</pixmap>
+    </property>
+   </widget>
+   <widget class="QLabel" name="sort_asc_att_number_button">
+    <property name="geometry">
+     <rect>
+      <x>806</x>
+      <y>350</y>
+      <width>13</width>
+      <height>14</height>
+     </rect>
+    </property>
+    <property name="styleSheet">
+     <string notr="true">background-color: rgb(231, 231, 231);</string>
+    </property>
+    <property name="text">
+     <string/>
+    </property>
+    <property name="pixmap">
+     <pixmap>../assets/buttons/asc.png</pixmap>
+    </property>
+   </widget>
+   <widget class="QLabel" name="sort_desc_att_number_button">
+    <property name="geometry">
+     <rect>
+      <x>790</x>
+      <y>350</y>
+      <width>13</width>
+      <height>14</height>
+     </rect>
+    </property>
+    <property name="styleSheet">
+     <string notr="true">background-color: rgb(231, 231, 231);</string>
+    </property>
+    <property name="text">
+     <string/>
+    </property>
+    <property name="pixmap">
+     <pixmap>../assets/buttons/desc.png</pixmap>
+    </property>
+   </widget>
    <zorder>media_frame</zorder>
    <zorder>main_label</zorder>
    <zorder>asset_list_label</zorder>
@@ -984,6 +1139,14 @@ QPushButton:hover {
    <zorder>previous_page_button</zorder>
    <zorder>download_catalogue_button</zorder>
    <zorder>download_dataset_button</zorder>
+   <zorder>sort_asc_asset_number_button</zorder>
+   <zorder>sort_desc_asset_number_button</zorder>
+   <zorder>sort_desc_asset_name_button</zorder>
+   <zorder>sort_asc_asset_name_button</zorder>
+   <zorder>sort_desc_asset_category_button</zorder>
+   <zorder>sort_asc_asset_category_button</zorder>
+   <zorder>sort_asc_att_number_button</zorder>
+   <zorder>sort_desc_att_number_button</zorder>
   </widget>
  </widget>
  <resources/>

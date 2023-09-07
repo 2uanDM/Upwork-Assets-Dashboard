@@ -43,6 +43,19 @@ class AssetCatelogueGUI(BaseGUI):
         self.download_catalogue_button.clicked.connect(self.test_action)
         self.download_dataset_button.clicked.connect(self.test_action)
 
+        # Sort buttons
+        self.sort_asc_asset_number_button.clicked.connect(self.test_action)
+        self.sort_desc_asset_number_button.clicked.connect(self.test_action)
+
+        self.sort_asc_asset_name_button.clicked.connect(self.test_action)
+        self.sort_desc_asset_name_button.clicked.connect(self.test_action)
+
+        self.sort_asc_asset_category_button.clicked.connect(self.test_action)
+        self.sort_desc_asset_category_button.clicked.connect(self.test_action)
+
+        self.sort_desc_att_number_button.clicked.connect(self.test_action)
+        self.sort_asc_att_number_button.clicked.connect(self.test_action)
+
         # Cell of master table clicked
         self.master_table.cellClicked.connect(self.master_table_row_clicked_event)
 

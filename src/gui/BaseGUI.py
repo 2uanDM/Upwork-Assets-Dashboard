@@ -58,6 +58,8 @@ class BaseGUI(QWidget):
         self.setup_crud_attribute_buttons()
         self.setup_crud_shape_buttons()
         self.setup_crud_media_buttons()
+        # ------------------- Setup sort buttons -------------------
+        self.setup_sort_button()
 
         # Retranslate Ui
         self.retranslate_base_ui()
@@ -522,6 +524,61 @@ class BaseGUI(QWidget):
         self.crud_delete_media_button.setObjectName(u"crud_delete_media_button")
         self.crud_delete_media_button.setGeometry(QRect(1530, 760, 19, 21))
         self.crud_delete_media_button.setPixmap(QPixmap(os.path.join(self.buttons_path, 'delete.png')))
+
+    def setup_sort_button(self):
+        # ------------------- Master Table -------------------
+
+        # --================== Sort by asset number button ==================--
+        self.sort_asc_asset_number_button = ClickableLabel(self.content_frame)
+        self.sort_asc_asset_number_button.setObjectName(u"sort_asc_asset_number_button")
+        self.sort_asc_asset_number_button.setGeometry(QRect(306, 170, 13, 14))
+        self.sort_asc_asset_number_button.setStyleSheet(u"background-color: rgb(231, 231, 231);")
+        self.sort_asc_asset_number_button.setPixmap(QPixmap(os.path.join(self.buttons_path, 'asc.png')))
+
+        self.sort_desc_asset_number_button = ClickableLabel(self.content_frame)
+        self.sort_desc_asset_number_button.setObjectName(u"sort_desc_asset_number_button")
+        self.sort_desc_asset_number_button.setGeometry(QRect(290, 170, 13, 14))
+        self.sort_desc_asset_number_button.setStyleSheet(u"background-color: rgb(231, 231, 231);")
+        self.sort_desc_asset_number_button.setPixmap(QPixmap(os.path.join(self.buttons_path, 'desc.png')))
+
+        # --================== Sort by asset name button ==================--
+        self.sort_desc_asset_name_button = ClickableLabel(self.content_frame)
+        self.sort_desc_asset_name_button.setObjectName(u"sort_desc_asset_name_button")
+        self.sort_desc_asset_name_button.setGeometry(QRect(514, 170, 13, 14))
+        self.sort_desc_asset_name_button.setStyleSheet(u"background-color: rgb(231, 231, 231);")
+        self.sort_desc_asset_name_button.setPixmap(QPixmap(os.path.join(self.buttons_path, 'desc.png')))
+
+        self.sort_asc_asset_name_button = ClickableLabel(self.content_frame)
+        self.sort_asc_asset_name_button.setObjectName(u"sort_asc_asset_name_button")
+        self.sort_asc_asset_name_button.setGeometry(QRect(530, 170, 13, 14))
+        self.sort_asc_asset_name_button.setStyleSheet(u"background-color: rgb(231, 231, 231);")
+        self.sort_asc_asset_name_button.setPixmap(QPixmap(os.path.join(self.buttons_path, 'asc.png')))
+
+        # --================== Sort by category button ==================--
+        self.sort_desc_asset_category_button = ClickableLabel(self.content_frame)
+        self.sort_desc_asset_category_button.setObjectName(u"sort_desc_asset_category_button")
+        self.sort_desc_asset_category_button.setGeometry(QRect(664, 170, 13, 14))
+        self.sort_desc_asset_category_button.setStyleSheet(u"background-color: rgb(231, 231, 231);")
+        self.sort_desc_asset_category_button.setPixmap(QPixmap(os.path.join(self.buttons_path, 'desc.png')))
+
+        self.sort_asc_asset_category_button = ClickableLabel(self.content_frame)
+        self.sort_asc_asset_category_button.setObjectName(u"sort_asc_asset_category_button")
+        self.sort_asc_asset_category_button.setGeometry(QRect(680, 170, 13, 14))
+        self.sort_asc_asset_category_button.setStyleSheet(u"background-color: rgb(231, 231, 231);")
+        self.sort_asc_asset_category_button.setPixmap(QPixmap(os.path.join(self.buttons_path, 'asc.png')))
+
+        # ------------------- Attribute Table -------------------
+        self.sort_asc_att_number_button = ClickableLabel(self.content_frame)
+        self.sort_asc_att_number_button.setObjectName(u"sort_asc_att_number_button")
+        self.sort_asc_att_number_button.setGeometry(QRect(806 - 40, 350, 13, 14))
+        self.sort_asc_att_number_button.setStyleSheet(u"background-color: rgb(231, 231, 231);")
+        self.sort_asc_att_number_button.setPixmap(QPixmap(os.path.join(self.buttons_path, 'asc.png')))
+
+        self.sort_desc_att_number_button = ClickableLabel(self.content_frame)
+        self.sort_desc_att_number_button.setObjectName(u"sort_desc_att_number_button")
+        self.sort_desc_att_number_button.setGeometry(QRect(790 - 40, 350, 13, 14))
+        self.sort_desc_att_number_button.setStyleSheet(u"background-color: rgb(231, 231, 231);")
+        self.sort_desc_att_number_button.setPixmap(QPixmap(os.path.join(self.buttons_path, 'desc.png')))
 
     def retranslate_base_ui(self):
         self.app_name.setText(QCoreApplication.translate("Form", u"ROCKET\nPROJECT", None))
