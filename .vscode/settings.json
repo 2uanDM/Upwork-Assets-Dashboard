@@ -9,11 +9,11 @@
   "prettier.printWidth": 120,
   "sqltools.connections": [
     {
-      "previewLimit": 100,
+      "previewLimit": 50,
       "driver": "SQLite",
-      "database": "${workspaceFolder:Upwork-Assets-Dashboard}/database/MT_AssetDB.db",
       "name": "test",
-      "group": "test"
+      "group": "test",
+      "database": "${workspaceFolder:Upwork-Assets-Dashboard}/new_assetDB.db"
     }
   ],
   "sqltools.useNodeRuntime": true,

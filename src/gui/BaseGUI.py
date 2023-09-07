@@ -176,6 +176,8 @@ class BaseGUI(QWidget):
         # ------------------- Master Table -------------------
         self.master_table = QTableWidget(self.content_frame)
         self.master_table.setColumnCount(4)
+        self.master_table.setRowCount(10)
+
         __qtablewidgetitem = QTableWidgetItem()
         self.master_table.setHorizontalHeaderItem(0, __qtablewidgetitem)
         __qtablewidgetitem1 = QTableWidgetItem()
@@ -186,7 +188,7 @@ class BaseGUI(QWidget):
         self.master_table.setHorizontalHeaderItem(3, __qtablewidgetitem3)
 
         self.master_table.setObjectName(u"master_table")
-        self.master_table.setGeometry(QRect(20, 160, 681, 701))
+        self.master_table.setGeometry(QRect(20, 160, 681, 691))
         self.master_table.setStyleSheet(self.css.get('master_table'))
         self.master_table.verticalHeader().setVisible(False)
 
@@ -200,7 +202,15 @@ class BaseGUI(QWidget):
         header.setDefaultAlignment(Qt.AlignLeft)
         header.setFont(self.font_for_table_header)
         header.setFixedHeight(35)
+
+        # Other properties
         self.master_table.setColumnWidth(2, 227)
+        for i in range(10):
+            self.master_table.setRowHeight(i, 65)  # Set the height of the rows
+        # When click on a cell of a row in the master table, it will choose the whole row
+        self.master_table.setSelectionBehavior(QAbstractItemView.SelectRows)
+        # Cannot edit the cells
+        self.master_table.setEditTriggers(QAbstractItemView.NoEditTriggers)
 
     def setup_detail_table(self):
         self.asset_detail_label = QLabel(self.content_frame)
@@ -392,13 +402,13 @@ class BaseGUI(QWidget):
     def setup_media_frame(self):
         self.media_frame = QFrame(self.content_frame)
         self.media_frame.setObjectName(u"media_frame")
-        self.media_frame.setGeometry(QRect(720, 700, 801, 161))
+        self.media_frame.setGeometry(QRect(720, 700, 801, 151))
         self.media_frame.setStyleSheet(self.css.get('media_frame'))
 
         # Horizontal layout
         self.horizontalLayoutWidget = QWidget(self.media_frame)
         self.horizontalLayoutWidget.setObjectName(u"horizontalLayoutWidget")
-        self.horizontalLayoutWidget.setGeometry(QRect(9, 10, 781, 141))
+        self.horizontalLayoutWidget.setGeometry(QRect(9, 10, 781, 131))
 
         self.horizontalLayout = QHBoxLayout(self.horizontalLayoutWidget)
         self.horizontalLayout.setSpacing(6)

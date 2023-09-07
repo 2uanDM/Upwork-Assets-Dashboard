@@ -9,10 +9,16 @@ class AssetCatelogueGUI(BaseGUI):
     def __init__(self, MainWindow) -> None:
         super().__init__(MainWindow)
 
-        self.add_to_master_table('image', 'asset_id', 'asset_name', 'category')
-        self.add_to_master_table('image', 'asset_id', 'asset_name', 'category')
-        self.add_to_master_table('image', 'asset_id', 'asset_name', 'category')
-        self.add_to_master_table('image', 'asset_id', 'asset_name', 'category')
+        # self.add_to_master_table('image', 'asset_id', 'asset_name', 'category')
+        # self.add_to_master_table('image', 'asset_id', 'asset_name', 'category')
+        # self.add_to_master_table('image', 'asset_id', 'asset_name', 'category')
+        # self.add_to_master_table('image', 'asset_id', 'asset_name', 'category')
+        # self.add_to_master_table('image', 'asset_id', 'asset_name', 'category')
+        # self.add_to_master_table('image', 'asset_id', 'asset_name', 'category')
+        # self.add_to_master_table('image', 'asset_id', 'asset_name', 'category')
+        # self.add_to_master_table('image', 'asset_id', 'asset_name', 'category')
+        # self.add_to_master_table('image', 'asset_id', 'asset_name', 'category')
+        # self.add_to_master_table('image', 'asset_id', 'asset_name', 'category')
 
         # Connect for buttons
         self.crud_add_asset_button.clicked.connect(self.test_action)
@@ -34,7 +40,7 @@ class AssetCatelogueGUI(BaseGUI):
         # Add these to the master table
         row_count = self.master_table.rowCount()
         self.master_table.insertRow(row_count)
-        self.master_table.setRowHeight(row_count, 40)
+        self.master_table.setRowHeight(row_count, 65)
 
         # Set the image
         # image_item = QTableWidgetItem()
