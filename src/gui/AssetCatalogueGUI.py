@@ -26,23 +26,11 @@ class AssetCatelogueGUI(BaseGUI):
         self.crud_add_media_button.clicked.connect(self.test_action)
         self.crud_delete_media_button.clicked.connect(self.test_action)
 
+        self.previous_page_button.clicked.connect(self.test_action)
+        self.next_page_button.clicked.connect(self.test_action)
+
+        self.download_catalogue_button.clicked.connect(self.test_action)
+        self.download_dataset_button.clicked.connect(self.test_action)
+
     def load_master_table(self, image, asset_id: str, asset_name: str, category: str):
-        # Add these to the master table
-        row_count = self.master_table.rowCount()
-        self.master_table.insertRow(row_count)
-        self.master_table.setRowHeight(row_count, 65)
-
-        # Set the image
-        # image_item = QTableWidgetItem()
-        # image_item.setData(Qt.DecorationRole, image)
-        # self.master_table.setItem(row_count, 0, image_item)
-
-        image_item = QTableWidgetItem()
-        image_item.setText(image)
-        self.master_table.setItem(row_count, 0, image_item)
-        # Set the asset id
-        self.master_table.setItem(row_count, 1, QTableWidgetItem(asset_id))
-        # Set the asset name
-        self.master_table.setItem(row_count, 2, QTableWidgetItem(asset_name))
-        # Set the category
-        self.master_table.setItem(row_count, 3, QTableWidgetItem(category))
+        pass

@@ -305,7 +305,7 @@ QPushButton:hover {
       <x>20</x>
       <y>160</y>
       <width>681</width>
-      <height>701</height>
+      <height>691</height>
      </rect>
     </property>
     <property name="styleSheet">
@@ -538,7 +538,7 @@ QTableView {
       <x>720</x>
       <y>700</y>
       <width>801</width>
-      <height>161</height>
+      <height>151</height>
      </rect>
     </property>
     <property name="styleSheet">
@@ -563,7 +563,7 @@ QFrame QLabel {
        <x>9</x>
        <y>10</y>
        <width>781</width>
-       <height>141</height>
+       <height>131</height>
       </rect>
      </property>
      <layout class="QHBoxLayout" name="horizontalLayout">
@@ -817,6 +817,145 @@ QFrame QLabel {
      <pixmap>../assets/buttons/1x/delete.png</pixmap>
     </property>
    </widget>
+   <widget class="QLabel" name="page_label">
+    <property name="geometry">
+     <rect>
+      <x>160</x>
+      <y>859</y>
+      <width>191</width>
+      <height>31</height>
+     </rect>
+    </property>
+    <property name="font">
+     <font>
+      <family>Segoe UI</family>
+      <pointsize>14</pointsize>
+      <weight>50</weight>
+      <bold>false</bold>
+     </font>
+    </property>
+    <property name="styleSheet">
+     <string notr="true">color:rgb(89, 89, 89)</string>
+    </property>
+    <property name="text">
+     <string>Page: 1/2</string>
+    </property>
+    <property name="alignment">
+     <set>Qt::AlignCenter</set>
+    </property>
+   </widget>
+   <widget class="QLabel" name="next_page_button">
+    <property name="geometry">
+     <rect>
+      <x>350</x>
+      <y>860</y>
+      <width>31</width>
+      <height>31</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string/>
+    </property>
+    <property name="pixmap">
+     <pixmap>../assets/buttons/next.png</pixmap>
+    </property>
+   </widget>
+   <widget class="QLabel" name="previous_page_button">
+    <property name="geometry">
+     <rect>
+      <x>130</x>
+      <y>860</y>
+      <width>31</width>
+      <height>31</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string/>
+    </property>
+    <property name="pixmap">
+     <pixmap>../assets/buttons/previous.png</pixmap>
+    </property>
+   </widget>
+   <widget class="QPushButton" name="download_catalogue_button">
+    <property name="geometry">
+     <rect>
+      <x>500</x>
+      <y>860</y>
+      <width>201</width>
+      <height>31</height>
+     </rect>
+    </property>
+    <property name="font">
+     <font>
+      <family>Segoe UI</family>
+      <pointsize>14</pointsize>
+      <weight>75</weight>
+      <bold>true</bold>
+     </font>
+    </property>
+    <property name="layoutDirection">
+     <enum>Qt::LeftToRight</enum>
+    </property>
+    <property name="styleSheet">
+     <string notr="true">/* Normal state styles */
+QPushButton {
+    color: rgb(69, 119, 185);
+    border: 2px solid rgb(241, 241, 241);
+    border-radius: 10px;
+    background-color: rgb(241, 241, 241);
+}
+
+/* Hover state styles */
+QPushButton:hover {
+    color: white;
+    background-color: darkgray;
+}
+</string>
+    </property>
+    <property name="text">
+     <string>Download Catalogue</string>
+    </property>
+   </widget>
+   <widget class="QPushButton" name="download_dataset_button">
+    <property name="geometry">
+     <rect>
+      <x>1320</x>
+      <y>860</y>
+      <width>201</width>
+      <height>31</height>
+     </rect>
+    </property>
+    <property name="font">
+     <font>
+      <family>Segoe UI</family>
+      <pointsize>14</pointsize>
+      <weight>75</weight>
+      <bold>true</bold>
+     </font>
+    </property>
+    <property name="layoutDirection">
+     <enum>Qt::LeftToRight</enum>
+    </property>
+    <property name="styleSheet">
+     <string notr="true">/* Normal state styles */
+QPushButton {
+    color: rgb(69, 119, 185);
+    border: 2px solid rgb(241, 241, 241);
+    border-radius: 10px;
+    background-color: rgb(241, 241, 241);
+}
+
+/* Hover state styles */
+QPushButton:hover {
+    color: white;
+    background-color: darkgray;
+}
+</string>
+    </property>
+    <property name="text">
+     <string>Download Dataset</string>
+    </property>
+   </widget>
    <zorder>media_frame</zorder>
    <zorder>main_label</zorder>
    <zorder>asset_list_label</zorder>
@@ -840,6 +979,11 @@ QFrame QLabel {
    <zorder>crud_delete_shape_button</zorder>
    <zorder>crud_add_media_button</zorder>
    <zorder>crud_delete_media_button</zorder>
+   <zorder>page_label</zorder>
+   <zorder>next_page_button</zorder>
+   <zorder>previous_page_button</zorder>
+   <zorder>download_catalogue_button</zorder>
+   <zorder>download_dataset_button</zorder>
   </widget>
  </widget>
  <resources/>

@@ -99,6 +99,12 @@ class BaseGUI(QWidget):
         self.font_for_table_header.setBold(True)
         self.font_for_table_header.setWeight(68)
 
+        self.font_for_page_label = QFont()
+        self.font_for_page_label.setFamily(u"Segoe UI")
+        self.font_for_page_label.setPointSize(14)
+        self.font_for_page_label.setBold(False)
+        self.font_for_page_label.setWeight(50)
+
     def setup_main_frame(self):
         self.menu_frame = QFrame(self)
         self.menu_frame.setObjectName(u"menu_frame")
@@ -211,6 +217,36 @@ class BaseGUI(QWidget):
         self.master_table.setSelectionBehavior(QAbstractItemView.SelectRows)
         # Cannot edit the cells
         self.master_table.setEditTriggers(QAbstractItemView.NoEditTriggers)
+
+        # --================== Pagination ==================--
+        self.page_label = QLabel(self.content_frame)
+        self.page_label.setObjectName(u"page_label")
+        self.page_label.setGeometry(QRect(160, 859, 191, 31))
+        self.page_label.setText("Page 1/1")
+        self.page_label.setFont(self.font_for_page_label)
+        self.page_label.setStyleSheet(u"color:rgb(89, 89, 89)")
+        self.page_label.setAlignment(Qt.AlignCenter)
+
+        # --================== Previous button ==================--
+        self.previous_page_button = ClickableLabel(self.content_frame)
+        self.previous_page_button.setObjectName(u"previous_page_button")
+        self.previous_page_button.setGeometry(QRect(130, 860, 31, 31))
+        self.previous_page_button.setPixmap(QPixmap(os.path.join(self.buttons_path, "previous.png")))
+
+        # --================== Next button ==================--
+        self.next_page_button = ClickableLabel(self.content_frame)
+        self.next_page_button.setObjectName(u"next_page_button")
+        self.next_page_button.setGeometry(QRect(350, 860, 31, 31))
+        self.next_page_button.setPixmap(QPixmap(os.path.join(self.buttons_path, "next.png")))
+
+        # --================== Download catalogue button ==================--
+        self.download_catalogue_button = QPushButton(self.content_frame)
+        self.download_catalogue_button.setObjectName(u"download_catalogue_button")
+        self.download_catalogue_button.setGeometry(QRect(500, 860, 201, 31))
+        self.download_catalogue_button.setFont(self.filter_label_font)
+        self.download_catalogue_button.setLayoutDirection(Qt.LeftToRight)
+        self.download_catalogue_button.setStyleSheet(self.css.get('apply_filter_button'))
+        self.download_catalogue_button.setText("Download catalogue")
 
     def setup_detail_table(self):
         self.asset_detail_label = QLabel(self.content_frame)
@@ -414,6 +450,15 @@ class BaseGUI(QWidget):
         self.horizontalLayout.setSpacing(6)
         self.horizontalLayout.setObjectName(u"horizontalLayout")
         self.horizontalLayout.setContentsMargins(2, 0, 0, 0)
+
+        # --================== Download dataset button ==================--
+        self.download_dataset_button = QPushButton(self.content_frame)
+        self.download_dataset_button.setObjectName(u"download_dataset_button")
+        self.download_dataset_button.setGeometry(QRect(1320, 860, 201, 31))
+        self.download_dataset_button.setFont(self.filter_label_font)
+        self.download_dataset_button.setLayoutDirection(Qt.LeftToRight)
+        self.download_dataset_button.setStyleSheet(self.css.get('apply_filter_button'))
+        self.download_dataset_button.setText("Download dataset")
 
     def setup_crud_asset_detail_buttons(self):
         # Add asset button
