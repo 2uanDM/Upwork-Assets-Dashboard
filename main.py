@@ -38,7 +38,7 @@ if __name__ == "__main__":
         main_window.setFixedWidth(1820)
         main_window.setWindowTitle(config['window_title'])
         main_window.setCurrentIndex(0)
-        main_window.setWindowIcon(QIcon('./assets/logo.jpg'))
+        main_window.setWindowIcon(QIcon('./assets/icon/logo.jpg'))
         main_window.show()
         sys.exit(app.exec_())
     except Exception as e:
