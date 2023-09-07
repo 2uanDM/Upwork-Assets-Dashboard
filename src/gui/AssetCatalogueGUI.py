@@ -136,19 +136,13 @@ class AssetCatelogueGUI(BaseGUI):
         # Get the filter value (number)
         asset_number_filter = self.number_input.text()
         # Get the filter value (name)
-        asset_name_filter = self.search_input.text()
+        asset_name_filter = self.search_input.text().lower()
 
-        if asset_number_filter == "" and asset_name_filter == "":
-            self.table_data = self.assets_data
-            self.total_assets = len(self.assets_data)
-            self.total_pages = self.total_assets // 10 + 1 if self.total_assets % 10 != 0 else self.total_assets // 10
-            self.current_page = 1
-            self.load_master_table(self.current_page)
-
+        # Apply the filter
         filtered_data = []
         for asset in self.assets_data:
             asset_number = str(asset[0])
-            asset_name = asset[1]
+            asset_name = asset[1].lower()
 
             asset_number_cond: bool = True if \
                 (asset_number.find(asset_number_filter) != -1 or asset_number_filter == "") else False
