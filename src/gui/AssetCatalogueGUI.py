@@ -176,7 +176,8 @@ class AssetCatelogueGUI(BaseGUI):
 
         self.table_data = filtered_data
         self.total_assets = len(filtered_data)
-        self.total_pages = self.total_assets // 10 + 1 if self.total_assets % 10 != 0 else self.total_assets // 10
+        self.total_pages = self.total_assets // 10 + \
+            1 if (self.total_assets % 10 != 0 or self.total_assets == 0) else self.total_assets // 10
         self.current_page = 1
         self.load_master_table(self.current_page)
 
@@ -242,7 +243,8 @@ class AssetCatelogueGUI(BaseGUI):
         self.reload_master_table_data_after_crud()
         self.table_data = self.assets_data
         self.total_assets = len(self.table_data)
-        self.total_pages = self.total_assets // 10 + 1 if self.total_assets % 10 != 0 else self.total_assets // 10
+        self.total_pages = self.total_assets // 10 + \
+            1 if (self.total_assets % 10 != 0 or self.total_assets == 0) else self.total_assets // 10
         self.current_page = 1
         self.load_master_table(self.current_page)
         self.apply_filter_button.click()
@@ -289,7 +291,8 @@ class AssetCatelogueGUI(BaseGUI):
         self.reload_master_table_data_after_crud()
         self.table_data = self.assets_data
         self.total_assets = len(self.table_data)
-        self.total_pages = self.total_assets // 10 + 1 if self.total_assets % 10 != 0 else self.total_assets // 10
+        self.total_pages = self.total_assets // 10 + \
+            1 if (self.total_assets % 10 != 0 or self.total_assets == 0) else self.total_assets // 10
         self.current_page = 1
         self.load_master_table(self.current_page)
         self.apply_filter_button.click()
@@ -324,7 +327,8 @@ class AssetCatelogueGUI(BaseGUI):
         self.reload_master_table_data_after_crud()
         self.table_data = self.assets_data
         self.total_assets = len(self.table_data)
-        self.total_pages = self.total_assets // 10 + 1 if self.total_assets % 10 != 0 else self.total_assets // 10
+        self.total_pages = self.total_assets // 10 + \
+            1 if (self.total_assets % 10 != 0 or self.total_assets == 0) else self.total_assets // 10
         self.current_page = self.total_pages
         self.load_master_table(self.current_page)
         self.reload_asset_detail_table()
