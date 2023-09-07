@@ -23,7 +23,7 @@ class AssetCatelogueGUI(BaseGUI):
         self.load_master_table(self.current_page)
 
         # Crud buttons
-        self.crud_add_asset_button.clicked.connect(self.test_action)
+        self.crud_add_asset_button.clicked.connect(self.crud_add_asset_event)
         self.crud_save_asset_button.clicked.connect(self.crud_save_asset_event)
         self.crud_delete_asset_button.clicked.connect(self.crud_delete_asset_event)
 
@@ -219,14 +219,18 @@ class AssetCatelogueGUI(BaseGUI):
     #######################################################################################################################################
 
     def crud_delete_asset_event(self):
-        user_choice = msg.yes_no_box("Are you sure to delete this asset? This action cannot be undone!")
-        if user_choice == QMessageBox.No:
-            return
-
         # Get the asset number and name
         asset_number = self.asset_number_item.text()
         asset_name = self.asset_name_item.text()
         asset_category_name = self.asset_detail_table.item(2, 1).text()
+
+        if asset_number == "" or asset_name == "" or asset_category_name == "":
+            msg.warning_box("Please select an asset to delete!")
+            return
+
+        user_choice = msg.yes_no_box("Are you sure to delete this asset? This action cannot be undone!")
+        if user_choice == QMessageBox.No:
+            return
 
         # Delete the asset
         success = self.db.delete_asset(int(asset_number), asset_name, asset_category_name)
@@ -288,9 +292,40 @@ class AssetCatelogueGUI(BaseGUI):
         self.total_assets = len(self.table_data)
         self.total_pages = self.total_assets // 10 + 1 if self.total_assets % 10 != 0 else self.total_assets // 10
         self.current_page = 1
-        self.number_input.setText("")
-        self.search_input.setText("")
         self.load_master_table(self.current_page)
+        self.apply_filter_button.click()
         self.reload_asset_detail_table()
 
         msg.information_box("Save asset information successfully!")
+
+    def crud_add_asset_event(self):
+        # Clear filter input
+        self.number_input.setText("")
+        self.search_input.setText("")
+        self.apply_filter_button.click()
+
+        # Move to the last page
+        if self.total_assets % 10 == 0:
+            self.total_pages += 1
+            self.current_page = self.total_pages
+            self.load_master_table(self.current_page)
+        else:
+            self.current_page = self.total_pages
+            self.load_master_table(self.current_page)
+
+        print('The new row to insert in master table is: ', len(self.assets_data) % 10 + 1)
+
+        # Create a new asset
+        success = self.db.create_new_asset()
+        if not success:
+            msg.warning_box("Error occurred when creating a new asset!")
+            return
+
+        # Reload the master table
+        self.reload_master_table_data_after_crud()
+        self.table_data = self.assets_data
+        self.total_assets = len(self.table_data)
+        self.total_pages = self.total_assets // 10 + 1 if self.total_assets % 10 != 0 else self.total_assets // 10
+        self.current_page = self.total_pages
+        self.load_master_table(self.current_page)
+        self.reload_asset_detail_table()

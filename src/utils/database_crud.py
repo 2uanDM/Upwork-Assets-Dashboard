@@ -119,6 +119,29 @@ class CrudDB():
                                       """)
         return command.fetchone()
 
+    def create_new_asset(self) -> bool:
+        # Insert a new row into AssetImportList table
+        operation = self.cursor.execute(f"""
+            insert into AssetImportList (ImportlistHeader, Importlist_2ndRow, Importlist_3ndRow)
+            values ('', '', '');
+                            """)
+        if operation.rowcount == 0:
+            return False
+
+        # Get the AssetImportListID of the newly created row
+        asset_import_list_id = self.cursor.execute("select last_insert_rowid()").fetchone()[0]
+
+        # Insert a new row into Asset table
+        operation = self.cursor.execute(f"""
+            insert into Asset (AssetNumber, AssetName, AssetVariant, AssetDescription, AssetCategoryID, AssetImportListID)
+            values (9999999, 'example', 'example', 'example', 1, {asset_import_list_id});
+                            """)
+        if operation.rowcount == 0:
+            return False
+
+        self.conn.commit()
+        return True
+
     def update_asset_table(self,
                            asset_id: int,
                            asset_number: int,
