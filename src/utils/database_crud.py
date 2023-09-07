@@ -48,4 +48,4 @@ class CrudDB():
 
 # if __name__ == '__main__':
 #     crud = CrudDB()
-#     # print(crud.load_master_table())
+#     print(crud.load_master_table())
