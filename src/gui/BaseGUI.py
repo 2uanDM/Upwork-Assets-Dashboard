@@ -656,3 +656,6 @@ class BaseGUI(QWidget):
 
     def test_action(self):
         print('Button clicked')
+
+    def closeEvent(self, event):
+        del self.db
