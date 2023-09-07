@@ -17,6 +17,9 @@ class AssetCatelogueGUI(BaseGUI):
         # Init the database
         self.db = CrudDB()
         self.reload_master_table_data_after_crud()
+        # Initially, the data in the table is the assets data when the filter is not applied
+        self.table_data = self.assets_data
+        # Load the master table
         self.load_master_table(self.current_page)
 
         # Crud buttons
@@ -59,11 +62,14 @@ class AssetCatelogueGUI(BaseGUI):
         # Cell of master table clicked
         self.master_table.cellClicked.connect(self.master_table_row_clicked_event)
 
+        # Apply filter button
+        self.apply_filter_button.clicked.connect(self.apply_filter_button_event)
+
     def reload_master_table_data_after_crud(self):
         data: dict = self.db.load_master_table()
         self.total_assets = data['total_assets']
         self.total_pages = data['total_pages']
-        self.table_data = data['data']
+        self.assets_data = data['data']
 
     def load_master_table(self, page: int):
         # Clear the table
@@ -125,3 +131,36 @@ class AssetCatelogueGUI(BaseGUI):
             self.import_list_2nd_row_value_item.setText(asset_detail[3])
             # Set the import list 3rd row
             self.import_list_3rd_row_value_item.setText(asset_detail[4])
+
+    def apply_filter_button_event(self):
+        # Get the filter value (number)
+        asset_number_filter = self.number_input.text()
+        # Get the filter value (name)
+        asset_name_filter = self.search_input.text()
+
+        if asset_number_filter == "" and asset_name_filter == "":
+            self.table_data = self.assets_data
+            self.total_assets = len(self.assets_data)
+            self.total_pages = self.total_assets // 10 + 1 if self.total_assets % 10 != 0 else self.total_assets // 10
+            self.current_page = 1
+            self.load_master_table(self.current_page)
+
+        filtered_data = []
+        for asset in self.assets_data:
+            asset_number = str(asset[0])
+            asset_name = asset[1]
+
+            asset_number_cond: bool = True if \
+                (asset_number.find(asset_number_filter) != -1 or asset_number_filter == "") else False
+
+            asset_name_cond: bool = True if \
+                (asset_name.find(asset_name_filter) != -1 or asset_name_filter == "") else False
+
+            if asset_number_cond and asset_name_cond:
+                filtered_data.append(asset)
+
+        self.table_data = filtered_data
+        self.total_assets = len(filtered_data)
+        self.total_pages = self.total_assets // 10 + 1 if self.total_assets % 10 != 0 else self.total_assets // 10
+        self.current_page = 1
+        self.load_master_table(self.current_page)
