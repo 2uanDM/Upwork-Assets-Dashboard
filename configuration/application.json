@@ -1,3 +1,4 @@
 {
-    "window_title" : "Rocket Project"
+    "window_title" : "Rocket Project",
+    "database_name" : "new_assetDB"
 }

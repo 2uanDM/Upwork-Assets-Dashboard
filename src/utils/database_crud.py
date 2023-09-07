@@ -1,9 +1,13 @@
+import json
 import sqlite3
 import os
 
+with open(os.path.join(os.getcwd(), 'configuration', 'application.json'), "r") as f:
+    config = json.load(f)
+
 
 class CrudDB():
-    DATABSE_PATH = os.path.join(os.getcwd(), 'new_assetDB.db')
+    DATABSE_PATH = os.path.join(os.getcwd(), f'{config["database_name"]}.db')
 
     def __init__(self) -> None:
         self.conn = sqlite3.connect(self.DATABSE_PATH)
