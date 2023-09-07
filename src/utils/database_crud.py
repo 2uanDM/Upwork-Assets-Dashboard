@@ -82,6 +82,36 @@ class CrudDB():
                                       """)
         return command.fetchone()
 
+    def delete_asset(self, asset_number: int, asset_name: str, asset_category_name: str) -> None:
+        """
+        Delete an asset from the database
+        Args:
+            asset_number (int)
+            asset_name (str)
+            asset_category_name (str)
+
+        Returns:
+            None
+        """
+        operation = self.cursor.execute(f"""
+            delete from Asset
+            where 1 = 1
+            and AssetNumber = {asset_number}
+            and AssetName = '{asset_name}'
+            and AssetCategoryID = (
+                select AssetCategoryID
+                from AssetCategory
+                where CategoryName = '{asset_category_name}'
+            );
+        """)
+
+        # Check if the operation is successful
+        if operation.rowcount == 0:
+            return False
+        else:
+            self.conn.commit()
+            return True
+
     def __del__(self):
         self.conn.commit()
         self.cursor.close()

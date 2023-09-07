@@ -6,6 +6,7 @@ import os
 sys.path.append(os.path.join(os.getcwd()))
 
 from src.gui.BaseGUI import BaseGUI
+from src.gui.MessageBoxDialog import MessageBox as msg
 from src.utils.database_crud import CrudDB
 
 
@@ -25,7 +26,7 @@ class AssetCatelogueGUI(BaseGUI):
         # Crud buttons
         self.crud_add_asset_button.clicked.connect(self.test_action)
         self.crud_save_asset_button.clicked.connect(self.test_action)
-        self.crud_delete_asset_button.clicked.connect(self.test_action)
+        self.crud_delete_asset_button.clicked.connect(self.crud_delete_asset_event)
 
         self.crud_add_attribute_button.clicked.connect(self.test_action)
         self.crud_save_attribute_button.clicked.connect(self.test_action)
@@ -65,6 +66,16 @@ class AssetCatelogueGUI(BaseGUI):
         # Apply filter button
         self.apply_filter_button.clicked.connect(self.apply_filter_button_event)
 
+    def reload_asset_detail_table(self):
+        self.asset_number_item.setText("")
+        self.asset_name_item.setText("")
+        self.asset_variant_value_item.setText("")
+        self.asset_category_value_item.setText("")
+        self.asset_description_value_item.setText("")
+        self.import_list_header_value_item.setText("")
+        self.import_list_2nd_row_value_item.setText("")
+        self.import_list_3rd_row_value_item.setText("")
+
     def reload_master_table_data_after_crud(self):
         data: dict = self.db.load_master_table()
         self.total_assets = data['total_assets']
@@ -86,6 +97,8 @@ class AssetCatelogueGUI(BaseGUI):
         for i, row in enumerate(data):
             for j, column in enumerate(row):
                 self.master_table.setItem(i, j + 1, QTableWidgetItem(str(column)))
+
+        self.reload_asset_detail_table()
 
     def next_page_button_event(self):
         # Renew the page label
@@ -194,3 +207,31 @@ class AssetCatelogueGUI(BaseGUI):
 
     def sort_desc_asset_category_button_event(self):
         self._sort_master_table(2, "desc")
+
+    #######################################################################################################################################
+
+    def crud_delete_asset_event(self):
+        user_choice = msg.yes_no_box("Are you sure to delete this asset? This action cannot be undone!")
+        if user_choice == QMessageBox.No:
+            return
+
+        # Get the asset number and name
+        asset_number = self.asset_number_item.text()
+        asset_name = self.asset_name_item.text()
+        asset_category_name = self.asset_category_value_item.text()
+
+        # Delete the asset
+        self.db.delete_asset(int(asset_number), asset_name, asset_category_name)
+
+        # Reload the master table
+        self.reload_master_table_data_after_crud()
+        self.table_data = self.assets_data
+        self.total_assets = len(self.table_data)
+        self.total_pages = self.total_assets // 10 + 1 if self.total_assets % 10 != 0 else self.total_assets // 10
+        self.current_page = 1
+        self.number_input.setText("")
+        self.search_input.setText("")
+        self.load_master_table(self.current_page)
+        self.reload_asset_detail_table()
+
+        msg.information_box("Delete asset successfully!")
