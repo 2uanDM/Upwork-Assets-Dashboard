@@ -47,14 +47,14 @@ class AssetCatelogueGUI(BaseGUI):
         self.download_dataset_button.clicked.connect(self.test_action)
 
         # Sort buttons
-        self.sort_asc_asset_number_button.clicked.connect(self.test_action)
-        self.sort_desc_asset_number_button.clicked.connect(self.test_action)
+        self.sort_asc_asset_number_button.clicked.connect(self.sort_asc_asset_number_button_event)
+        self.sort_desc_asset_number_button.clicked.connect(self.sort_desc_asset_number_button_event)
 
-        self.sort_asc_asset_name_button.clicked.connect(self.test_action)
-        self.sort_desc_asset_name_button.clicked.connect(self.test_action)
+        self.sort_asc_asset_name_button.clicked.connect(self.sort_asc_asset_name_button_event)
+        self.sort_desc_asset_name_button.clicked.connect(self.sort_desc_asset_name_button_event)
 
-        self.sort_asc_asset_category_button.clicked.connect(self.test_action)
-        self.sort_desc_asset_category_button.clicked.connect(self.test_action)
+        self.sort_asc_asset_category_button.clicked.connect(self.sort_asc_asset_category_button_event)
+        self.sort_desc_asset_category_button.clicked.connect(self.sort_desc_asset_category_button_event)
 
         self.sort_desc_att_number_button.clicked.connect(self.test_action)
         self.sort_asc_att_number_button.clicked.connect(self.test_action)
@@ -158,3 +158,39 @@ class AssetCatelogueGUI(BaseGUI):
         self.total_pages = self.total_assets // 10 + 1 if self.total_assets % 10 != 0 else self.total_assets // 10
         self.current_page = 1
         self.load_master_table(self.current_page)
+
+    def _sort_master_table(self, column: int, sort_type: str):
+        """
+            This is a support function for handle sort button event of master table
+        Args:
+            column (int): The column to sort in master table: 
+
+            - 0: Asset number
+            - 1: Asset name
+            - 2: Asset category
+
+            sort_type (str): "asc" or "desc"
+        """
+        self.table_data.sort(key=lambda x: x[column], reverse=True if sort_type == "desc" else False)
+
+        # Then reload the master table
+        self.current_page = 1
+        self.load_master_table(self.current_page)
+
+    def sort_asc_asset_number_button_event(self):
+        self._sort_master_table(0, "asc")
+
+    def sort_desc_asset_number_button_event(self):
+        self._sort_master_table(0, "desc")
+
+    def sort_asc_asset_name_button_event(self):
+        self._sort_master_table(1, "asc")
+
+    def sort_desc_asset_name_button_event(self):
+        self._sort_master_table(1, "desc")
+
+    def sort_asc_asset_category_button_event(self):
+        self._sort_master_table(2, "asc")
+
+    def sort_desc_asset_category_button_event(self):
+        self._sort_master_table(2, "desc")

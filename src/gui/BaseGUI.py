@@ -167,12 +167,14 @@ class BaseGUI(QWidget):
         self.number_input.setFont(self.filter_label_font)
         self.number_input.setStyleSheet(self.css.get('number_input'))
         self.number_input.setAlignment(Qt.AlignCenter)
+        self.number_input.setPlaceholderText("Asset #")
 
         self.search_input = QLineEdit(self.content_frame)
         self.search_input.setObjectName(u"search_input")
         self.search_input.setGeometry(QRect(260, 120, 241, 31))
         self.search_input.setFont(self.filter_label_font)
         self.search_input.setStyleSheet(self.css.get('search_input'))
+        self.search_input.setPlaceholderText("Asset name")
 
         self.apply_filter_button = QPushButton(self.content_frame)
         self.apply_filter_button.setObjectName(u"apply_filter_button")
