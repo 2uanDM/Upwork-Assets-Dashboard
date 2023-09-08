@@ -168,6 +168,11 @@ class AddImageGUI(QWidget):
     def add_image(self):
         image_path = self.path_input.text().strip()
         image_category = self.comboBox.currentText()
+
+        if image_path == '':
+            msg.warning_box('No image to add!', icon_path='./assets/icon/logo.jpg')
+            return
+
         self.add_image_signal.emit(image_path, image_category)
         self.MainWindow.close()
 

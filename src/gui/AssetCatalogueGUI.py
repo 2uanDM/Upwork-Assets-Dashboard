@@ -10,6 +10,17 @@ from src.gui.MessageBoxDialog import MessageBox as msg
 from src.gui.AddImageGUI import AddImageGUI
 
 
+class ClickableLabel(QLabel):
+    clicked = pyqtSignal()
+
+    def __init__(self, parent=None):
+        super().__init__(parent)
+
+    def mousePressEvent(self, event):
+        if event.button() == Qt.LeftButton:
+            self.clicked.emit()
+
+
 class AssetCatelogueGUI(BaseGUI):
     icon_path: str = './assets/icon/logo.jpg'
 
@@ -381,7 +392,13 @@ class AssetCatelogueGUI(BaseGUI):
         pass
 
     def store_asset_image_to_database(self, image_path: str, image_category: str):
-        # Open the image with default image viewer
-        os.startfile(image_path)
+
+        self.label_3 = ClickableLabel(self.horizontalLayoutWidget)
+        self.label_3.setObjectName(u"label_3")
+        self.label_3.setPixmap(QPixmap(image_path))
+        self.label_3.setAlignment(Qt.AlignCenter)
+        self.label_3.clicked.connect(lambda: os.startfile(image_path))
+
+        self.horizontalLayout.addWidget(self.label_3)
 
     #######################################################################################################################################
