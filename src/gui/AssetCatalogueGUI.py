@@ -1,3 +1,4 @@
+import shutil
 from PyQt5.QtGui import *
 from PyQt5.QtWidgets import *
 from PyQt5.QtCore import *
@@ -400,6 +401,9 @@ class AssetCatelogueGUI(BaseGUI):
         # self.label_3.clicked.connect(lambda: os.startfile(image_path))
         # self.horizontalLayout.addWidget(self.label_3)
 
+        # Get the image name from image_path
+        image_name = image_path.split('/')[-1]
+
         # Check if the folder image of asset is existed. If not, create it and naming it with asset id
         list_of_asset_image_folders = os.listdir(self.asset_pictures_path)
 
@@ -410,6 +414,23 @@ class AssetCatelogueGUI(BaseGUI):
             self.asset_detail_table.item(2, 1).text()
         )
 
-        if f'{asset_id}_{self.asset_name_item.text()}' not in list_of_asset_image_folders:
-            os.mkdir(os.path.join(self.asset_pictures_path, f'{asset_id}_{self.asset_name_item.text()}'))
+        # If the folder image of asset is not existed, create it
+        asset_folder_name = f'{asset_id}_{self.asset_name_item.text()}'
+        if asset_folder_name not in list_of_asset_image_folders:
+            os.mkdir(os.path.join(self.asset_pictures_path, asset_folder_name))
+
+        # Check if existing the image with the same name in the asset folder
+        list_of_images = os.listdir(os.path.join(self.asset_pictures_path, asset_folder_name))
+        if image_name in list_of_images:
+            msg.warning_box(f'This image: "{image_name}" is already existed in this asset!', icon_path=self.icon_path)
+            return
+        else:
+            # Copy the image to the asset folder
+            shutil.copy(image_path, os.path.join(self.asset_pictures_path, asset_folder_name))
+
+        print('Image name: ', image_name)
+        print('Image Category: ', image_category)
+        print('List of images folder: ', list_of_asset_image_folders)
+        print('List of images in this asset: ', list_of_images)
+
     #######################################################################################################################################

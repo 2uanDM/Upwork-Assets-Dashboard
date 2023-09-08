@@ -174,7 +174,6 @@ class AddImageGUI(QWidget):
             return
 
         self.add_image_signal.emit(image_path, image_category)
-        self.MainWindow.close()
 
     def preview_image(self):
         image_path = self.path_input.text().strip()
