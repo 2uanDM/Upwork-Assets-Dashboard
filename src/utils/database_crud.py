@@ -12,6 +12,7 @@ class CrudDB():
     def __init__(self) -> None:
         self.conn = sqlite3.connect(self.DATABSE_PATH)
         self.cursor = self.conn.cursor()
+        self.conn.execute('PRAGMA foreign_keys = ON;')
 
     def get_category_id(self, category_name: str) -> int:
         return self.cursor.execute(f"""
@@ -79,7 +80,8 @@ class CrudDB():
                 "data": [],
             }
         else:
-            total_pages = total_assets // 10 + 1 if total_assets % 10 != 0 else total_assets // 10
+            total_pages = total_assets // 10 + 1 if (total_assets %
+                                                     10 != 0 or total_assets == 0) else total_assets // 10
 
             all_assets = self.cursor.execute("""
             SELECT AssetNumber, AssetName, ac.CategoryName
@@ -106,6 +108,8 @@ class CrudDB():
         Returns:
             tuple: (AssetVariant, AssetDescription, ImportlistHeader, Importlist_2ndRow, Importlist_3ndRow)
         """
+        asset_id = self.get_asset_id(asset_number, asset_name, asset_category_name)
+
         command = self.cursor.execute(f"""
             select 
                     a.AssetVariant,
@@ -114,33 +118,37 @@ class CrudDB():
                     Importlist_2ndRow,
                     Importlist_3ndRow
             from Asset as a 
-            join AssetCategory as ac 
-                on ac.AssetCategoryID = a.AssetCategoryID
             join AssetImportList as ail 
-                on ail.AssetImportListID = a.AssetImportListID
-            where 1 = 1 
-            and a.AssetNumber = {asset_number}
-            and a.AssetName = '{asset_name}'
-            and ac.CategoryName = '{asset_category_name}';                                  
+                on ail.AssetID = a.AssetID
+            where a.AssetID = {asset_id};                                
                                       """)
         return command.fetchone()
 
     def create_new_asset(self) -> bool:
-        # Insert a new row into AssetImportList table
+
+        # Get the smallest available AssetCategoryID
+        asset_category_id: int = self.cursor.execute("""
+            select AssetCategoryID
+            from AssetCategory
+            order by AssetCategoryID
+            limit 1;
+            """).fetchone()[0]
+
+        # Insert a new row into Asset table
         operation = self.cursor.execute(f"""
-            insert into AssetImportList (ImportlistHeader, Importlist_2ndRow, Importlist_3ndRow)
-            values ('', '', '');
+            insert into Asset (AssetNumber, AssetName, AssetVariant, AssetDescription, AssetCategoryID)
+            values (9999999, 'example', 'example', 'example', {asset_category_id});
                             """)
         if operation.rowcount == 0:
             return False
 
-        # Get the AssetImportListID of the newly created row
-        asset_import_list_id = self.cursor.execute("select last_insert_rowid()").fetchone()[0]
+        # Get the AssetID of the newly created row
+        asset_id = self.cursor.execute("select last_insert_rowid()").fetchone()[0]
 
-        # Insert a new row into Asset table
+        # Insert a new row into AssetImportList table
         operation = self.cursor.execute(f"""
-            insert into Asset (AssetNumber, AssetName, AssetVariant, AssetDescription, AssetCategoryID, AssetImportListID)
-            values (9999999, 'example', 'example', 'example', 1, {asset_import_list_id});
+            insert into AssetImportList ('AssetID',ImportlistHeader, Importlist_2ndRow, Importlist_3ndRow)
+            values ({asset_id},'', '', '');
                             """)
         if operation.rowcount == 0:
             return False
@@ -186,11 +194,7 @@ class CrudDB():
                 ImportlistHeader = '{import_list_header}',
                 Importlist_2ndRow = '{import_list_2nd_row}',
                 Importlist_3ndRow = '{import_list_3nd_row}'
-            where AssetImportListID = (
-                select AssetImportListID
-                from Asset
-                where AssetID = {asset_id}
-            );    
+            where AssetID = {asset_id};
                                          """)
 
         # Check if the operation is successful
@@ -211,16 +215,11 @@ class CrudDB():
         Returns:
             None
         """
+        asset_id = self.get_asset_id(asset_number, asset_name, asset_category_name)
+
         operation = self.cursor.execute(f"""
             delete from Asset
-            where 1 = 1
-            and AssetNumber = {asset_number}
-            and AssetName = '{asset_name}'
-            and AssetCategoryID = (
-                select AssetCategoryID
-                from AssetCategory
-                where CategoryName = '{asset_category_name}'
-            );
+            where AssetID = {asset_id};
         """)
 
         # Check if the operation is successful
@@ -236,7 +235,7 @@ class CrudDB():
         self.conn.close()
 
 
-# if __name__ == '__main__':
-#     crud = CrudDB()
-#     # print(crud.load_master_table())
-#     print(crud.get_list_of_image_categories())
+if __name__ == '__main__':
+    crud = CrudDB()
+    # print(crud.load_master_table())
+    crud.test()

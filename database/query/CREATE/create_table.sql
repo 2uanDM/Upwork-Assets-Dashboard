@@ -2,43 +2,18 @@ CREATE TABLE IF NOT EXISTS DataType (
     DataTypeID INTEGER PRIMARY KEY AUTOINCREMENT,
     DataTypeName TEXT NOT NULL UNIQUE
 );
-CREATE TABLE IF NOT EXISTS Attribute (
-    AttributeID INTEGER PRIMARY KEY AUTOINCREMENT,
-    AttributeOrderNumber INTEGER NOT NULL,
-    AttributeName TEXT NOT NULL UNIQUE,
-    DataTypeID INTEGER NOT NULL,
-    FOREIGN KEY (DataTypeID) REFERENCES DataType (DataTypeID)
-);
 CREATE TABLE IF NOT EXISTS ShapeType (
     ShapeTypeID INTEGER PRIMARY KEY AUTOINCREMENT,
     TypeName TEXT NOT NULL UNIQUE
-);
-CREATE TABLE IF NOT EXISTS Shape (
-    ShapeID INTEGER PRIMARY KEY AUTOINCREMENT,
-    ShapeDescription TEXT,
-    ShapeTypeID INTEGER NOT NULL,
-    FOREIGN KEY (ShapeTypeID) REFERENCES ShapeType (ShapeTypeID)
 );
 CREATE TABLE IF NOT EXISTS ImageCategory (
     ImageCategoryID INTEGER PRIMARY KEY AUTOINCREMENT,
     CategoryName TEXT NOT NULL
 );
-CREATE TABLE IF NOT EXISTS Image (
-    ImageID INTEGER PRIMARY KEY AUTOINCREMENT,
-    ImageFileName TEXT NOT NULL UNIQUE,
-    ImageCategoryID INTEGER NOT NULL,
-    FOREIGN KEY (ImageCategoryID) REFERENCES ImageCategory (ImageCategoryID)
-);
 CREATE TABLE IF NOT EXISTS AssetCategory (
     AssetCategoryID INTEGER PRIMARY KEY AUTOINCREMENT,
     CategoryNumber INTEGER NOT NULL UNIQUE,
     CategoryName TEXT NOT NULL
-);
-CREATE TABLE IF NOT EXISTS AssetImportList (
-    AssetImportListID INTEGER PRIMARY KEY AUTOINCREMENT,
-    ImportlistHeader TEXT NOT NULL,
-    Importlist_2ndRow TEXT NOT NULL,
-    Importlist_3ndRow TEXT NOT NULL
 );
 CREATE TABLE IF NOT EXISTS Asset (
     AssetID INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -47,30 +22,38 @@ CREATE TABLE IF NOT EXISTS Asset (
     AssetVariant TEXT,
     AssetDescription TEXT,
     AssetCategoryID INTEGER NOT NULL,
-    AssetImportListID INTEGER NOT NULL,
-    FOREIGN KEY (AssetCategoryID) REFERENCES AssetCategory (AssetCategoryID),
-    FOREIGN KEY (AssetImportListID) REFERENCES AssetImportList (AssetImportListID) ON DELETE CASCADE
+    FOREIGN KEY (AssetCategoryID) REFERENCES AssetCategory (AssetCategoryID)
 );
-CREATE TABLE AssetAttribute (
+CREATE TABLE IF NOT EXISTS AssetAttribute (
+    AssetAttributeID INTEGER PRIMARY KEY AUTOINCREMENT,
     AssetID INTEGER NOT NULL,
-    AttributeID INTEGER NOT NULL,
-    FOREIGN KEY (AssetID) REFERENCES Asset (AssetID),
-    FOREIGN KEY (AttributeID) REFERENCES Attribute (AttributeID),
-    PRIMARY KEY (AssetID, AttributeID)
+    AttributeOrderNumber INTEGER NOT NULL,
+    AttributeName TEXT NOT NULL,
+    DataTypeID INTEGER NOT NULL,
+    FOREIGN KEY (DataTypeID) REFERENCES DataType (DataTypeID),
+    FOREIGN KEY (AssetID) REFERENCES Asset (AssetID) ON DELETE CASCADE
 );
-CREATE TABLE AssetShape(
+CREATE TABLE IF NOT EXISTS AssetShape (
+    AssetShapeID INTEGER PRIMARY KEY AUTOINCREMENT,
     AssetID INTEGER NOT NULL,
-    ShapeID INTEGER NOT NULL,
-    FOREIGN KEY (AssetID) REFERENCES Asset (AssetID),
-    FOREIGN KEY (ShapeID) REFERENCES Shape (ShapeID),
-    PRIMARY KEY (AssetID, ShapeID)
+    ShapeTypeID INTEGER NOT NULL,
+    ShapeDescription TEXT,
+    FOREIGN KEY (ShapeTypeID) REFERENCES ShapeType (ShapeTypeID),
+    FOREIGN KEY (AssetID) REFERENCES Asset (AssetID) ON DELETE CASCADE
 );
-CREATE TABLE AssetImage(
+CREATE TABLE IF NOT EXISTS AssetImage (
+    AssetImageID INTEGER PRIMARY KEY AUTOINCREMENT,
+    ImageFileName TEXT NOT NULL UNIQUE,
+    ImageCategoryID INTEGER NOT NULL,
+    FOREIGN KEY (ImageCategoryID) REFERENCES ImageCategory (ImageCategoryID)
+);
+CREATE TABLE IF NOT EXISTS AssetImportList (
+    AssetImportListID INTEGER PRIMARY KEY AUTOINCREMENT,
     AssetID INTEGER NOT NULL,
-    ImageID INTEGER NOT NULL,
-    FOREIGN KEY (AssetID) REFERENCES Asset (AssetID),
-    FOREIGN KEY (ImageID) REFERENCES Image (ImageID),
-    PRIMARY KEY (AssetID, ImageID)
+    ImportlistHeader TEXT NOT NULL,
+    Importlist_2ndRow TEXT NOT NULL,
+    Importlist_3ndRow TEXT NOT NULL,
+    FOREIGN KEY (AssetID) REFERENCES Asset (AssetID) ON DELETE CASCADE
 );
 CREATE TABLE Project (
     ProjectID INTEGER PRIMARY KEY AUTOINCREMENT,
