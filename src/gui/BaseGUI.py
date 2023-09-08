@@ -71,6 +71,7 @@ class QComboBoxDelegate(QStyledItemDelegate):
 class BaseGUI(QWidget):
     buttons_path = os.path.join(os.getcwd(), 'assets', 'buttons')
     asset_pictures_path = os.path.join(os.getcwd(), 'asset_pictures')  # Folder where store the asset pictures
+    temp_folder_path = os.path.join(os.getcwd(), '.temp')  # Folder where store the temp pictures
 
     def __init__(self, MainWindow) -> None:
         """

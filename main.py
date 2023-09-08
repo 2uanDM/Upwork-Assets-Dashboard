@@ -1,4 +1,5 @@
 import json
+import subprocess
 import traceback
 from PyQt5.QtGui import QIcon
 from PyQt5.QtCore import Qt, pyqtSignal
@@ -38,9 +39,21 @@ if __name__ == "__main__":
     with open(os.path.join(os.getcwd(), 'configuration', 'application.json'), "r") as f:
         config = json.load(f)
 
+    template_folder_images_name = '.temp'
+    folder_path = os.path.join(os.getcwd(), template_folder_images_name)
+    # Check if the temp folder exists
+    if not os.path.exists(os.path.join(os.getcwd(), template_folder_images_name)):
+        os.mkdir(folder_path)
+        subprocess.run(["attrib", "+h", folder_path], shell=True, check=True)  # Set the .temp folder to be hidden
+
+    # When the application is closed, delete the temp folder
+    def on_close():
+        os.rmdir(folder_path)
+
     try:
         app = QApplication(sys.argv)
         main_window = StackedWidget()
+        main_window.closed.connect(on_close)
 
         # Import all GUIs
         asset_catalogue_gui = AssetCatelogueGUI(main_window)
