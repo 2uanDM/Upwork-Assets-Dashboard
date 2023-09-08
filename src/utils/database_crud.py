@@ -75,7 +75,7 @@ class CrudDB():
             where ai.AssetID = {asset_id} and ai.ImageFileName = '{image_name}';
         """).fetchone()[0]
 
-    def load_master_table(self) -> dict:
+    def load_all_assets_data(self) -> dict:
         """
         return {
 

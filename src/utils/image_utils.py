@@ -12,7 +12,7 @@ class ImageResize():
 
     def fit_master_table(self, asset_id: int, asset_name: str, image_name: str):
         """
-        Resize the image to fit the master table
+        Resize the image to fit the master table and save it to the temp folder
         Args:
             asset_id (int): Example: 1
             asset_name (str): Example: 'Asset 1'
@@ -40,7 +40,7 @@ class ImageResize():
 
     def fit_media_frame(self, asset_id: int, asset_name: str, image_name: str):
         """
-        Resize the image to fit the media frame
+        Resize the image to fit the media frame and save it to the temp folder
         Args:
             asset_id (int): Example: 1
             asset_name (str): Example: 'Asset 1'
