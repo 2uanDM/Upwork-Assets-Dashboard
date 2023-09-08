@@ -72,7 +72,7 @@ class CrudDB():
             from AssetImage as ai
             join ImageCategory as ic
             on ai.ImageCategoryID = ic.ImageCategoryID
-            where ai.AssetID = {asset_id};
+            where ai.AssetID = {asset_id} and ai.ImageFileName = '{image_name}';
         """).fetchone()[0]
 
     def load_master_table(self) -> dict:

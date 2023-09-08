@@ -33,7 +33,10 @@ class ImageResize():
         if not os.path.exists(temp_asset_image_folder):
             os.mkdir(temp_asset_image_folder)
 
-        image.save(os.path.join(temp_asset_image_folder, f'{image_name}^mastertable.png'))
+        # Got just the name not the extension
+        just_image_name = image_name.split('.')[0]
+        extension = image_name.split('.')[1]
+        image.save(os.path.join(temp_asset_image_folder, f'{just_image_name}^mastertable.{extension}'))
 
     def fit_media_frame(self, asset_id: int, asset_name: str, image_name: str):
         """
@@ -58,7 +61,26 @@ class ImageResize():
         if not os.path.exists(temp_asset_image_folder):
             os.mkdir(temp_asset_image_folder)
 
-        image.save(os.path.join(temp_asset_image_folder, f'{image_name}^mediaframe.png'))
+        # Got just the name not the extension
+        just_image_name = image_name.split('.')[0]
+        extension = image_name.split('.')[1]
+        image.save(os.path.join(temp_asset_image_folder, f'{just_image_name}^mediaframe.{extension}'))
+
+    def convert_to_png(self, image_dir: str):
+        """
+            Convert the image to png 
+        Args:
+            image_dir (str): The abs path of the image
+        """
+        image = Image.open(image_dir)
+        # Got just the name not the extension from the abs path
+        image_name = image_dir.split('\\')[-1].split('.')[0]
+        original_path = os.path.dirname(image_dir)
+
+        print('image_name', image_name)
+        print('original_path', original_path)
+
+        image.save(os.path.join(original_path, f'{image_name}.png'))
 
 
 # if __name__ == "__main__":

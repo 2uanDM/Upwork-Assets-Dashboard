@@ -5,10 +5,14 @@ from PyQt5.QtGui import *
 from PyQt5.QtWidgets import *
 from PyQt5.QtCore import *
 from PyQt5.QtWidgets import QStyleOptionViewItem, QWidget
-from src.utils.database_crud import CrudDB
-from src.utils.image_utils import ImageResize
+import sys
 import json
 import os
+sys.path.append(os.path.join(os.getcwd()))
+
+from src.utils.database_crud import CrudDB
+from src.utils.image_utils import ImageResize
+
 
 # Import the css json
 css_path = os.path.join(os.getcwd(), 'assets', 'css', 'css.json')

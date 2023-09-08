@@ -184,6 +184,11 @@ class AddImageGUI(QWidget):
             msg.warning_box('No image to add!', icon_path='./assets/icon/logo.jpg')
             return
 
+        # Check if the image path is exist
+        if not os.path.exists(image_path):
+            msg.warning_box('Image path is not exist!', icon_path='./assets/icon/logo.jpg')
+            return
+
         self.add_image_signal.emit(image_path, image_category)
 
     def preview_image(self):

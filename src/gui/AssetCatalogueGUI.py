@@ -123,14 +123,15 @@ class AssetCatelogueGUI(BaseGUI):
                 continue
 
             # Resize for the master table: Just need to resize the first image
-            first_image_name = list_of_images[0].split('.')[0]
-            if not os.path.exists(os.path.join(temp_asset_image_folder, f'{first_image_name}^mastertable.png')):
+            first_image_name = list_of_images[0]
+            just_first_image_name = first_image_name.split('.')[0]
+            if not os.path.exists(os.path.join(temp_asset_image_folder, f'{just_first_image_name}^mastertable.png')):
                 self.resizer.fit_master_table(asset_id, asset_name, first_image_name)
 
             # Resize for the media frame: Just need to resize all the images
             for image_name in list_of_images:
-                image_name = image_name.split('.')[0]
-                if not os.path.exists(os.path.join(temp_asset_image_folder, f'{image_name}^mediaframe.png')):
+                just_name = image_name.split('.')[0]
+                if not os.path.exists(os.path.join(temp_asset_image_folder, f'{just_name}^mediaframe.png')):
                     self.resizer.fit_media_frame(asset_id, asset_name, image_name)
 
     def load_master_table(self, page: int):
@@ -150,6 +151,9 @@ class AssetCatelogueGUI(BaseGUI):
                 self.master_table.setItem(i, j + 1, QTableWidgetItem(str(column)))
 
         self.reload_asset_detail_table()
+
+        # Reload the horizontal layout
+        self.reload_the_horizontal_layout()
 
         # TODO: Load the image preview of assets in current pages
 
@@ -204,36 +208,49 @@ class AssetCatelogueGUI(BaseGUI):
 
             # --== Load the images of current asset into horizontalayouts ==--
 
-            if self.current_asset_images is not None:
-                # Clear the horizontal layouts
-                for i in reversed(range(self.horizontalLayout.count())):
-                    self.horizontalLayout.itemAt(i).widget().setParent(None)  # Auto garbage collection
-
+            self.reload_the_horizontal_layout()
             self.current_asset_images = []
 
             # Browse the temp folder to get the images of current asset (for media frame)
             asset_folder_name = f'{self.current_asset_id}_{self.asset_name_item.text()}'
-            list_of_images_for_media_frame = []
+
             for image_name in os.listdir(os.path.join(self.temp_folder_path, asset_folder_name)):
                 if image_name.find('^mediaframe') != -1:
+                    extension = image_name.split('.')[1]
+                    just_image_name = image_name.split('.')[0]
+                    original_image_name = f'{just_image_name.replace("^mediaframe","")}.{extension}'
                     # Create a ClickableLabel
-                    image_label: ClickableLabel = self.get_clickable_image_label(image_name.split('^')[0])
+                    image_label: ClickableLabel = self.get_clickable_image_label(just_image_name, extension)
                     # Get the image category name
                     image_category_name = self.db.get_asset_image_category_name(
-                        self.current_asset_id, image_name.split('^')[0])
+                        self.current_asset_id, original_image_name)
 
                     # Add the image to the list
-                    self.current_asset_images.append((image_label, image_name.split('^')[0], image_category_name))
+                    self.current_asset_images.append((image_label, original_image_name, image_category_name))
 
             # Add the images to the horizontal layout
             for image in self.current_asset_images:
                 self.horizontalLayout.addWidget(image[0])
 
-    def get_clickable_image_label(self, image_name: str) -> ClickableLabel:
-        print('Image name: ', image_name)
+            print('Current asset images: ', self.current_asset_images)
+
+    def reload_the_horizontal_layout(self):
+        # Clear the horizontal layouts
+        for i in reversed(range(self.horizontalLayout.count())):
+            self.horizontalLayout.itemAt(i).widget().setParent(None)  # Auto garbage collection
+
+    def get_clickable_image_label(self, just_image_name: str, extension: str) -> ClickableLabel:
+        print(f'Current image: {just_image_name}.{extension}')
         """
+        Arg:
+            just_image_name (str): Example: 'image^mediaframe'
+            extension (str): Example: 'png'
+        Return:
             This function return a ClickableLabel with the image_path_resized and set to the action show the original image when clicked
         """
+        # Get the original image name
+        orignal_image_name = f"{just_image_name.replace('^mediaframe', '')}.{extension}"
+
         # Get the current AssetID
         asset_id: int = self.db.get_asset_id(
             int(self.asset_number_item.text()),
@@ -242,9 +259,9 @@ class AssetCatelogueGUI(BaseGUI):
         )
 
         image_path_resized = os.path.join(
-            self.temp_folder_path, f'{asset_id}_{self.asset_name_item.text()}', f'{image_name}^mediaframe.png')
+            self.temp_folder_path, f'{asset_id}_{self.asset_name_item.text()}', f'{just_image_name}.{extension}')
         image_path_original = os.path.join(
-            self.asset_pictures_path, f'{asset_id}_{self.asset_name_item.text()}', f'{image_name}.png')
+            self.asset_pictures_path, f'{asset_id}_{self.asset_name_item.text()}', orignal_image_name)
 
         # Create a ClickableLabel
         image_label = ClickableLabel(self.horizontalLayoutWidget)
@@ -481,6 +498,20 @@ class AssetCatelogueGUI(BaseGUI):
     def store_asset_image_to_database(self, image_path: str, image_category: str):
         # Get the image name from image_path
         image_name = image_path.split('/')[-1]
+
+        # Got the name and extension of the image
+        just_image_name = image_name.split('.')[0]
+        extension = image_name.split('.')[1]
+
+        # If the extension is not png, convert it to png using PIL in the original folder
+        if extension != 'png':
+            self.resizer.convert_to_png(image_path)
+            # Delete the original image
+            os.remove(image_path)
+            # Rename the extension of the image
+            image_name = image_name.split('.')[0] + '.png'
+            # Rename the image_path
+            image_path = os.path.join(os.path.dirname(image_path), f'{just_image_name}.png')
 
         # Check if the folder image of asset is existed. If not, create it and naming it with asset id
         list_of_asset_image_folders = os.listdir(self.asset_pictures_path)
