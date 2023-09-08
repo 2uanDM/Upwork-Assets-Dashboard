@@ -156,6 +156,33 @@ class CrudDB():
         self.conn.commit()
         return True
 
+    def create_new_image(self,
+                         asset_number: int,
+                         asset_name: str,
+                         asset_category_name: str,
+                         image_file_name: str,
+                         image_category_name: str) -> bool:
+        # Get the AssetID of the asset
+        asset_id: int = self.get_asset_id(asset_number, asset_name, asset_category_name)
+
+        # Get the ImageCategoryID of the image category
+        image_category_id: int = self.cursor.execute(f"""
+            select ImageCategoryID
+            from ImageCategory
+            where CategoryName = '{image_category_name}';
+        """).fetchone()[0]
+
+        # Insert a new row into AssetImage table
+        operation = self.cursor.execute(f"""
+            insert into AssetImage (AssetID, ImageFileName, ImageCategoryID)
+            values ({asset_id}, '{image_file_name}', {image_category_id});
+        """)
+        if operation.rowcount == 0:
+            return False
+
+        self.conn.commit()
+        return True
+
     def update_asset_table(self,
                            asset_id: int,
                            asset_number: int,

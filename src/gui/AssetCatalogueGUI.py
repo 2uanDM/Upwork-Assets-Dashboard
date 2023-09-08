@@ -393,12 +393,23 @@ class AssetCatelogueGUI(BaseGUI):
 
     def store_asset_image_to_database(self, image_path: str, image_category: str):
 
-        self.label_3 = ClickableLabel(self.horizontalLayoutWidget)
-        self.label_3.setObjectName(u"label_3")
-        self.label_3.setPixmap(QPixmap(image_path))
-        self.label_3.setAlignment(Qt.AlignCenter)
-        self.label_3.clicked.connect(lambda: os.startfile(image_path))
+        # self.label_3 = ClickableLabel(self.horizontalLayoutWidget)
+        # self.label_3.setObjectName(u"label_3")
+        # self.label_3.setPixmap(QPixmap(image_path))
+        # self.label_3.setAlignment(Qt.AlignCenter)
+        # self.label_3.clicked.connect(lambda: os.startfile(image_path))
+        # self.horizontalLayout.addWidget(self.label_3)
 
-        self.horizontalLayout.addWidget(self.label_3)
+        # Check if the folder image of asset is existed. If not, create it and naming it with asset id
+        list_of_asset_image_folders = os.listdir(self.asset_pictures_path)
 
+        # Get the AssetID of current asset
+        asset_id: int = self.db.get_asset_id(
+            int(self.asset_number_item.text()),
+            self.asset_name_item.text(),
+            self.asset_detail_table.item(2, 1).text()
+        )
+
+        if f'{asset_id}_{self.asset_name_item.text()}' not in list_of_asset_image_folders:
+            os.mkdir(os.path.join(self.asset_pictures_path, f'{asset_id}_{self.asset_name_item.text()}'))
     #######################################################################################################################################
