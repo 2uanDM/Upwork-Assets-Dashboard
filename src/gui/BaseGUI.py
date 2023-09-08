@@ -6,6 +6,7 @@ from PyQt5.QtWidgets import *
 from PyQt5.QtCore import *
 from PyQt5.QtWidgets import QStyleOptionViewItem, QWidget
 from src.utils.database_crud import CrudDB
+from src.utils.image_utils import ImageResize
 import json
 import os
 
@@ -85,6 +86,9 @@ class BaseGUI(QWidget):
 
         # ------------------- Connect the database -------------------
         self.db = CrudDB()
+
+        # ------------------- Setup the image resize -------------------
+        self.resizer = ImageResize()
 
         # ------------------- Setup Fonts -------------------
         self.setup_fonts()

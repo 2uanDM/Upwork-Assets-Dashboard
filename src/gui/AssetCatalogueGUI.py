@@ -101,6 +101,33 @@ class AssetCatelogueGUI(BaseGUI):
         self.total_pages = data['total_pages']
         self.assets_data = data['data']
 
+        # Generate the images for master table for all the assets loaded in self.assets_data
+        for asset in self.assets_data:
+            asset_number: int = asset[0]
+            asset_name: str = asset[1]
+            asset_category_name: str = asset[2]
+
+            # Get the AssetID of current asset
+            asset_id: int = self.db.get_asset_id(asset_number, asset_name, asset_category_name)
+
+            # Check if the folder image of asset is existed. If not, create it and naming it with asset id
+            temp_asset_image_folder = os.path.join(self.temp_folder_path, f'{asset_id}_{asset_name}')
+            if not os.path.exists(temp_asset_image_folder):
+                os.mkdir(temp_asset_image_folder)
+
+            # Get the list of images of current asset
+            list_of_images = self.db.get_list_of_asset_images(asset_number, asset_name, asset_category_name)
+            if len(list_of_images) == 0:
+                continue
+
+            first_image_name = list_of_images[0]
+
+            # Check if the resized image is existed. If not, create it
+            if not os.path.exists(os.path.join(temp_asset_image_folder, f'{first_image_name}^mastertable.png')):
+                self.resizer.fit_master_table(asset_id, asset_name, first_image_name)
+            if not os.path.exists(os.path.join(temp_asset_image_folder, f'{first_image_name}^mediaframe.png')):
+                self.resizer.fit_media_frame(asset_id, asset_name, first_image_name)
+
     def load_master_table(self, page: int):
         # Clear the table
         self.master_table.clearContents()
@@ -118,6 +145,8 @@ class AssetCatelogueGUI(BaseGUI):
                 self.master_table.setItem(i, j + 1, QTableWidgetItem(str(column)))
 
         self.reload_asset_detail_table()
+
+        # TODO: Load the image preview of assets in current pages
 
     def next_page_button_event(self):
         # Renew the page label

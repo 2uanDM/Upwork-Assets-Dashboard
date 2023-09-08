@@ -47,13 +47,13 @@ if __name__ == "__main__":
         subprocess.run(["attrib", "+h", folder_path], shell=True, check=True)  # Set the .temp folder to be hidden
 
     # When the application is closed, delete the temp folder
-    def on_close():
-        os.rmdir(folder_path)
+    # def on_close():
+    #     os.rmdir(folder_path)
 
     try:
         app = QApplication(sys.argv)
         main_window = StackedWidget()
-        main_window.closed.connect(on_close)
+        # main_window.closed.connect(on_close)
 
         # Import all GUIs
         asset_catalogue_gui = AssetCatelogueGUI(main_window)
