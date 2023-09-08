@@ -6,16 +6,16 @@ import os
 sys.path.append(os.path.join(os.getcwd()))
 
 from src.gui.BaseGUI import BaseGUI
-from src.utils.database_crud import CrudDB
+from src.gui.MessageBoxDialog import MessageBox as msg
 
 
 class AssetCatelogueGUI(BaseGUI):
     def __init__(self, MainWindow) -> None:
         super().__init__(MainWindow)
         self.current_page = 1
+        self.current_asset_id = None
 
-        # Init the database
-        self.db = CrudDB()
+        # Initial data from the database
         self.reload_master_table_data_after_crud()
         # Initially, the data in the table is the assets data when the filter is not applied
         self.table_data = self.assets_data
@@ -23,9 +23,9 @@ class AssetCatelogueGUI(BaseGUI):
         self.load_master_table(self.current_page)
 
         # Crud buttons
-        self.crud_add_asset_button.clicked.connect(self.test_action)
-        self.crud_save_asset_button.clicked.connect(self.test_action)
-        self.crud_delete_asset_button.clicked.connect(self.test_action)
+        self.crud_add_asset_button.clicked.connect(self.crud_add_asset_event)
+        self.crud_save_asset_button.clicked.connect(self.crud_save_asset_event)
+        self.crud_delete_asset_button.clicked.connect(self.crud_delete_asset_event)
 
         self.crud_add_attribute_button.clicked.connect(self.test_action)
         self.crud_save_attribute_button.clicked.connect(self.test_action)
@@ -65,6 +65,21 @@ class AssetCatelogueGUI(BaseGUI):
         # Apply filter button
         self.apply_filter_button.clicked.connect(self.apply_filter_button_event)
 
+    def reload_asset_detail_table(self):
+        self.asset_number_item.setText("")
+        self.asset_name_item.setText("")
+        self.asset_variant_value_item.setText("")
+        self.asset_description_value_item.setText("")
+        self.import_list_header_value_item.setText("")
+        self.import_list_2nd_row_value_item.setText("")
+        self.import_list_3rd_row_value_item.setText("")
+
+        # Qcombobox
+        self.asset_detail_table.setItem(2, 1, QTableWidgetItem(""))
+
+        # Current Asset ID
+        self.current_asset_id = None
+
     def reload_master_table_data_after_crud(self):
         data: dict = self.db.load_master_table()
         self.total_assets = data['total_assets']
@@ -86,6 +101,8 @@ class AssetCatelogueGUI(BaseGUI):
         for i, row in enumerate(data):
             for j, column in enumerate(row):
                 self.master_table.setItem(i, j + 1, QTableWidgetItem(str(column)))
+
+        self.reload_asset_detail_table()
 
     def next_page_button_event(self):
         # Renew the page label
@@ -110,6 +127,10 @@ class AssetCatelogueGUI(BaseGUI):
             asset_name = self.master_table.item(row, 2).text()
             asset_category_name = self.master_table.item(row, 3).text()
 
+            # Get the asset id
+            self.current_asset_id = self.db.get_asset_id(int(asset_number), asset_name, asset_category_name)
+            print('Current AssetID: ', self.current_asset_id)
+            # Get the asset detail
             asset_detail: tuple = self.db.load_asset_detail_table(int(asset_number), asset_name, asset_category_name)
 
             if asset_detail is None:
@@ -122,7 +143,7 @@ class AssetCatelogueGUI(BaseGUI):
             # Set the asset variant
             self.asset_variant_value_item.setText(asset_detail[0])
             # Set the asset category
-            self.asset_category_value_item.setText(asset_category_name)
+            self.asset_detail_table.setItem(2, 1, QTableWidgetItem(asset_category_name))
             # Set the asset description
             self.asset_description_value_item.setText(asset_detail[1])
             # Set the import list header
@@ -155,7 +176,8 @@ class AssetCatelogueGUI(BaseGUI):
 
         self.table_data = filtered_data
         self.total_assets = len(filtered_data)
-        self.total_pages = self.total_assets // 10 + 1 if self.total_assets % 10 != 0 else self.total_assets // 10
+        self.total_pages = self.total_assets // 10 + \
+            1 if (self.total_assets % 10 != 0 or self.total_assets == 0) else self.total_assets // 10
         self.current_page = 1
         self.load_master_table(self.current_page)
 
@@ -194,3 +216,124 @@ class AssetCatelogueGUI(BaseGUI):
 
     def sort_desc_asset_category_button_event(self):
         self._sort_master_table(2, "desc")
+
+    #######################################################################################################################################
+
+    def crud_delete_asset_event(self):
+        # Get the asset number and name
+        asset_number = self.asset_number_item.text()
+        asset_name = self.asset_name_item.text()
+        asset_category_name = self.asset_detail_table.item(2, 1).text()
+
+        if asset_number == "" or asset_name == "" or asset_category_name == "":
+            msg.warning_box("Please select an asset to delete!")
+            return
+
+        user_choice = msg.yes_no_box("Are you sure to delete this asset? This action cannot be undone!")
+        if user_choice == QMessageBox.No:
+            return
+
+        # Delete the asset
+        success = self.db.delete_asset(int(asset_number), asset_name, asset_category_name)
+
+        if not success:
+            msg.warning_box("Error occurred when deleting this asset!")
+            return
+        # Reload the master table
+        self.reload_master_table_data_after_crud()
+        self.table_data = self.assets_data
+        self.total_assets = len(self.table_data)
+        self.total_pages = self.total_assets // 10 + \
+            1 if (self.total_assets % 10 != 0 or self.total_assets == 0) else self.total_assets // 10
+        self.current_page = 1
+        self.load_master_table(self.current_page)
+        self.apply_filter_button.click()
+        self.reload_asset_detail_table()
+
+        msg.information_box("Delete asset successfully!")
+
+    def crud_save_asset_event(self):
+        # Get the current asset information
+        asset_number = self.asset_number_item.text()
+        asset_name = self.asset_name_item.text()
+        asset_category_name = self.asset_detail_table.item(2, 1).text()
+        asset_variant = self.asset_variant_value_item.text()
+        asset_description = self.asset_description_value_item.text()
+        import_list_header = self.import_list_header_value_item.text()
+        import_list_2nd_row = self.import_list_2nd_row_value_item.text()
+        import_list_3rd_row = self.import_list_3rd_row_value_item.text()
+
+        if not asset_number.isdigit():
+            msg.warning_box("Asset number must be a number!")
+            return
+
+        user_choice = msg.yes_no_box("Are you sure to save changes of this asset?")
+        if user_choice == QMessageBox.No:
+            return
+
+        # Update the Asset table
+        success = self.db.update_asset_table(self.current_asset_id,
+                                             int(asset_number),
+                                             asset_name,
+                                             asset_variant,
+                                             self.db.get_category_id(asset_category_name),
+                                             asset_description)
+
+        if not success:
+            msg.warning_box("Error occurred when updating information in 'Asset' table!")
+            return
+
+        # Update the AssetImportList table
+        success = self.db.update_asset_import_list(self.current_asset_id,
+                                                   import_list_header,
+                                                   import_list_2nd_row,
+                                                   import_list_3rd_row)
+        if not success:
+            msg.warning_box("Error occurred when updating information in 'AssetImportList' table!")
+            return
+
+        # Reload the master table
+        self.reload_master_table_data_after_crud()
+        self.table_data = self.assets_data
+        self.total_assets = len(self.table_data)
+        self.total_pages = self.total_assets // 10 + \
+            1 if (self.total_assets % 10 != 0 or self.total_assets == 0) else self.total_assets // 10
+        self.current_page = 1
+        self.load_master_table(self.current_page)
+        self.apply_filter_button.click()
+        self.reload_asset_detail_table()
+
+        msg.information_box("Save asset information successfully!")
+
+    def crud_add_asset_event(self):
+        # Clear filter input
+        self.number_input.setText("")
+        self.search_input.setText("")
+        self.apply_filter_button.click()
+
+        # Move to the last page
+        if self.total_assets % 10 == 0:
+            self.total_pages += 1
+            self.current_page = self.total_pages
+            self.load_master_table(self.current_page)
+        else:
+            self.current_page = self.total_pages
+            self.load_master_table(self.current_page)
+
+        print('The new row to insert in master table is: ', len(self.assets_data) % 10 + 1)
+
+        # Create a new asset
+        success = self.db.create_new_asset()
+        if not success:
+            msg.warning_box("Error occurred when creating a new asset!")
+            return
+
+        # Reload the master table
+        self.reload_master_table_data_after_crud()
+        self.table_data = self.assets_data
+        self.total_assets = len(self.table_data)
+        self.total_pages = self.total_assets // 10 + \
+            1 if (self.total_assets % 10 != 0 or self.total_assets == 0) else self.total_assets // 10
+        self.current_page = self.total_pages
+        self.load_master_table(self.current_page)
+        self.reload_asset_detail_table()

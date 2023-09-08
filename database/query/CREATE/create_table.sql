@@ -49,25 +49,28 @@ CREATE TABLE IF NOT EXISTS Asset (
     AssetCategoryID INTEGER NOT NULL,
     AssetImportListID INTEGER NOT NULL,
     FOREIGN KEY (AssetCategoryID) REFERENCES AssetCategory (AssetCategoryID),
-    FOREIGN KEY (AssetImportListID) REFERENCES AssetImportList (AssetImportListID)
+    FOREIGN KEY (AssetImportListID) REFERENCES AssetImportList (AssetImportListID) ON DELETE CASCADE
 );
 CREATE TABLE AssetAttribute (
     AssetID INTEGER NOT NULL,
     AttributeID INTEGER NOT NULL,
     FOREIGN KEY (AssetID) REFERENCES Asset (AssetID),
-    FOREIGN KEY (AttributeID) REFERENCES Attribute (AttributeID)
+    FOREIGN KEY (AttributeID) REFERENCES Attribute (AttributeID),
+    PRIMARY KEY (AssetID, AttributeID)
 );
 CREATE TABLE AssetShape(
     AssetID INTEGER NOT NULL,
     ShapeID INTEGER NOT NULL,
     FOREIGN KEY (AssetID) REFERENCES Asset (AssetID),
-    FOREIGN KEY (ShapeID) REFERENCES Shape (ShapeID)
+    FOREIGN KEY (ShapeID) REFERENCES Shape (ShapeID),
+    PRIMARY KEY (AssetID, ShapeID)
 );
 CREATE TABLE AssetImage(
     AssetID INTEGER NOT NULL,
     ImageID INTEGER NOT NULL,
     FOREIGN KEY (AssetID) REFERENCES Asset (AssetID),
-    FOREIGN KEY (ImageID) REFERENCES Image (ImageID)
+    FOREIGN KEY (ImageID) REFERENCES Image (ImageID),
+    PRIMARY KEY (AssetID, ImageID)
 );
 CREATE TABLE Project (
     ProjectID INTEGER PRIMARY KEY AUTOINCREMENT,

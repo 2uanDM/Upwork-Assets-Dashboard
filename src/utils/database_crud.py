@@ -1,13 +1,54 @@
+import json
 import sqlite3
 import os
 
+with open(os.path.join(os.getcwd(), 'configuration', 'application.json'), "r") as f:
+    config = json.load(f)
+
 
 class CrudDB():
-    DATABSE_PATH = os.path.join(os.getcwd(), 'new_assetDB.db')
+    DATABSE_PATH = os.path.join(os.getcwd(), f'{config["database_name"]}.db')
 
     def __init__(self) -> None:
         self.conn = sqlite3.connect(self.DATABSE_PATH)
         self.cursor = self.conn.cursor()
+
+    def get_category_id(self, category_name: str) -> int:
+        return self.cursor.execute(f"""
+            select AssetCategoryID
+            from AssetCategory
+            where CategoryName = '{category_name}';
+        """).fetchone()[0]
+
+    def get_asset_id(self, asset_number: int, asset_name: str, asset_category_name: str) -> int:
+        """
+        Get the asset id from the database
+        Args:
+            asset_number (int)
+            asset_name (str)
+            asset_category_name (str)
+
+        Returns:
+            int: The asset id
+        """
+        return self.cursor.execute(f"""
+            select AssetID
+            from Asset
+            where 1 = 1
+            and AssetNumber = {asset_number}
+            and AssetName = '{asset_name}'
+            and AssetCategoryID = (
+                select AssetCategoryID
+                from AssetCategory
+                where CategoryName = '{asset_category_name}'
+            );
+        """).fetchone()[0]
+
+    def get_list_of_asset_categories(self) -> list:
+        """
+        Return a list of asset categories
+        """
+        return [category[0] for category in self.cursor.execute("SELECT CategoryName FROM AssetCategory").fetchall()]
 
     def load_master_table(self) -> dict:
         """
@@ -78,6 +119,111 @@ class CrudDB():
                                       """)
         return command.fetchone()
 
+    def create_new_asset(self) -> bool:
+        # Insert a new row into AssetImportList table
+        operation = self.cursor.execute(f"""
+            insert into AssetImportList (ImportlistHeader, Importlist_2ndRow, Importlist_3ndRow)
+            values ('', '', '');
+                            """)
+        if operation.rowcount == 0:
+            return False
+
+        # Get the AssetImportListID of the newly created row
+        asset_import_list_id = self.cursor.execute("select last_insert_rowid()").fetchone()[0]
+
+        # Insert a new row into Asset table
+        operation = self.cursor.execute(f"""
+            insert into Asset (AssetNumber, AssetName, AssetVariant, AssetDescription, AssetCategoryID, AssetImportListID)
+            values (9999999, 'example', 'example', 'example', 1, {asset_import_list_id});
+                            """)
+        if operation.rowcount == 0:
+            return False
+
+        self.conn.commit()
+        return True
+
+    def update_asset_table(self,
+                           asset_id: int,
+                           asset_number: int,
+                           asset_name: str,
+                           asset_variant: str,
+                           asset_category_id: int,
+                           asset_description: str,
+                           ) -> bool:
+        operation = self.cursor.execute(f"""
+            update Asset 
+            set 
+                AssetName = '{asset_name}', 
+                AssetNumber = {asset_number},
+                AssetVariant = '{asset_variant}',
+                AssetDescription = '{asset_description}',
+                AssetCategoryID = {asset_category_id}
+            where AssetID = {asset_id};                    
+                                        """)
+
+        # Check if the operation is successful
+        if operation.rowcount == 0:
+            return False
+        else:
+            self.conn.commit()
+            return True
+
+    def update_asset_import_list(self,
+                                 asset_id: int,
+                                 import_list_header: str,
+                                 import_list_2nd_row: str,
+                                 import_list_3nd_row: str) -> bool:
+
+        opearation = self.cursor.execute(f"""
+            update AssetImportList 
+            set 
+                ImportlistHeader = '{import_list_header}',
+                Importlist_2ndRow = '{import_list_2nd_row}',
+                Importlist_3ndRow = '{import_list_3nd_row}'
+            where AssetImportListID = (
+                select AssetImportListID
+                from Asset
+                where AssetID = {asset_id}
+            );    
+                                         """)
+
+        # Check if the operation is successful
+        if opearation.rowcount == 0:
+            return False
+        else:
+            self.conn.commit()
+            return True
+
+    def delete_asset(self, asset_number: int, asset_name: str, asset_category_name: str) -> bool:
+        """
+        Delete an asset from the database
+        Args:
+            asset_number (int)
+            asset_name (str)
+            asset_category_name (str)
+
+        Returns:
+            None
+        """
+        operation = self.cursor.execute(f"""
+            delete from Asset
+            where 1 = 1
+            and AssetNumber = {asset_number}
+            and AssetName = '{asset_name}'
+            and AssetCategoryID = (
+                select AssetCategoryID
+                from AssetCategory
+                where CategoryName = '{asset_category_name}'
+            );
+        """)
+
+        # Check if the operation is successful
+        if operation.rowcount == 0:
+            return False
+        else:
+            self.conn.commit()
+            return True
+
     def __del__(self):
         self.conn.commit()
         self.cursor.close()
@@ -87,4 +233,4 @@ class CrudDB():
 # if __name__ == '__main__':
 #     crud = CrudDB()
 #     # print(crud.load_master_table())
-#     print(crud.load_asset_detail_table(1103, 'Pencil Sharpener', 'Office Supplies'))
+#     print(crud.get_list_of_asset_categories())

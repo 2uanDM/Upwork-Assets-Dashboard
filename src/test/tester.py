@@ -1,33 +1,70 @@
-from PyQt5.QtWidgets import QApplication, QMainWindow, QTableWidget, QTableWidgetItem
-from PyQt5.QtGui import QColor
 import sys
+from PyQt5.QtWidgets import QApplication, QMainWindow, QTableWidget, QTableWidgetItem, QComboBox, QVBoxLayout, QWidget, QStyledItemDelegate
+from PyQt5.QtCore import Qt
 
 
-class CustomTableWidget(QTableWidget):
-    def __init__(self, rows, columns):
-        super().__init__(rows, columns)
+class ComboBoxDelegate(QStyledItemDelegate):
+    def createEditor(self, parent, option, index):
+        row = index.row()
+        column = index.column()
 
-        # Hide the horizontal header
-        self.horizontalHeader().hide()
+        # Specify the desired cell where the delegate should be applied
+        target_row = 1
+        target_column = 1
 
-        # Add a custom row with two columns
-        self.setRowCount(1)
-        self.setColumnCount(2)
+        if row == target_row and column == target_column:
+            editor = QComboBox(parent)
+            editor.addItem("Option 1")
+            editor.addItem("Option 2")
+            editor.addItem("Option 3")
+            return editor
 
-        # Set background color for the first row
-        first_row_item = QTableWidgetItem()
-        first_row_item.setBackground(QColor(231, 231, 231))  # Set your desired background color
-        self.setItem(0, 0, first_row_item)
+        # Use the default editor for other cells
+        return super().createEditor(parent, option, index)
 
-        # Set text for the first row
-        first_row_text = "Custom Text"  # Set your desired text
-        self.setItem(0, 1, QTableWidgetItem(first_row_text))
+    def setEditorData(self, editor, index):
+        current_text = index.model().data(index, Qt.EditRole)
+        # If the editor is a QComboBox, this will select the current text
+        if isinstance(editor, QComboBox):
+            editor.setCurrentText(current_text)
+        else:
+            super().setEditorData(editor, index)
+
+    def setModelData(self, editor, model, index):
+        if isinstance(editor, QComboBox):
+            model.setData(index, editor.currentText(), Qt.EditRole)
+        else:
+            super().setModelData(editor, model, index)
+
+
+class MyWindow(QMainWindow):
+    def __init__(self):
+        super().__init__()
+
+        self.setWindowTitle("QTableWidget with ComboBox")
+        self.setGeometry(100, 100, 800, 600)
+
+        central_widget = QWidget(self)
+        self.setCentralWidget(central_widget)
+
+        layout = QVBoxLayout(central_widget)
+
+        # Create a QTableWidget
+        self.tableWidget = QTableWidget(self)
+        self.tableWidget.setColumnCount(2)
+        self.tableWidget.setRowCount(3)
+
+        # Set the custom delegate
+        combo_delegate = ComboBoxDelegate()
+        self.tableWidget.setItemDelegate(combo_delegate)
+
+        self.tableWidget.setItem(1, 1, QTableWidgetItem("Option 2"))
+
+        layout.addWidget(self.tableWidget)
 
 
 if __name__ == "__main__":
     app = QApplication(sys.argv)
-    window = QMainWindow()
-    table_widget = CustomTableWidget(3, 3)
-    window.setCentralWidget(table_widget)
+    window = MyWindow()
     window.show()
     sys.exit(app.exec_())
