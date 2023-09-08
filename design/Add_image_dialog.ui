@@ -213,7 +213,7 @@ QPushButton:hover {
      <string>Add </string>
     </property>
    </widget>
-   <widget class="QPushButton" name="add_image_button_2">
+   <widget class="QPushButton" name="preview_button">
     <property name="geometry">
      <rect>
       <x>220</x>

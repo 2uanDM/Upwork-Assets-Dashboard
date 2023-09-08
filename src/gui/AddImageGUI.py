@@ -4,6 +4,7 @@ from PyQt5.QtCore import *
 import sys
 import os
 sys.path.append(os.path.join(os.getcwd()))
+from src.gui.MessageBoxDialog import MessageBox as msg
 
 
 class AddImageGUI(QWidget):
@@ -28,6 +29,7 @@ class AddImageGUI(QWidget):
         self.image_path()
         self.choose_category()
         self.add_image_button()
+        self.add_preview_button()
 
     def setup_font(self):
         self.font = QFont()
@@ -110,7 +112,7 @@ class AddImageGUI(QWidget):
     def add_image_button(self):
         self.add_image_button = QPushButton(self.frame)
         self.add_image_button.setObjectName(u"add_image_button")
-        self.add_image_button.setGeometry(QRect(330, 310, 121, 41))
+        self.add_image_button.setGeometry(QRect(460, 310, 121, 41))
         self.add_image_button.setFont(self.font2)
         self.add_image_button.setStyleSheet(u"/* Normal state styles */\n"
                                             "QPushButton {\n"
@@ -130,12 +132,36 @@ class AddImageGUI(QWidget):
         self.add_image_button.setText(u"Add")
         self.add_image_button.clicked.connect(self.add_image)
 
+    def add_preview_button(self):
+        self.preview_button = QPushButton(self.frame)
+        self.preview_button.setObjectName(u"preview_button")
+        self.preview_button.setGeometry(QRect(220, 310, 121, 41))
+        self.preview_button.setFont(self.font2)
+        self.preview_button.setLayoutDirection(Qt.LeftToRight)
+        self.preview_button.setStyleSheet(u"/* Normal state styles */\n"
+                                          "QPushButton {\n"
+                                          "    color: rgb(69, 119, 185);\n"
+                                          "    border: 2px solid rgb(241, 241, 241);\n"
+                                          "    border-radius: 10px;\n"
+                                          "    background-color: rgb(241, 241, 241);\n"
+                                          "}\n"
+                                          "\n"
+                                          "/* Hover state styles */\n"
+                                          "QPushButton:hover {\n"
+                                          "    color: white;\n"
+                                          "    background-color: darkgray;\n"
+                                          "}\n"
+                                          "")
+
+        self.preview_button.setText(u"Preview")
+        self.preview_button.clicked.connect(self.preview_image)
+
     def open_file_dialog(self):
         # Open browse pictures dialog with native OS file browser
         image_path = QFileDialog.getOpenFileName(self,
                                                  caption='Choose Image',
                                                  directory='c:\\',
-                                                 filter="Image files (*.jpg *.png *.jpeg)")
+                                                 filter="Image files (*.jpg *.png *.jpeg, *.bmp)")
         if image_path[0]:
             self.path_input.setText(image_path[0])
 
@@ -143,4 +169,12 @@ class AddImageGUI(QWidget):
         image_path = self.path_input.text().strip()
         image_category = self.comboBox.currentText()
         self.add_image_signal.emit(image_path, image_category)
-        self.close()
+        self.MainWindow.close()
+
+    def preview_image(self):
+        image_path = self.path_input.text().strip()
+        if image_path == '':
+            msg.warning_box('Please select an image to preview', icon_path='./assets/icon/logo.jpg')
+            return
+
+        os.startfile(image_path)
