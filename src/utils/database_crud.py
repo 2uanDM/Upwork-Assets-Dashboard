@@ -50,6 +50,12 @@ class CrudDB():
         """
         return [category[0] for category in self.cursor.execute("SELECT CategoryName FROM AssetCategory").fetchall()]
 
+    def get_list_of_image_categories(self) -> list:
+        """
+        Return a list of image categories
+        """
+        return [category[0] for category in self.cursor.execute("SELECT CategoryName FROM ImageCategory").fetchall()]
+
     def load_master_table(self) -> dict:
         """
         return {
@@ -233,4 +239,4 @@ class CrudDB():
 # if __name__ == '__main__':
 #     crud = CrudDB()
 #     # print(crud.load_master_table())
-#     print(crud.get_list_of_asset_categories())
+#     print(crud.get_list_of_image_categories())

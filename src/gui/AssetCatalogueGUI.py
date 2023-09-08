@@ -7,9 +7,12 @@ sys.path.append(os.path.join(os.getcwd()))
 
 from src.gui.BaseGUI import BaseGUI
 from src.gui.MessageBoxDialog import MessageBox as msg
+from src.gui.AddImageGUI import AddImageGUI
 
 
 class AssetCatelogueGUI(BaseGUI):
+    icon_path: str = './assets/icon/logo.jpg'
+
     def __init__(self, MainWindow) -> None:
         super().__init__(MainWindow)
         self.current_page = 1
@@ -35,7 +38,7 @@ class AssetCatelogueGUI(BaseGUI):
         self.crud_save_shape_button.clicked.connect(self.test_action)
         self.crud_delete_shape_button.clicked.connect(self.test_action)
 
-        self.crud_add_media_button.clicked.connect(self.test_action)
+        self.crud_add_media_button.clicked.connect(self.crud_add_image_event)
         self.crud_delete_media_button.clicked.connect(self.test_action)
 
         # Buttons for master table
@@ -226,10 +229,11 @@ class AssetCatelogueGUI(BaseGUI):
         asset_category_name = self.asset_detail_table.item(2, 1).text()
 
         if asset_number == "" or asset_name == "" or asset_category_name == "":
-            msg.warning_box("Please select an asset to delete!")
+            msg.warning_box("Please select an asset to delete!", icon_path=self.icon_path)
             return
 
-        user_choice = msg.yes_no_box("Are you sure to delete this asset? This action cannot be undone!")
+        user_choice = msg.yes_no_box(
+            "Are you sure to delete this asset? This action cannot be undone!", icon_path=self.icon_path)
         if user_choice == QMessageBox.No:
             return
 
@@ -237,7 +241,7 @@ class AssetCatelogueGUI(BaseGUI):
         success = self.db.delete_asset(int(asset_number), asset_name, asset_category_name)
 
         if not success:
-            msg.warning_box("Error occurred when deleting this asset!")
+            msg.warning_box("Error occurred when deleting this asset!", icon_path=self.icon_path)
             return
         # Reload the master table
         self.reload_master_table_data_after_crud()
@@ -250,9 +254,13 @@ class AssetCatelogueGUI(BaseGUI):
         self.apply_filter_button.click()
         self.reload_asset_detail_table()
 
-        msg.information_box("Delete asset successfully!")
+        msg.information_box("Delete asset successfully!", icon_path=self.icon_path)
 
     def crud_save_asset_event(self):
+        if self.current_asset_id is None:
+            msg.warning_box("Please select an asset to update!", icon_path=self.icon_path)
+            return
+
         # Get the current asset information
         asset_number = self.asset_number_item.text()
         asset_name = self.asset_name_item.text()
@@ -264,10 +272,10 @@ class AssetCatelogueGUI(BaseGUI):
         import_list_3rd_row = self.import_list_3rd_row_value_item.text()
 
         if not asset_number.isdigit():
-            msg.warning_box("Asset number must be a number!")
+            msg.warning_box("Asset number must be a number!", icon_path=self.icon_path)
             return
 
-        user_choice = msg.yes_no_box("Are you sure to save changes of this asset?")
+        user_choice = msg.yes_no_box("Are you sure to save changes of this asset?", icon_path=self.icon_path)
         if user_choice == QMessageBox.No:
             return
 
@@ -280,7 +288,7 @@ class AssetCatelogueGUI(BaseGUI):
                                              asset_description)
 
         if not success:
-            msg.warning_box("Error occurred when updating information in 'Asset' table!")
+            msg.warning_box("Error occurred when updating information in 'Asset' table!", icon_path=self.icon_path)
             return
 
         # Update the AssetImportList table
@@ -289,7 +297,8 @@ class AssetCatelogueGUI(BaseGUI):
                                                    import_list_2nd_row,
                                                    import_list_3rd_row)
         if not success:
-            msg.warning_box("Error occurred when updating information in 'AssetImportList' table!")
+            msg.warning_box("Error occurred when updating information in 'AssetImportList' table!",
+                            icon_path=self.icon_path)
             return
 
         # Reload the master table
@@ -303,7 +312,7 @@ class AssetCatelogueGUI(BaseGUI):
         self.apply_filter_button.click()
         self.reload_asset_detail_table()
 
-        msg.information_box("Save asset information successfully!")
+        msg.information_box("Save asset information successfully!", icon_path=self.icon_path)
 
     def crud_add_asset_event(self):
         # Clear filter input
@@ -325,7 +334,7 @@ class AssetCatelogueGUI(BaseGUI):
         # Create a new asset
         success = self.db.create_new_asset()
         if not success:
-            msg.warning_box("Error occurred when creating a new asset!")
+            msg.warning_box("Error occurred when creating a new asset!", icon_path=self.icon_path)
             return
 
         # Reload the master table
@@ -337,3 +346,38 @@ class AssetCatelogueGUI(BaseGUI):
         self.current_page = self.total_pages
         self.load_master_table(self.current_page)
         self.reload_asset_detail_table()
+
+    #######################################################################################################################################
+    def crud_add_image_event(self):
+        # Show a sub window include choose file button and a ComboBox to choose the image category
+        # Then add the image to the database
+
+        if self.current_asset_id is None:
+            msg.warning_box("Please select an asset to add image!", icon_path=self.icon_path)
+            return
+
+        self.image_window = QMainWindow()
+        self.image_window.resize(721, 417)
+        self.image_window.setWindowTitle(u"Add Image")
+        self.image_window.setWindowIcon(QIcon('./assets/icon/logo.jpg'))
+
+        self.image_window_widget = AddImageGUI(
+            asset_name=self.asset_name_item.text(),
+            image_categories=self.db.get_list_of_image_categories(),
+            MainWindow=self.image_window
+        )
+
+        # Add widget to the window
+        self.image_window.setCentralWidget(self.image_window_widget)
+        self.image_window_widget.add_signal.connect(self.store_asset_image_to_database)
+
+        # Show the window
+        self.image_window.show()
+
+    def crud_delete_image_event(self):
+        pass
+
+    def store_asset_image_to_database(image_path: str, image_category: str):
+        print(image_path, image_category)
+
+    #######################################################################################################################################
