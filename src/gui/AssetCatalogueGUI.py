@@ -444,9 +444,9 @@ class AssetCatelogueGUI(BaseGUI):
             msg.warning_box(f'Error occurred when adding image: "{image_name}" to database!', icon_path=self.icon_path)
             return
 
-        print('Image name: ', image_name)
-        print('Image Category: ', image_category)
-        print('List of images folder: ', list_of_asset_image_folders)
-        print('List of images in this asset: ', list_of_images)
+        self.image_window_widget.set_result_label_text(
+            f'Add image "{image_name}" successfully!')
+        print(f'Add image "{image_name}" to the asset with id = {asset_id} successfully!')
 
+        # TODO: Reload the Master table to show the image preview and reload the image horizontal layout
     #######################################################################################################################################

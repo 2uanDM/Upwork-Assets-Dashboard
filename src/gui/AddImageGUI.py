@@ -30,6 +30,7 @@ class AddImageGUI(QWidget):
         self.choose_category()
         self.add_image_button()
         self.add_preview_button()
+        self.setup_result_label()
 
     def setup_font(self):
         self.font = QFont()
@@ -156,6 +157,16 @@ class AddImageGUI(QWidget):
         self.preview_button.setText(u"Preview")
         self.preview_button.clicked.connect(self.preview_image)
 
+    def setup_result_label(self):
+        self.result_label = QLabel(self.frame)
+        self.result_label.setObjectName(u"result_label")
+        self.result_label.setGeometry(QRect(70, 250, 661, 31))
+        font4 = QFont()
+        font4.setFamily(u"Segoe UI")
+        font4.setPointSize(12)
+        self.result_label.setFont(font4)
+        self.result_label.setStyleSheet(u"color:rgb(89,89,89)")
+
     def open_file_dialog(self):
         # Open browse pictures dialog with native OS file browser
         image_path = QFileDialog.getOpenFileName(self,
@@ -182,3 +193,6 @@ class AddImageGUI(QWidget):
             return
 
         os.startfile(image_path)
+
+    def set_result_label_text(self, text: str):
+        self.result_label.setText(text)
