@@ -253,9 +253,6 @@ class AssetCatelogueGUI(BaseGUI):
         msg.information_box("Delete asset successfully!")
 
     def crud_save_asset_event(self):
-        user_choice = msg.yes_no_box("Are you sure to save changes of this asset?")
-        if user_choice == QMessageBox.No:
-            return
         # Get the current asset information
         asset_number = self.asset_number_item.text()
         asset_name = self.asset_name_item.text()
@@ -265,6 +262,14 @@ class AssetCatelogueGUI(BaseGUI):
         import_list_header = self.import_list_header_value_item.text()
         import_list_2nd_row = self.import_list_2nd_row_value_item.text()
         import_list_3rd_row = self.import_list_3rd_row_value_item.text()
+
+        if not asset_number.isdigit():
+            msg.warning_box("Asset number must be a number!")
+            return
+
+        user_choice = msg.yes_no_box("Are you sure to save changes of this asset?")
+        if user_choice == QMessageBox.No:
+            return
 
         # Update the Asset table
         success = self.db.update_asset_table(self.current_asset_id,
