@@ -66,6 +66,15 @@ class CrudDB():
             where AssetID = {asset_id};
         """).fetchall()]
 
+    def get_asset_image_category_name(self, asset_id: int, image_name: str) -> str:
+        return self.cursor.execute(f"""
+            select ic.CategoryName
+            from AssetImage as ai
+            join ImageCategory as ic
+            on ai.ImageCategoryID = ic.ImageCategoryID
+            where ai.AssetID = {asset_id};
+        """).fetchone()[0]
+
     def load_master_table(self) -> dict:
         """
         return {

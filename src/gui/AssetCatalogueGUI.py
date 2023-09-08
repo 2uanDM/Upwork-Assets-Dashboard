@@ -29,6 +29,8 @@ class AssetCatelogueGUI(BaseGUI):
         super().__init__(MainWindow)
         self.current_page = 1
         self.current_asset_id = None
+        # Store the information of images of current asset (image: ClickableLabel with Pixmap,'image_name', 'image_category_name')
+        self.current_asset_images = None
 
         # Initial data from the database
         self.reload_master_table_data_after_crud()
@@ -121,12 +123,13 @@ class AssetCatelogueGUI(BaseGUI):
                 continue
 
             # Resize for the master table: Just need to resize the first image
-            first_image_name = list_of_images[0]
+            first_image_name = list_of_images[0].split('.')[0]
             if not os.path.exists(os.path.join(temp_asset_image_folder, f'{first_image_name}^mastertable.png')):
                 self.resizer.fit_master_table(asset_id, asset_name, first_image_name)
 
             # Resize for the media frame: Just need to resize all the images
             for image_name in list_of_images:
+                image_name = image_name.split('.')[0]
                 if not os.path.exists(os.path.join(temp_asset_image_folder, f'{image_name}^mediaframe.png')):
                     self.resizer.fit_media_frame(asset_id, asset_name, image_name)
 
@@ -198,6 +201,58 @@ class AssetCatelogueGUI(BaseGUI):
             self.import_list_2nd_row_value_item.setText(asset_detail[3])
             # Set the import list 3rd row
             self.import_list_3rd_row_value_item.setText(asset_detail[4])
+
+            # --== Load the images of current asset into horizontalayouts ==--
+
+            if self.current_asset_images is not None:
+                # Clear the horizontal layouts
+                for i in reversed(range(self.horizontalLayout.count())):
+                    self.horizontalLayout.itemAt(i).widget().setParent(None)  # Auto garbage collection
+
+            self.current_asset_images = []
+
+            # Browse the temp folder to get the images of current asset (for media frame)
+            asset_folder_name = f'{self.current_asset_id}_{self.asset_name_item.text()}'
+            list_of_images_for_media_frame = []
+            for image_name in os.listdir(os.path.join(self.temp_folder_path, asset_folder_name)):
+                if image_name.find('^mediaframe') != -1:
+                    # Create a ClickableLabel
+                    image_label: ClickableLabel = self.get_clickable_image_label(image_name.split('^')[0])
+                    # Get the image category name
+                    image_category_name = self.db.get_asset_image_category_name(
+                        self.current_asset_id, image_name.split('^')[0])
+
+                    # Add the image to the list
+                    self.current_asset_images.append((image_label, image_name.split('^')[0], image_category_name))
+
+            # Add the images to the horizontal layout
+            for image in self.current_asset_images:
+                self.horizontalLayout.addWidget(image[0])
+
+    def get_clickable_image_label(self, image_name: str) -> ClickableLabel:
+        print('Image name: ', image_name)
+        """
+            This function return a ClickableLabel with the image_path_resized and set to the action show the original image when clicked
+        """
+        # Get the current AssetID
+        asset_id: int = self.db.get_asset_id(
+            int(self.asset_number_item.text()),
+            self.asset_name_item.text(),
+            self.asset_detail_table.item(2, 1).text()
+        )
+
+        image_path_resized = os.path.join(
+            self.temp_folder_path, f'{asset_id}_{self.asset_name_item.text()}', f'{image_name}^mediaframe.png')
+        image_path_original = os.path.join(
+            self.asset_pictures_path, f'{asset_id}_{self.asset_name_item.text()}', f'{image_name}.png')
+
+        # Create a ClickableLabel
+        image_label = ClickableLabel(self.horizontalLayoutWidget)
+        image_label.setPixmap(QPixmap(image_path_resized))
+        image_label.setAlignment(Qt.AlignCenter)
+        image_label.clicked.connect(lambda: os.startfile(image_path_original))
+
+        return image_label
 
     def apply_filter_button_event(self):
         # Get the filter value (number)
