@@ -7,7 +7,7 @@ sys.path.append(os.path.join(os.getcwd()))
 
 
 class AddImageGUI(QWidget):
-    add_signal = pyqtSignal(str, str)  # (image_path, image_category)
+    add_image_signal = pyqtSignal(str, str)
 
     def __init__(self, asset_name: str, image_categories: list, MainWindow) -> None:
         super().__init__(MainWindow)
@@ -134,4 +134,6 @@ class AddImageGUI(QWidget):
         pass
 
     def add_image(self):
-        self.add_signal.emit(self.path_input.text().strip(), self.comboBox.currentText())
+        image_path = self.path_input.text().strip()
+        image_category = self.comboBox.currentText()
+        self.add_image_signal.emit(image_path, image_category)

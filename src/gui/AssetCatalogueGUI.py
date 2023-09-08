@@ -369,7 +369,7 @@ class AssetCatelogueGUI(BaseGUI):
 
         # Add widget to the window
         self.image_window.setCentralWidget(self.image_window_widget)
-        self.image_window_widget.add_signal.connect(self.store_asset_image_to_database)
+        self.image_window_widget.add_image_signal.connect(self.store_asset_image_to_database)
 
         # Show the window
         self.image_window.show()
@@ -377,7 +377,8 @@ class AssetCatelogueGUI(BaseGUI):
     def crud_delete_image_event(self):
         pass
 
-    def store_asset_image_to_database(image_path: str, image_category: str):
+    def store_asset_image_to_database(self, image_path: str, image_category: str):
+        # Store the image to the database
         print(image_path, image_category)
 
     #######################################################################################################################################
