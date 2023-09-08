@@ -492,7 +492,6 @@ class AssetCatelogueGUI(BaseGUI):
     def crud_add_image_event(self):
         # Show a sub window include choose file button and a ComboBox to choose the image category
         # Then add the image to the database
-
         if self.current_asset_id is None:
             msg.warning_box("Please select an asset to add image!", icon_path=self.icon_path)
             return

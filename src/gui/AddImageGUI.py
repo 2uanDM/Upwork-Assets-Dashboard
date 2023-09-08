@@ -1,3 +1,4 @@
+import json
 from PyQt5.QtGui import *
 from PyQt5.QtWidgets import *
 from PyQt5.QtCore import *
@@ -169,12 +170,25 @@ class AddImageGUI(QWidget):
 
     def open_file_dialog(self):
         # Open browse pictures dialog with native OS file browser
-        image_path = QFileDialog.getOpenFileName(self,
-                                                 caption='Choose Image',
-                                                 directory='c:\\',
-                                                 filter="Image files (*.jpg *.png *.jpeg, *.bmp)")
+        with open(os.path.join(os.getcwd(), 'configuration', 'application.json'), "r") as f:
+            config = json.load(f)
+
+        image_path = QFileDialog.getOpenFileName(
+            self,
+            caption='Choose Image',
+            directory=os.getcwd() if config['latest_browser_folder'] == '' else config['latest_browser_folder'],
+            filter="Image files (*.jpg *.png *.jpeg, *.bmp)"
+        )
         if image_path[0]:
             self.path_input.setText(image_path[0])
+
+            # Save the latest browser folder
+            config['latest_browser_folder'] = os.path.dirname(image_path[0])
+            # Save the config file
+            json.dump(config,
+                      open(os.path.join(os.getcwd(), 'configuration', 'application.json'), "w"),
+                      indent=4,
+                      ensure_ascii=False)
 
     def add_image(self):
         image_path = self.path_input.text().strip()

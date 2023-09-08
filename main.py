@@ -46,13 +46,17 @@ if __name__ == "__main__":
         os.mkdir(folder_path)
 
     # When the application is closed, delete the temp folder
-    # def on_close():
-    #     os.rmdir(folder_path)
+    def on_close():
+        config['latest_browser_folder'] = ""
+        json.dump(config,
+                  open(os.path.join(os.getcwd(), 'configuration', 'application.json'), "w"),
+                  indent=4,
+                  ensure_ascii=False)
 
     try:
         app = QApplication(sys.argv)
         main_window = StackedWidget()
-        # main_window.closed.connect(on_close)
+        main_window.closed.connect(on_close)
 
         # Import all GUIs
         asset_catalogue_gui = AssetCatelogueGUI(main_window)
