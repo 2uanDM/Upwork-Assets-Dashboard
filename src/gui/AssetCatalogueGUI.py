@@ -371,6 +371,9 @@ class AssetCatelogueGUI(BaseGUI):
         self.image_window.setCentralWidget(self.image_window_widget)
         self.image_window_widget.add_image_signal.connect(self.store_asset_image_to_database)
 
+        # with self.main_window is a QStackedWidget, when self.main_window is close, close the self.image_window too
+        self.main_window.closed.connect(self.image_window.close)
+
         # Show the window
         self.image_window.show()
 
@@ -378,7 +381,7 @@ class AssetCatelogueGUI(BaseGUI):
         pass
 
     def store_asset_image_to_database(self, image_path: str, image_category: str):
-        # Store the image to the database
-        print(image_path, image_category)
+        # Open the image with default image viewer
+        os.startfile(image_path)
 
     #######################################################################################################################################

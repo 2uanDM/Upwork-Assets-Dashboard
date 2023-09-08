@@ -1,7 +1,7 @@
 import json
 import traceback
 from PyQt5.QtGui import QIcon
-from PyQt5.QtCore import Qt
+from PyQt5.QtCore import Qt, pyqtSignal
 from PyQt5.QtWidgets import QApplication, QMessageBox, QStackedWidget
 
 import sys
@@ -16,6 +16,19 @@ def add_path_to_env():
     os.environ["QT_QPA_PLATFORM_PLUGIN_PATH"] = new_path
 
 
+class StackedWidget(QStackedWidget):
+    closed = pyqtSignal()
+
+    def __init__(self, parent=None):
+        super().__init__(parent)
+        self.parent = parent
+
+    # Handle the close event
+    def closeEvent(self, event):
+        self.closed.emit()
+        event.accept()
+
+
 if __name__ == "__main__":
     add_path_to_env()
     QApplication.setAttribute(Qt.AA_EnableHighDpiScaling, True)
@@ -27,7 +40,7 @@ if __name__ == "__main__":
 
     try:
         app = QApplication(sys.argv)
-        main_window = QStackedWidget()
+        main_window = StackedWidget()
 
         # Import all GUIs
         asset_catalogue_gui = AssetCatelogueGUI(main_window)

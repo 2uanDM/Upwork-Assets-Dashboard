@@ -155,7 +155,7 @@ color: white</string>
    <widget class="QComboBox" name="comboBox">
     <property name="geometry">
      <rect>
-      <x>218</x>
+      <x>220</x>
       <y>180</y>
       <width>481</width>
       <height>31</height>
@@ -176,7 +176,7 @@ color: rgb(89, 89, 89);</string>
    <widget class="QPushButton" name="add_image_button">
     <property name="geometry">
      <rect>
-      <x>330</x>
+      <x>460</x>
       <y>310</y>
       <width>121</width>
       <height>41</height>
@@ -211,6 +211,46 @@ QPushButton:hover {
     </property>
     <property name="text">
      <string>Add </string>
+    </property>
+   </widget>
+   <widget class="QPushButton" name="add_image_button_2">
+    <property name="geometry">
+     <rect>
+      <x>220</x>
+      <y>310</y>
+      <width>121</width>
+      <height>41</height>
+     </rect>
+    </property>
+    <property name="font">
+     <font>
+      <family>Segoe UI</family>
+      <pointsize>14</pointsize>
+      <weight>75</weight>
+      <bold>true</bold>
+     </font>
+    </property>
+    <property name="layoutDirection">
+     <enum>Qt::LeftToRight</enum>
+    </property>
+    <property name="styleSheet">
+     <string notr="true">/* Normal state styles */
+QPushButton {
+    color: rgb(69, 119, 185);
+    border: 2px solid rgb(241, 241, 241);
+    border-radius: 10px;
+    background-color: rgb(241, 241, 241);
+}
+
+/* Hover state styles */
+QPushButton:hover {
+    color: white;
+    background-color: darkgray;
+}
+</string>
+    </property>
+    <property name="text">
+     <string>Preview</string>
     </property>
    </widget>
   </widget>

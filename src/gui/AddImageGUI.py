@@ -143,3 +143,4 @@ class AddImageGUI(QWidget):
         image_path = self.path_input.text().strip()
         image_category = self.comboBox.currentText()
         self.add_image_signal.emit(image_path, image_category)
+        self.close()
