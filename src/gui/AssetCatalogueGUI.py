@@ -393,14 +393,6 @@ class AssetCatelogueGUI(BaseGUI):
         pass
 
     def store_asset_image_to_database(self, image_path: str, image_category: str):
-
-        # self.label_3 = ClickableLabel(self.horizontalLayoutWidget)
-        # self.label_3.setObjectName(u"label_3")
-        # self.label_3.setPixmap(QPixmap(image_path))
-        # self.label_3.setAlignment(Qt.AlignCenter)
-        # self.label_3.clicked.connect(lambda: os.startfile(image_path))
-        # self.horizontalLayout.addWidget(self.label_3)
-
         # Get the image name from image_path
         image_name = image_path.split('/')[-1]
 
@@ -422,11 +414,35 @@ class AssetCatelogueGUI(BaseGUI):
         # Check if existing the image with the same name in the asset folder
         list_of_images = os.listdir(os.path.join(self.asset_pictures_path, asset_folder_name))
         if image_name in list_of_images:
-            msg.warning_box(f'This image: "{image_name}" is already existed in this asset!', icon_path=self.icon_path)
+            msg.warning_box(
+                f'The image: "{image_name}" is already existed in the folder "{asset_folder_name}"!', icon_path=self.icon_path)
             return
-        else:
-            # Copy the image to the asset folder
-            shutil.copy(image_path, os.path.join(self.asset_pictures_path, asset_folder_name))
+
+        # Check if existing the image with the same name in the database
+        if image_name in self.db.get_list_of_asset_images(
+            asset_number=int(self.asset_number_item.text()),
+            asset_name=self.asset_name_item.text(),
+            asset_category_name=self.asset_detail_table.item(2, 1).text()
+        ):
+            msg.warning_box(
+                f'The image: "{image_name}" is already existed in the database\nwhere AssetID = {asset_id}!', icon_path=self.icon_path)
+            return
+
+        # Else copy the image to the asset folder
+        shutil.copy(image_path, os.path.join(self.asset_pictures_path, asset_folder_name))
+
+        # Now insert the image to the database
+        success = self.db.create_new_image(
+            asset_number=int(self.asset_number_item.text()),
+            asset_name=self.asset_name_item.text(),
+            asset_category_name=self.asset_detail_table.item(2, 1).text(),
+            image_file_name=image_name,
+            image_category_name=image_category
+        )
+
+        if not success:
+            msg.warning_box(f'Error occurred when adding image: "{image_name}" to database!', icon_path=self.icon_path)
+            return
 
         print('Image name: ', image_name)
         print('Image Category: ', image_category)
