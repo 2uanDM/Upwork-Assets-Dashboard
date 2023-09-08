@@ -44,7 +44,6 @@ if __name__ == "__main__":
     # Check if the temp folder exists
     if not os.path.exists(os.path.join(os.getcwd(), template_folder_images_name)):
         os.mkdir(folder_path)
-        subprocess.run(["attrib", "+h", folder_path], shell=True, check=True)  # Set the .temp folder to be hidden
 
     # When the application is closed, delete the temp folder
     # def on_close():

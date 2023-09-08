@@ -120,13 +120,15 @@ class AssetCatelogueGUI(BaseGUI):
             if len(list_of_images) == 0:
                 continue
 
+            # Resize for the master table: Just need to resize the first image
             first_image_name = list_of_images[0]
-
-            # Check if the resized image is existed. If not, create it
             if not os.path.exists(os.path.join(temp_asset_image_folder, f'{first_image_name}^mastertable.png')):
                 self.resizer.fit_master_table(asset_id, asset_name, first_image_name)
-            if not os.path.exists(os.path.join(temp_asset_image_folder, f'{first_image_name}^mediaframe.png')):
-                self.resizer.fit_media_frame(asset_id, asset_name, first_image_name)
+
+            # Resize for the media frame: Just need to resize all the images
+            for image_name in list_of_images:
+                if not os.path.exists(os.path.join(temp_asset_image_folder, f'{image_name}^mediaframe.png')):
+                    self.resizer.fit_media_frame(asset_id, asset_name, image_name)
 
     def load_master_table(self, page: int):
         # Clear the table
