@@ -131,7 +131,13 @@ class AddImageGUI(QWidget):
         self.add_image_button.clicked.connect(self.add_image)
 
     def open_file_dialog(self):
-        pass
+        # Open browse pictures dialog with native OS file browser
+        image_path = QFileDialog.getOpenFileName(self,
+                                                 caption='Choose Image',
+                                                 directory='c:\\',
+                                                 filter="Image files (*.jpg *.png *.jpeg)")
+        if image_path[0]:
+            self.path_input.setText(image_path[0])
 
     def add_image(self):
         image_path = self.path_input.text().strip()
