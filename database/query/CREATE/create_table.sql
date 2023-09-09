@@ -30,7 +30,8 @@ CREATE TABLE IF NOT EXISTS AssetAttribute (
     AttributeOrderNumber INTEGER NOT NULL,
     AttributeName TEXT NOT NULL,
     DataTypeID INTEGER NOT NULL,
-    FOREIGN KEY (DataTypeID) REFERENCES DataType (DataTypeID),
+    AttributeRemark TEXT,
+    FOREIGN KEY (DataTypeID) REFERENCES DataType (DataTypeID) ON DELETE CASCADE,
     FOREIGN KEY (AssetID) REFERENCES Asset (AssetID) ON DELETE CASCADE
 );
 CREATE TABLE IF NOT EXISTS AssetShape (

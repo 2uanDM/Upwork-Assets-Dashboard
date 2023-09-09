@@ -148,6 +148,15 @@ class CrudDB():
                                       """)
         return command.fetchone()
 
+    def load_asset_attribute_table(self, asset_id: int) -> list:
+        return self.cursor.execute(f"""
+            select AttributeOrderNumber, AttributeName, DataTypeName, AttributeRemark
+            from AssetAttribute as aa
+            join DataType as dt
+                on aa.DataTypeID = dt.DataTypeID
+            where aa.AssetID = {asset_id}
+            """).fetchall()
+
     def create_new_asset(self) -> bool:
 
         # Get the smallest available AssetCategoryID
@@ -203,6 +212,29 @@ class CrudDB():
         operation = self.cursor.execute(f"""
             insert into AssetImage (AssetID, ImageFileName, ImageCategoryID)
             values ({asset_id}, '{image_file_name}', {image_category_id});
+        """)
+        if operation.rowcount == 0:
+            return False
+
+        self.conn.commit()
+        return True
+
+    def create_new_attribute(self, asset_id: int) -> bool:
+        # Get the biggest AttributeOrderNumber of the asset
+        attribute_order_number: int = self.cursor.execute(f"""
+            select max(AttributeOrderNumber)
+            from AssetAttribute
+            where AssetID = {asset_id};
+        """).fetchone()[0]
+
+        if attribute_order_number is None:
+            attribute_order_number = 1
+        else:
+            attribute_order_number += 1
+
+        operation = self.cursor.execute(f"""
+            insert into AssetAttribute (AssetID, AttributeOrderNumber, AttributeName, DataTypeID, AttributeRemark)
+            values ({asset_id}, {attribute_order_number}, '', 1, '');
         """)
         if operation.rowcount == 0:
             return False
@@ -310,8 +342,17 @@ class CrudDB():
         self.cursor.close()
         self.conn.close()
 
+    def test(self):
+        attribute_order_number: int = self.cursor.execute(f"""
+            select max(AttributeOrderNumber)
+            from AssetAttribute
+            where AssetID = 3;
+        """).fetchone()[0]
+
+        return attribute_order_number
+
 
 if __name__ == '__main__':
     crud = CrudDB()
     # print(crud.load_master_table())
-    crud.test()
+    print(crud.load_asset_attribute_table(3))

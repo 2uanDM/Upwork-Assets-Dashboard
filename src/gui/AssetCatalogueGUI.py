@@ -199,7 +199,7 @@ class AssetCatelogueGUI(BaseGUI):
             self.import_list_3rd_row_value_item.setText(asset_detail[4])
 
             # --====================== TODO:Fill the asset attribute table ======================--
-
+            self.fill_attribute_table(self.current_asset_id)
             # --====================== TODO:Fill the asset shape table ======================--
 
             # --====================== Fill in the media frame  ======================--
@@ -226,7 +226,7 @@ class AssetCatelogueGUI(BaseGUI):
         # Clear the horizontal layout
         self.clear_the_horizontal_layout()
         # TODO:Clear the Attribute table
-
+        self.clear_the_attribute_table()
         # TODO:Clear the Shape table
 
         # TODO: Load the image preview of assets in current pages
@@ -493,6 +493,45 @@ class AssetCatelogueGUI(BaseGUI):
         self.current_page = self.total_pages
         self.fill_in_master_table(self.current_page)
         self.clear_asset_detail_table()
+
+    # --====================== Action for Attribute table ======================--
+
+    def clear_the_attribute_table(self):
+        self.attribute_table.clearContents()
+        self.attribute_table.setRowCount(0)
+
+    def fill_attribute_table(self, asset_id: int):
+        if asset_id is None:
+            return
+
+        # Clear the attribute table
+        self.attribute_table.clearContents()
+        self.attribute_table.setRowCount(0)
+
+        # Get the attribute data from the database
+        attribute_data: list = self.db.load_asset_attribute_table(asset_id)
+
+        if attribute_data == []:
+            return
+
+        self.attribute_table.setRowCount(len(attribute_data))
+
+        for i, attribute in enumerate(attribute_data):
+            for j, column in enumerate(attribute):
+                self.attribute_table.setItem(i, j, QTableWidgetItem(str(column)))
+
+        # TODO: Handle the data type with QComboBox StyleDelegate
+
+    def crud_add_attribute_button_event(self):
+        if self.current_asset_id is None:
+            msg.warning_box("Please select an asset to add attribute!", icon_path=self.icon_path)
+            return
+
+    def crud_save_attribute_button_event(self):
+        pass
+
+    def crud_delete_attribute_button_event(self):
+        pass
 
     # --====================== Action for media frame ======================--
 
