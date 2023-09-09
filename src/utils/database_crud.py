@@ -111,6 +111,9 @@ class CrudDB():
             where ai.AssetID = {asset_id} and ai.ImageFileName = '{image_name}';
         """).fetchone()[0]
 
+    def get_list_of_shape_types(self) -> list:
+        return [x[0] for x in self.cursor.execute(f"select TypeName from ShapeType;").fetchall()]
+
     def load_all_assets_data(self) -> dict:
         """
         return {
@@ -185,6 +188,15 @@ class CrudDB():
             join DataType as dt
                 on aa.DataTypeID = dt.DataTypeID
             where aa.AssetID = {asset_id}
+            """).fetchall()
+
+    def load_asset_shape_table(self, asset_id: int) -> list:
+        return self.cursor.execute(f"""
+            select AssetShapeID, TypeName, ShapeDescription
+            from AssetShape as ash
+            join ShapeType as st
+                on ash.ShapeTypeID = st.ShapeTypeID
+            where ash.AssetID = {asset_id};
             """).fetchall()
 
     def create_new_asset(self) -> bool:
@@ -265,6 +277,28 @@ class CrudDB():
         operation = self.cursor.execute(f"""
             insert into AssetAttribute (AssetID, AttributeOrderNumber, AttributeName, DataTypeID, AttributeRemark)
             values ({asset_id}, {attribute_order_number}, '', 1, '');
+        """)
+        if operation.rowcount == 0:
+            return False
+
+        self.conn.commit()
+        return True
+
+    def create_new_shape(self, asset_id: int) -> bool:
+        # Get the smallest ShapeTypeID
+        shape_type_id: int = self.cursor.execute(f"""
+            select ShapeTypeID
+            from ShapeType
+            order by ShapeTypeID
+            limit 1;
+        """).fetchone()[0]
+
+        if shape_type_id is None:
+            shape_type_id = 1
+
+        operation = self.cursor.execute(f"""
+            insert into AssetShape (AssetID, ShapeTypeID, ShapeDescription)
+            values ({asset_id}, {shape_type_id}, 'Example Description');
         """)
         if operation.rowcount == 0:
             return False
@@ -450,24 +484,8 @@ class CrudDB():
         self.cursor.close()
         self.conn.close()
 
-    def test(self):
-        attribute_order_number: int = self.cursor.execute(f"""
-            select count(*)
-            from AssetAttribute as aa
-            join DataType as dt 
-            on aa.DataTypeID = dt.DataTypeID
-            where 1 = 1
-            and aa.AssetID = 1
-            and aa.AttributeOrderNumber = 2
-            and aa.AttributeName = 'test'
-            and dt.DataTypeName = 'heh'
-            and aa.AttributeRemark = 'adu';
-        """).fetchone()[0]
-
-        return attribute_order_number
-
 
 if __name__ == '__main__':
     crud = CrudDB()
     # print(crud.load_master_table())
-    print(crud.test())
+    print(crud.get_list_of_shape_types())

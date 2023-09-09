@@ -537,6 +537,13 @@ class BaseGUI(QWidget):
         self.shape_table.setColumnWidth(1, 150)
         self.shape_table.setColumnWidth(2, 580)
 
+        # Set the delegate for the 2nd column
+        self.shape_name_delegate = QComboBoxDelegateForColumn(
+            options=self.db.get_list_of_shape_types(),
+            parent=self.shape_table
+        )
+        self.shape_table.setItemDelegateForColumn(1, self.shape_name_delegate)
+
     def setup_media_frame(self):
         self.media_frame = QFrame(self.content_frame)
         self.media_frame.setObjectName(u"media_frame")

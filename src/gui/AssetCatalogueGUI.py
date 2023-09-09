@@ -65,9 +65,9 @@ class AssetCatelogueGUI(BaseGUI):
         self.crud_save_attribute_button.clicked.connect(self.crud_save_attribute_button_event)
         self.crud_delete_attribute_button.clicked.connect(self.crud_delete_attribute_button_event)
 
-        self.crud_add_shape_button.clicked.connect(self.test_action)
-        self.crud_save_shape_button.clicked.connect(self.test_action)
-        self.crud_delete_shape_button.clicked.connect(self.test_action)
+        self.crud_add_shape_button.clicked.connect(self.crud_add_shape_button_event)
+        self.crud_save_shape_button.clicked.connect(self.crud_save_shape_button_event)
+        self.crud_delete_shape_button.clicked.connect(self.crud_delete_shape_button_event)
 
         self.crud_add_media_button.clicked.connect(self.crud_add_image_event)
         self.crud_delete_media_button.clicked.connect(self.crud_delete_image_event)
@@ -187,6 +187,7 @@ class AssetCatelogueGUI(BaseGUI):
 
     def sort_desc_att_number_button_event(self):
         self._sort_attribute_table(0, "desc")
+
     # --====================== Action for master table and asset details ======================--
 
     def next_page_button_event(self):
@@ -240,8 +241,8 @@ class AssetCatelogueGUI(BaseGUI):
 
             # --====================== Fill the asset attribute table ======================--
             self.fill_attribute_table(self.current_asset_id)
-            # --====================== TODO:Fill the asset shape table ======================--
-
+            # --====================== Fill the asset shape table ======================--
+            self.fill_shape_table(self.current_asset_id)
             # --====================== Fill in the media frame  ======================--
             self.fill_in_media_frame()
 
@@ -267,8 +268,8 @@ class AssetCatelogueGUI(BaseGUI):
         self.clear_the_horizontal_layout()
         # Clear the Attribute table
         self.clear_the_attribute_table()
-        # TODO:Clear the Shape table
-
+        # Clear the Shape table
+        self.clear_the_shape_table()
         # Load the image preview of assets in current pages
         self.fill_preview_image_in_master_table(page=page)
 
@@ -311,7 +312,7 @@ class AssetCatelogueGUI(BaseGUI):
             self.clear_asset_detail_table()  # Clear the asset detail table
             self.clear_the_horizontal_layout()  # Clear the horizontal layout
             self.clear_the_attribute_table()
-            # TODO: Add clear the shape table
+            self.clear_the_shape_table()
             return
 
         # Else apply the filter
@@ -339,7 +340,7 @@ class AssetCatelogueGUI(BaseGUI):
         self.clear_asset_detail_table()  # Clear the asset detail table
         self.clear_the_horizontal_layout()  # Clear the horizontal layout
         self.clear_the_attribute_table()
-        # TODO: Add clear the shape table
+        self.clear_the_shape_table()
 
     def get_read_only_image_label(self, asset_id: int) -> QLabel:
         """
@@ -650,6 +651,55 @@ class AssetCatelogueGUI(BaseGUI):
         self.fill_attribute_table(self.current_asset_id)
 
         msg.information_box("Delete attribute successfully!", icon_path=self.icon_path)
+
+    # --====================== Action for Shape table ======================--
+    def clear_the_shape_table(self):
+        self.shape_table.clearContents()
+        self.shape_table.setRowCount(0)
+
+    def fill_shape_table(self, asset_id: int):
+        if asset_id is None:
+            return
+
+        # Clear the attribute table
+        self.shape_table.clearContents()
+        self.shape_table.setRowCount(0)
+
+        # Get the shape data from the database
+        shape_data: list = self.db.load_asset_shape_table(asset_id)
+
+        print(f'Shape data for AssetID {asset_id}:', shape_data)
+        if shape_data == []:
+            return
+
+        self.shape_table.setRowCount(len(shape_data))
+
+        for i, shape in enumerate(shape_data):
+            for j, column in enumerate(shape):
+                self.shape_table.setItem(i, j, QTableWidgetItem(str(column)))
+
+    def crud_add_shape_button_event(self):
+        if self.current_asset_id is None:
+            msg.warning_box("Please select an asset to add shape!", icon_path=self.icon_path)
+            return
+
+        # Create new shape in the database
+        success = self.db.create_new_shape(self.current_asset_id)
+        if not success:
+            msg.warning_box("Error occurred when creating a new shape!", icon_path=self.icon_path)
+            return
+
+        # Reload the shape table
+        self.fill_shape_table(self.current_asset_id)
+
+        # Scroll to the last row
+        self.shape_table.scrollToBottom()
+
+    def crud_save_shape_button_event(self):
+        pass
+
+    def crud_delete_shape_button_event(self):
+        pass
 
     # --====================== Action for media frame ======================--
 
