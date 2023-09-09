@@ -212,6 +212,12 @@ class BaseGUI(QWidget):
         self.app_name.setFont(self.project_name_font)
         self.app_name.setStyleSheet(u"color:rgb(69, 119, 185)")
 
+        project_name = self.db.get_project_name()
+
+        if project_name:
+            lines = project_name.split('\\n')
+            self.app_name.setText('\n'.join(lines))
+
         self.asset_catalogue_button = QPushButton(self.menu_frame)
         self.asset_catalogue_button.setObjectName(u"asset_catalogue_button")
         self.asset_catalogue_button.setGeometry(QRect(0, 150, 241, 61))
@@ -708,7 +714,6 @@ class BaseGUI(QWidget):
         self.sort_desc_att_number_button.setPixmap(QPixmap(os.path.join(self.buttons_path, 'desc.png')))
 
     def retranslate_base_ui(self):
-        self.app_name.setText(QCoreApplication.translate("Form", u"ROCKET\nPROJECT", None))
         self.asset_catalogue_button.setText(QCoreApplication.translate("Form", u"Asset catalogue", None))
         self.main_label.setText(QCoreApplication.translate("Form", u"ASSET CATALOGUE", None))
         self.asset_list_label.setText(QCoreApplication.translate("Form", u"ASSET LIST", None))

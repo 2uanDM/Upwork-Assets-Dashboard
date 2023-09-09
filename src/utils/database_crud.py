@@ -513,6 +513,17 @@ class CrudDB():
             self.conn.commit()
             return True
 
+    def get_project_name(self) -> str:
+        output = self.cursor.execute(f"""
+            select ProjectName
+            from Project;
+        """).fetchone()
+
+        if output is None:
+            return ""
+        else:
+            return output[0]
+
     def __del__(self):
         self.conn.commit()
         self.cursor.close()
