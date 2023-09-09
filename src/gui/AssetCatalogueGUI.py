@@ -61,9 +61,9 @@ class AssetCatelogueGUI(BaseGUI):
         self.crud_save_asset_button.clicked.connect(self.crud_save_asset_event)
         self.crud_delete_asset_button.clicked.connect(self.crud_delete_asset_event)
 
-        self.crud_add_attribute_button.clicked.connect(self.test_action)
-        self.crud_save_attribute_button.clicked.connect(self.test_action)
-        self.crud_delete_attribute_button.clicked.connect(self.test_action)
+        self.crud_add_attribute_button.clicked.connect(self.crud_add_attribute_button_event)
+        self.crud_save_attribute_button.clicked.connect(self.crud_save_attribute_button_event)
+        self.crud_delete_attribute_button.clicked.connect(self.crud_delete_attribute_button_event)
 
         self.crud_add_shape_button.clicked.connect(self.test_action)
         self.crud_save_shape_button.clicked.connect(self.test_action)
@@ -526,6 +526,18 @@ class AssetCatelogueGUI(BaseGUI):
         if self.current_asset_id is None:
             msg.warning_box("Please select an asset to add attribute!", icon_path=self.icon_path)
             return
+
+        # Create new attribute in the database
+        success = self.db.create_new_attribute(self.current_asset_id)
+        if not success:
+            msg.warning_box("Error occurred when creating a new attribute!", icon_path=self.icon_path)
+            return
+
+        # Reload the attribute table
+        self.fill_attribute_table(self.current_asset_id)
+
+        # Scroll to the last row
+        self.attribute_table.scrollToBottom()
 
     def crud_save_attribute_button_event(self):
         pass
