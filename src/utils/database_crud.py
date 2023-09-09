@@ -14,6 +14,30 @@ class CrudDB():
         self.cursor = self.conn.cursor()
         self.conn.execute('PRAGMA foreign_keys = ON;')
 
+    def check_if_asset_attribute_exists(self,
+                                        asset_id: int,
+                                        attribute_order_number: int,
+                                        attribute_name: str,
+                                        data_type_name: str,
+                                        attribute_remark: str) -> bool:
+        count: int = self.cursor.execute(f"""
+            select count(*)
+            from AssetAttribute as aa
+            join DataType as dt 
+            on aa.DataTypeID = dt.DataTypeID
+            where 1 = 1
+            and aa.AssetID = {asset_id}
+            and aa.AttributeOrderNumber = {attribute_order_number}
+            and aa.AttributeName = '{attribute_name}'
+            and dt.DataTypeName = '{data_type_name}'
+            and aa.AttributeRemark = '{attribute_remark}';
+            """).fetchone()[0]
+
+        if count == 0:
+            return False
+        else:
+            return True
+
     def get_asset_name_frome_asset_id(self, asset_id: int) -> str:
         return self.cursor.execute(f"""
             select AssetName
@@ -367,6 +391,38 @@ class CrudDB():
             self.conn.commit()
             return True
 
+    def delete_asset_attribute(self, asset_id: int, row_data: tuple) -> bool:
+        """
+        Delete an attribute from the database of an asset
+        Args:
+            asset_id (int): The AssetID of the asset to be deleted
+            row_data (list): The data of the row to be deleted (AttributeOrderNumber: int, AttributeName: str, DataTypeName: str, AttributeRemark: str)
+
+        Returns:
+            bool: True if the operation is successful, False otherwise
+        """
+
+        operation = self.cursor.execute(f"""
+            delete from AssetAttribute
+            where 1 = 1
+            and AssetID = {asset_id}
+            and AttributeOrderNumber = {row_data[0]}
+            and AttributeName = '{row_data[1]}'
+            and AttributeRemark = '{row_data[3]}'
+            and DataTypeID = (
+                select DataTypeID
+                from DataType
+                where DataTypeName = '{row_data[2]}'
+            );
+        """)
+
+        # Check if the operation is successful
+        if operation.rowcount == 0:
+            return False
+        else:
+            self.conn.commit()
+            return True
+
     def delete_asset_image(self, asset_id: int, asset_image_name: str) -> bool:
         """
         Delete an image from the database
@@ -396,9 +452,16 @@ class CrudDB():
 
     def test(self):
         attribute_order_number: int = self.cursor.execute(f"""
-            select max(AttributeOrderNumber)
-            from AssetAttribute
-            where AssetID = 3;
+            select count(*)
+            from AssetAttribute as aa
+            join DataType as dt 
+            on aa.DataTypeID = dt.DataTypeID
+            where 1 = 1
+            and aa.AssetID = 1
+            and aa.AttributeOrderNumber = 2
+            and aa.AttributeName = 'test'
+            and dt.DataTypeName = 'heh'
+            and aa.AttributeRemark = 'adu';
         """).fetchone()[0]
 
         return attribute_order_number
@@ -407,4 +470,4 @@ class CrudDB():
 if __name__ == '__main__':
     crud = CrudDB()
     # print(crud.load_master_table())
-    print(crud.load_asset_attribute_table(3))
+    print(crud.test())

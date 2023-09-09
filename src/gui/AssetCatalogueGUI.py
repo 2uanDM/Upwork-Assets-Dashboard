@@ -567,7 +567,49 @@ class AssetCatelogueGUI(BaseGUI):
         msg.information_box("Save attribute successfully!", icon_path=self.icon_path)
 
     def crud_delete_attribute_button_event(self):
-        pass
+        if self.current_asset_id is None:
+            msg.warning_box("Please select an asset to delete attribute!", icon_path=self.icon_path)
+            return
+
+        # Get the current clicked attribute data row
+        current_clicked_attribute_row = self.attribute_table.currentRow()
+
+        if current_clicked_attribute_row == -1:
+            msg.warning_box("Please select an attribute to delete!", icon_path=self.icon_path)
+            return
+
+        # Get the current clicked data in the attribute table
+        current_att_order_number: str = self.attribute_table.item(current_clicked_attribute_row, 0).text()
+        current_att_name: str = self.attribute_table.item(current_clicked_attribute_row, 1).text()
+        current_att_datatype: str = self.attribute_table.item(current_clicked_attribute_row, 2).text()
+        current_att_remark: str = self.attribute_table.item(current_clicked_attribute_row, 3).text()
+
+        if not self.db.check_if_asset_attribute_exists(
+                asset_id=self.current_asset_id,
+                attribute_order_number=int(current_att_order_number),
+                attribute_name=current_att_name,
+                data_type_name=current_att_datatype,
+                attribute_remark=current_att_remark):
+            msg.warning_box("This attribute does not exist! Have you saved the changes yet?", icon_path=self.icon_path)
+            return
+
+        user_choice = msg.yes_no_box("Are you sure to delete this attribute?", icon_path=self.icon_path)
+        if user_choice == QMessageBox.No:
+            return
+
+        # Delete the attribute in the database
+        success = self.db.delete_asset_attribute(
+            asset_id=self.current_asset_id,
+            row_data=(int(current_att_order_number), current_att_name, current_att_datatype, current_att_remark))
+
+        if not success:
+            msg.warning_box("Error occurred when deleting attribute!", icon_path=self.icon_path)
+            return
+
+        # Reload the attribute table
+        self.fill_attribute_table(self.current_asset_id)
+
+        msg.information_box("Delete attribute successfully!", icon_path=self.icon_path)
 
     # --====================== Action for media frame ======================--
 
