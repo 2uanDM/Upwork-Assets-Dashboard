@@ -57,9 +57,8 @@ class CrudDB():
         """
         return [category[0] for category in self.cursor.execute("SELECT CategoryName FROM ImageCategory").fetchall()]
 
-    def get_list_of_asset_images(self, asset_number: int, asset_name: str, asset_category_name: str) -> list:
+    def get_list_of_asset_images(self, asset_id: int) -> list:
         # Get the AssetID of the asset
-        asset_id: int = self.get_asset_id(asset_number, asset_name, asset_category_name)
         return [image[0] for image in self.cursor.execute(f"""
             select ImageFileName
             from AssetImage
@@ -175,14 +174,9 @@ class CrudDB():
         return True
 
     def create_new_image(self,
-                         asset_number: int,
-                         asset_name: str,
-                         asset_category_name: str,
+                         asset_id: int,
                          image_file_name: str,
                          image_category_name: str) -> bool:
-        # Get the AssetID of the asset
-        asset_id: int = self.get_asset_id(asset_number, asset_name, asset_category_name)
-
         # Get the ImageCategoryID of the image category
         image_category_id: int = self.cursor.execute(f"""
             select ImageCategoryID

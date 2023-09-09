@@ -260,11 +260,7 @@ class AssetCatelogueGUI(BaseGUI):
         orignal_image_name = f"{just_image_name.replace('^mediaframe', '')}.{extension}"
 
         # Get the current AssetID
-        asset_id: int = self.db.get_asset_id(
-            int(self.asset_number_item.text()),
-            self.asset_name_item.text(),
-            self.asset_detail_table.item(2, 1).text()
-        )
+        asset_id: int = self.current_asset_id
 
         image_path_resized = os.path.join(
             self.temp_folder_path, f'{asset_id}_{self.asset_name_item.text()}', f'{just_image_name}.{extension}')
@@ -542,11 +538,7 @@ class AssetCatelogueGUI(BaseGUI):
 
         # Check if the folder image of asset is existed. If not, create it and naming it with "asset id_asset name"
         list_of_asset_image_folders = os.listdir(self.asset_pictures_path)
-        asset_id: int = self.db.get_asset_id(
-            int(self.asset_number_item.text()),
-            self.asset_name_item.text(),
-            self.asset_detail_table.item(2, 1).text()
-        )
+        asset_id: int = self.current_asset_id
         asset_folder_name = f'{asset_id}_{self.asset_name_item.text()}'
         if asset_folder_name not in list_of_asset_image_folders:
             os.mkdir(os.path.join(self.asset_pictures_path, asset_folder_name))
@@ -559,11 +551,7 @@ class AssetCatelogueGUI(BaseGUI):
             return
 
         # Check if existing the image with the same name in the database
-        if image_name in self.db.get_list_of_asset_images(
-            asset_number=int(self.asset_number_item.text()),
-            asset_name=self.asset_name_item.text(),
-            asset_category_name=self.asset_detail_table.item(2, 1).text()
-        ):
+        if image_name in self.db.get_list_of_asset_images(asset_id=asset_id):
             msg.warning_box(
                 f'The image: "{image_name}" is already existed in the database\nwhere AssetID = {asset_id}!', icon_path=self.icon_path)
             return
@@ -576,9 +564,7 @@ class AssetCatelogueGUI(BaseGUI):
 
         # --====================== Insert to the database ======================--
         success = self.db.create_new_image(
-            asset_number=int(self.asset_number_item.text()),
-            asset_name=self.asset_name_item.text(),
-            asset_category_name=self.asset_detail_table.item(2, 1).text(),
+            asset_id,
             image_file_name=image_name,
             image_category_name=image_category
         )
