@@ -58,6 +58,12 @@ class CrudDB():
         """
         return [category[0] for category in self.cursor.execute("SELECT CategoryName FROM AssetCategory").fetchall()]
 
+    def get_list_of_data_types(self) -> list:
+        """
+        Return a list of data types
+        """
+        return [data_type[0] for data_type in self.cursor.execute("SELECT DataTypeName FROM DataType").fetchall()]
+
     def get_list_of_image_categories(self) -> list:
         """
         Return a list of image categories

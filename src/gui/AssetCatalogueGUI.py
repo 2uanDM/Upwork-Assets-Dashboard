@@ -198,7 +198,7 @@ class AssetCatelogueGUI(BaseGUI):
             # Set the import list 3rd row
             self.import_list_3rd_row_value_item.setText(asset_detail[4])
 
-            # --====================== TODO:Fill the asset attribute table ======================--
+            # --====================== Fill the asset attribute table ======================--
             self.fill_attribute_table(self.current_asset_id)
             # --====================== TODO:Fill the asset shape table ======================--
 
@@ -225,11 +225,11 @@ class AssetCatelogueGUI(BaseGUI):
         self.clear_asset_detail_table()
         # Clear the horizontal layout
         self.clear_the_horizontal_layout()
-        # TODO:Clear the Attribute table
+        # Clear the Attribute table
         self.clear_the_attribute_table()
         # TODO:Clear the Shape table
 
-        # TODO: Load the image preview of assets in current pages
+        # Load the image preview of assets in current pages
         self.fill_preview_image_in_master_table(page=page)
 
     def fill_preview_image_in_master_table(self, page: int):
@@ -270,7 +270,8 @@ class AssetCatelogueGUI(BaseGUI):
             self.fill_in_master_table(self.current_page)  # Reload the master table with all data
             self.clear_asset_detail_table()  # Clear the asset detail table
             self.clear_the_horizontal_layout()  # Clear the horizontal layout
-            # TODO: Add clear the attribute table and shape table
+            self.clear_the_attribute_table()
+            # TODO: Add clear the shape table
             return
 
         # Else apply the filter
@@ -297,7 +298,8 @@ class AssetCatelogueGUI(BaseGUI):
         self.fill_in_master_table(self.current_page)
         self.clear_asset_detail_table()  # Clear the asset detail table
         self.clear_the_horizontal_layout()  # Clear the horizontal layout
-        # TODO: Add clear the attribute table and shape table
+        self.clear_the_attribute_table()
+        # TODO: Add clear the shape table
 
     def get_read_only_image_label(self, asset_id: int) -> QLabel:
         """
@@ -519,8 +521,6 @@ class AssetCatelogueGUI(BaseGUI):
         for i, attribute in enumerate(attribute_data):
             for j, column in enumerate(attribute):
                 self.attribute_table.setItem(i, j, QTableWidgetItem(str(column)))
-
-        # TODO: Handle the data type with QComboBox StyleDelegate
 
     def crud_add_attribute_button_event(self):
         if self.current_asset_id is None:

@@ -73,6 +73,37 @@ class QComboBoxDelegate(QStyledItemDelegate):
             super().setModelData(editor, model, index)
 
 
+class QComboBoxDelegateForColumn(QStyledItemDelegate):
+    """
+        This class is used to create a combobox in a specific column of the table
+    Args:
+        options (list): The list of options for the combobox
+    """
+
+    def __init__(self, options: list, parent):
+        super().__init__(parent)
+        self.options = options
+
+    def createEditor(self, parent, option, index) -> QWidget:
+        editor = QComboBox(parent)
+        editor.addItems(self.options)
+        return editor
+
+    def setEditorData(self, editor, index) -> None:
+        current_text = index.model().data(index, Qt.EditRole)
+        # If the editor is a QComboBox, this will select the current text
+        if isinstance(editor, QComboBox):
+            editor.setCurrentText(current_text)
+        else:
+            super().setEditorData(editor, index)
+
+    def setModelData(self, editor, model, index) -> None:
+        if isinstance(editor, QComboBox):
+            model.setData(index, editor.currentText(), Qt.EditRole)
+        else:
+            super().setModelData(editor, model, index)
+
+
 class BaseGUI(QWidget):
     buttons_path = os.path.join(os.getcwd(), 'assets', 'buttons')
     asset_pictures_path = os.path.join(os.getcwd(), 'asset_pictures')  # Folder where store the asset pictures
@@ -462,6 +493,13 @@ class BaseGUI(QWidget):
         self.attribute_table.setColumnWidth(1, 200)
         self.attribute_table.setColumnWidth(2, 120)
         self.attribute_table.setColumnWidth(3, 410)
+
+        # Set the delegate for the 3rd column
+        self.datatype_delegate = QComboBoxDelegateForColumn(
+            options=self.db.get_list_of_data_types(),
+            parent=self.attribute_table
+        )
+        self.attribute_table.setItemDelegateForColumn(2, self.datatype_delegate)
 
     def setup_shape_table(self):
         self.shape_table = QTableWidget(self.content_frame)
