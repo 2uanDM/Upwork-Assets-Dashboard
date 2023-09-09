@@ -225,11 +225,12 @@ class AssetCatelogueGUI(BaseGUI):
         self.clear_asset_detail_table()
         # Clear the horizontal layout
         self.clear_the_horizontal_layout()
-        # Clear the Attribute table
+        # TODO:Clear the Attribute table
 
-        # Clear the Shape table
+        # TODO:Clear the Shape table
 
         # TODO: Load the image preview of assets in current pages
+        print(data)
 
     def apply_filter_button_event(self):
         # Get the filter value (number)
@@ -453,13 +454,16 @@ class AssetCatelogueGUI(BaseGUI):
     def get_clickable_image_label(self, just_image_name: str, extension: str) -> ClickableImage:
         """
         Arg:
-            just_image_name (str): Example: 'image^mediaframe'
+            just_image_name (str): Example: 'image^mediaframe' or 'image^mastertable'
             extension (str): Example: 'png'
         Return:
             This function return a ClickableImage with the image_path_resized and set to the action show the original image when clicked
         """
         # Get the original image name
-        orignal_image_name = f"{just_image_name.replace('^mediaframe', '')}.{extension}"
+        if '^mediaframe' in just_image_name:
+            orignal_image_name = f"{just_image_name.replace('^mediaframe', '')}.{extension}"
+        else:
+            orignal_image_name = f"{just_image_name.replace('^mastertable', '')}.{extension}"
 
         # Get the current AssetID
         asset_id: int = self.current_asset_id

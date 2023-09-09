@@ -158,10 +158,18 @@ class CrudDB():
             limit 1;
             """).fetchone()[0]
 
+        # Get the biggest AssetNumber
+        asset_number: int = self.cursor.execute("""
+            select AssetNumber
+            from Asset
+            order by AssetNumber desc
+            limit 1;
+            """).fetchone()[0]
+
         # Insert a new row into Asset table
         operation = self.cursor.execute(f"""
             insert into Asset (AssetNumber, AssetName, AssetVariant, AssetDescription, AssetCategoryID)
-            values (9999999, 'example', 'example', 'example', {asset_category_id});
+            values ({asset_number + 111}, 'example{asset_number + 111}', 'example{asset_number + 111}', 'example{asset_number + 111}', {asset_category_id});
                             """)
         if operation.rowcount == 0:
             return False
