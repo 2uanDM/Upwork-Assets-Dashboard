@@ -46,6 +46,8 @@ class AssetCatelogueGUI(BaseGUI):
         self.current_asset_id = None
         # Store the information of images of current asset (image: ClickableImage with Pixmap,'image_name', 'image_category_name')
         self.current_asset_images = None
+        # Store the current clicked image (image: ClickableImage with Pixmap,'image_name', 'image_category_name')
+        self.current_clicked_image: tuple = None
 
         # Initial data from the database
         self.reload_data_after_crud()
@@ -68,7 +70,7 @@ class AssetCatelogueGUI(BaseGUI):
         self.crud_delete_shape_button.clicked.connect(self.test_action)
 
         self.crud_add_media_button.clicked.connect(self.crud_add_image_event)
-        self.crud_delete_media_button.clicked.connect(self.test_action)
+        self.crud_delete_media_button.clicked.connect(self.crud_delete_image_event)
 
         # Buttons for master table
         self.previous_page_button.clicked.connect(self.previous_page_button_event)
@@ -96,6 +98,8 @@ class AssetCatelogueGUI(BaseGUI):
 
         # Apply filter button
         self.apply_filter_button.clicked.connect(self.apply_filter_button_event)
+        self.number_input.returnPressed.connect(self.apply_filter_button_event)
+        self.search_input.returnPressed.connect(self.apply_filter_button_event)
 
     # --====================== Reload data ======================--
 
@@ -443,6 +447,7 @@ class AssetCatelogueGUI(BaseGUI):
             if image[0] == image_label:
                 image_name = image[1]
                 image_category_name = image[2]
+                self.current_clicked_image: tuple = image
                 self.image_category_label.setText(f'Category: {image_category_name}')
 
     def get_clickable_image_label(self, just_image_name: str, extension: str) -> ClickableImage:
@@ -480,6 +485,9 @@ class AssetCatelogueGUI(BaseGUI):
 
         # Clear the image category label
         self.image_category_label.setText("")
+
+        # Set the current clicked image to None
+        self.current_clicked_image = None
 
     def fill_in_media_frame(self):
         self.clear_the_horizontal_layout()  # Clear the horizontal layout before adding new images
@@ -632,4 +640,59 @@ class AssetCatelogueGUI(BaseGUI):
         self.fill_in_media_frame()
 
     def crud_delete_image_event(self):
-        pass
+        if self.current_clicked_image is None:
+            msg.warning_box("Please select an asset to delete image!", icon_path=self.icon_path)
+            return
+
+        if msg.yes_no_box('Are you sure to delete this image? Action cannot be undone!', icon_path=self.icon_path) == QMessageBox.No:
+            return
+
+        # First, try to delete the image in the database
+        delete_operation = self.db.delete_asset_image(
+            asset_id=self.current_asset_id,
+            asset_image_name=self.current_clicked_image[1]
+        )
+
+        if not delete_operation:
+            msg.warning_box(
+                f'Error occurred when deleting image: "{self.current_clicked_image[1]}" in the database!', icon_path=self.icon_path)
+            return
+
+        # If the image is deleted in the database, delete the image in the asset folder
+        asset_folder_name = f'{self.current_asset_id}_{self.asset_name_item.text()}'
+        if os.path.exists(os.path.join(self.asset_pictures_path, asset_folder_name, self.current_clicked_image[1])):
+            os.remove(os.path.join(
+                self.asset_pictures_path, asset_folder_name, self.current_clicked_image[1]))
+
+        # If the image is deleted in the asset folder, delete the image in the temp folder
+        # But we need to check if the image is choosed to be the preview image in the master table or not
+
+        is_preview_image = False
+        just_current_image_name = self.current_clicked_image[1].split('.')[0]
+        for temp_image in os.listdir(os.path.join(self.temp_folder_path, asset_folder_name)):
+            if temp_image.find('^mastertable') != -1 and temp_image.find(just_current_image_name) != -1:
+                is_preview_image = True
+                break
+
+        # Delete the image in the temp folder
+        for temp_image in os.listdir(os.path.join(self.temp_folder_path, asset_folder_name)):
+            if temp_image.find(just_current_image_name) != -1:
+                os.remove(os.path.join(
+                    self.temp_folder_path, asset_folder_name, temp_image))
+
+        if is_preview_image:
+            # If the image is choosed to be the preview image in the master table, we need to choose another image to be the preview image
+            current_asset_images = os.listdir(os.path.join(self.asset_pictures_path, asset_folder_name))
+            if current_asset_images != []:
+                # Choose the first image in the list to be the preview image
+                self.resize_newly_added_image(
+                    self.current_asset_id, self.asset_name_item.text(), current_asset_images[0])
+
+        # Notify the user
+        msg.information_box(
+            f'Delete image "{self.current_clicked_image[1]}" successfully!', icon_path=self.icon_path)
+
+        # Reload the master table
+        self.reload_data_after_crud()
+        self.fill_in_master_table(self.current_page)
+        self.fill_in_media_frame()
