@@ -97,48 +97,7 @@ class AssetCatelogueGUI(BaseGUI):
         # Apply filter button
         self.apply_filter_button.clicked.connect(self.apply_filter_button_event)
 
-    def clear_asset_detail_table(self):
-        self.asset_number_item.setText("")
-        self.asset_name_item.setText("")
-        self.asset_variant_value_item.setText("")
-        self.asset_description_value_item.setText("")
-        self.import_list_header_value_item.setText("")
-        self.import_list_2nd_row_value_item.setText("")
-        self.import_list_3rd_row_value_item.setText("")
-
-        # Qcombobox
-        self.asset_detail_table.setItem(2, 1, QTableWidgetItem(""))
-
-        # Current Asset ID
-        self.current_asset_id = None
-
-    def resize_newly_added_image(self, asset_id: int, asset_name: str, image_name: str):
-        """
-        Resize the newly added image to fit the master table and media frame
-        Args:
-            asset_id (int): Example: 1
-            asset_name (str): Example: 'Asset 1'
-            image_name (str): Example: 'image.png'
-        """
-        just_image_name = image_name.split('.')[0]
-        extension = image_name.split('.')[1]
-
-        # Check if the folder image of asset is existed. If not, create it and naming it with asset id_asset name
-        temp_asset_image_folder = os.path.join(self.temp_folder_path, f'{asset_id}_{asset_name}')
-        if not os.path.exists(temp_asset_image_folder):
-            os.mkdir(temp_asset_image_folder)
-
-        # Check whether the image contain "mastertable" is existed in the temp folder or not
-        existed_mastertable_image = False
-        for resized_image_dir in os.listdir(temp_asset_image_folder):
-            if resized_image_dir.find('^mastertable') != -1:
-                existed_mastertable_image = True
-                break
-        if not existed_mastertable_image:
-            self.resizer.fit_master_table(asset_id, asset_name, image_name)
-
-        # Create the image for media frame
-        self.resizer.fit_media_frame(asset_id, asset_name, image_name)
+    # --====================== Reload data ======================--
 
     def reload_data_after_crud(self):
         data: dict = self.db.load_all_assets_data()
@@ -146,31 +105,45 @@ class AssetCatelogueGUI(BaseGUI):
         self.total_pages = data['total_pages']
         self.assets_data = data['data']
 
-    def fill_in_master_table(self, page: int):
-        # Clear the table
-        self.master_table.clearContents()
+    # --====================== Action for sort buttons ======================--
 
-        # Renew the page label
-        self.page_label.setText(f"Page {self.current_page} of {self.total_pages}")
+    def _sort_master_table(self, column: int, sort_type: str):
+        """
+            This is a support function for handle sort button event of master table
+        Args:
+            column (int): The column to sort in master table: 
 
-        # Load the text data (still not handle the image so j -> j+1)
-        if self.total_assets == 0:
-            return
+            - 0: Asset number
+            - 1: Asset name
+            - 2: Asset category
 
-        data = self.table_data[(page - 1) * 10: page * 10]  # Ten rows per page
-        for i, row in enumerate(data):
-            for j, column in enumerate(row):
-                self.master_table.setItem(i, j + 1, QTableWidgetItem(str(column)))
+            sort_type (str): "asc" or "desc"
+        """
+        self.table_data.sort(key=lambda x: x[column], reverse=True if sort_type == "desc" else False)
 
-        # Clear the asset detail table
-        self.clear_asset_detail_table()
-        # Clear the horizontal layout
-        self.clear_the_horizontal_layout()
-        # Clear the Attribute table
+        # Then reload the master table
+        self.current_page = 1
+        self.fill_in_master_table(self.current_page)
 
-        # Clear the Shape table
+    def sort_asc_asset_number_button_event(self):
+        self._sort_master_table(0, "asc")
 
-        # TODO: Load the image preview of assets in current pages
+    def sort_desc_asset_number_button_event(self):
+        self._sort_master_table(0, "desc")
+
+    def sort_asc_asset_name_button_event(self):
+        self._sort_master_table(1, "asc")
+
+    def sort_desc_asset_name_button_event(self):
+        self._sort_master_table(1, "desc")
+
+    def sort_asc_asset_category_button_event(self):
+        self._sort_master_table(2, "asc")
+
+    def sort_desc_asset_category_button_event(self):
+        self._sort_master_table(2, "desc")
+
+    # --====================== Action for master table and asset details ======================--
 
     def next_page_button_event(self):
         # Renew the page label
@@ -228,78 +201,31 @@ class AssetCatelogueGUI(BaseGUI):
             # --====================== Fill in the media frame  ======================--
             self.fill_in_media_frame()
 
-    def fill_in_media_frame(self):
-        self.clear_the_horizontal_layout()  # Clear the horizontal layout before adding new images
-        self.current_asset_images = []  # Clear the current asset images metadata list
+    def fill_in_master_table(self, page: int):
+        # Clear the table
+        self.master_table.clearContents()
 
-        # Browse the temp folder to get the images of current asset (for media frame)
-        asset_folder_name = f'{self.current_asset_id}_{self.asset_name_item.text()}'
+        # Renew the page label
+        self.page_label.setText(f"Page {self.current_page} of {self.total_pages}")
 
-        if not os.path.exists(os.path.join(self.temp_folder_path, asset_folder_name)):
-            os.mkdir(os.path.join(self.temp_folder_path, asset_folder_name))
+        # Load the text data (still not handle the image so j -> j+1)
+        if self.total_assets == 0:
             return
 
-        for image_name in os.listdir(os.path.join(self.temp_folder_path, asset_folder_name)):
-            if image_name.find('^mediaframe') != -1:
-                extension = image_name.split('.')[1]
-                just_image_name = image_name.split('.')[0]
-                original_image_name = f'{just_image_name.replace("^mediaframe","")}.{extension}'
-                # Create a ClickableImage
-                image_label: ClickableImage = self.get_clickable_image_label(just_image_name, extension)
-                # Get the image category name
-                image_category_name = self.db.get_asset_image_category_name(
-                    self.current_asset_id, original_image_name)
-                # Add the image to the metadata list
-                self.current_asset_images.append((image_label, original_image_name, image_category_name))
+        data = self.table_data[(page - 1) * 10: page * 10]  # Ten rows per page
+        for i, row in enumerate(data):
+            for j, column in enumerate(row):
+                self.master_table.setItem(i, j + 1, QTableWidgetItem(str(column)))
 
-        # Add the images to the horizontal layout
-        for image in self.current_asset_images:
-            self.horizontalLayout.addWidget(image[0])
+        # Clear the asset detail table
+        self.clear_asset_detail_table()
+        # Clear the horizontal layout
+        self.clear_the_horizontal_layout()
+        # Clear the Attribute table
 
-        print('Current asset images: ', self.current_asset_images)
+        # Clear the Shape table
 
-    def clear_the_horizontal_layout(self):
-        # Clear the horizontal layouts
-        for i in reversed(range(self.horizontalLayout.count())):
-            self.horizontalLayout.itemAt(i).widget().setParent(None)  # Auto garbage collection
-
-        # Clear the image category label
-        self.image_category_label.setText("")
-
-    def get_clickable_image_label(self, just_image_name: str, extension: str) -> ClickableImage:
-        """
-        Arg:
-            just_image_name (str): Example: 'image^mediaframe'
-            extension (str): Example: 'png'
-        Return:
-            This function return a ClickableImage with the image_path_resized and set to the action show the original image when clicked
-        """
-        # Get the original image name
-        orignal_image_name = f"{just_image_name.replace('^mediaframe', '')}.{extension}"
-
-        # Get the current AssetID
-        asset_id: int = self.current_asset_id
-
-        image_path_resized = os.path.join(
-            self.temp_folder_path, f'{asset_id}_{self.asset_name_item.text()}', f'{just_image_name}.{extension}')
-        image_path_original = os.path.join(
-            self.asset_pictures_path, f'{asset_id}_{self.asset_name_item.text()}', orignal_image_name)
-
-        # Create a ClickableImage
-        image_label = ClickableImage(self.horizontalLayoutWidget)
-        image_label.setPixmap(QPixmap(image_path_resized))
-        image_label.setAlignment(Qt.AlignCenter)
-        image_label.double_clicked.connect(lambda: os.startfile(image_path_original))
-        image_label.clicked.connect(self.show_image_detail)
-
-        return image_label
-
-    def show_image_detail(self, image_label: ClickableImage):
-        for image in self.current_asset_images:
-            if image[0] == image_label:
-                image_name = image[1]
-                image_category_name = image[2]
-                self.image_category_label.setText(f'Category: {image_category_name}')
+        # TODO: Load the image preview of assets in current pages
 
     def apply_filter_button_event(self):
         # Get the filter value (number)
@@ -347,43 +273,20 @@ class AssetCatelogueGUI(BaseGUI):
         self.clear_the_horizontal_layout()  # Clear the horizontal layout
         # TODO: Add clear the attribute table and shape table
 
-    def _sort_master_table(self, column: int, sort_type: str):
-        """
-            This is a support function for handle sort button event of master table
-        Args:
-            column (int): The column to sort in master table: 
+    def clear_asset_detail_table(self):
+        self.asset_number_item.setText("")
+        self.asset_name_item.setText("")
+        self.asset_variant_value_item.setText("")
+        self.asset_description_value_item.setText("")
+        self.import_list_header_value_item.setText("")
+        self.import_list_2nd_row_value_item.setText("")
+        self.import_list_3rd_row_value_item.setText("")
 
-            - 0: Asset number
-            - 1: Asset name
-            - 2: Asset category
+        # Qcombobox
+        self.asset_detail_table.setItem(2, 1, QTableWidgetItem(""))
 
-            sort_type (str): "asc" or "desc"
-        """
-        self.table_data.sort(key=lambda x: x[column], reverse=True if sort_type == "desc" else False)
-
-        # Then reload the master table
-        self.current_page = 1
-        self.fill_in_master_table(self.current_page)
-
-    def sort_asc_asset_number_button_event(self):
-        self._sort_master_table(0, "asc")
-
-    def sort_desc_asset_number_button_event(self):
-        self._sort_master_table(0, "desc")
-
-    def sort_asc_asset_name_button_event(self):
-        self._sort_master_table(1, "asc")
-
-    def sort_desc_asset_name_button_event(self):
-        self._sort_master_table(1, "desc")
-
-    def sort_asc_asset_category_button_event(self):
-        self._sort_master_table(2, "asc")
-
-    def sort_desc_asset_category_button_event(self):
-        self._sort_master_table(2, "desc")
-
-    #######################################################################################################################################
+        # Current Asset ID
+        self.current_asset_id = None
 
     def crud_delete_asset_event(self):
         # Get the asset number and name
@@ -533,7 +436,109 @@ class AssetCatelogueGUI(BaseGUI):
         self.fill_in_master_table(self.current_page)
         self.clear_asset_detail_table()
 
-    #######################################################################################################################################
+    # --====================== Action for media frame ======================--
+
+    def show_image_detail(self, image_label: ClickableImage):
+        for image in self.current_asset_images:
+            if image[0] == image_label:
+                image_name = image[1]
+                image_category_name = image[2]
+                self.image_category_label.setText(f'Category: {image_category_name}')
+
+    def get_clickable_image_label(self, just_image_name: str, extension: str) -> ClickableImage:
+        """
+        Arg:
+            just_image_name (str): Example: 'image^mediaframe'
+            extension (str): Example: 'png'
+        Return:
+            This function return a ClickableImage with the image_path_resized and set to the action show the original image when clicked
+        """
+        # Get the original image name
+        orignal_image_name = f"{just_image_name.replace('^mediaframe', '')}.{extension}"
+
+        # Get the current AssetID
+        asset_id: int = self.current_asset_id
+
+        image_path_resized = os.path.join(
+            self.temp_folder_path, f'{asset_id}_{self.asset_name_item.text()}', f'{just_image_name}.{extension}')
+        image_path_original = os.path.join(
+            self.asset_pictures_path, f'{asset_id}_{self.asset_name_item.text()}', orignal_image_name)
+
+        # Create a ClickableImage
+        image_label = ClickableImage(self.horizontalLayoutWidget)
+        image_label.setPixmap(QPixmap(image_path_resized))
+        image_label.setAlignment(Qt.AlignCenter)
+        image_label.double_clicked.connect(lambda: os.startfile(image_path_original))
+        image_label.clicked.connect(self.show_image_detail)
+
+        return image_label
+
+    def clear_the_horizontal_layout(self):
+        # Clear the horizontal layouts
+        for i in reversed(range(self.horizontalLayout.count())):
+            self.horizontalLayout.itemAt(i).widget().setParent(None)  # Auto garbage collection
+
+        # Clear the image category label
+        self.image_category_label.setText("")
+
+    def fill_in_media_frame(self):
+        self.clear_the_horizontal_layout()  # Clear the horizontal layout before adding new images
+        self.current_asset_images = []  # Clear the current asset images metadata list
+
+        # Browse the temp folder to get the images of current asset (for media frame)
+        asset_folder_name = f'{self.current_asset_id}_{self.asset_name_item.text()}'
+
+        if not os.path.exists(os.path.join(self.temp_folder_path, asset_folder_name)):
+            os.mkdir(os.path.join(self.temp_folder_path, asset_folder_name))
+            return
+
+        for image_name in os.listdir(os.path.join(self.temp_folder_path, asset_folder_name)):
+            if image_name.find('^mediaframe') != -1:
+                extension = image_name.split('.')[1]
+                just_image_name = image_name.split('.')[0]
+                original_image_name = f'{just_image_name.replace("^mediaframe","")}.{extension}'
+                # Create a ClickableImage
+                image_label: ClickableImage = self.get_clickable_image_label(just_image_name, extension)
+                # Get the image category name
+                image_category_name = self.db.get_asset_image_category_name(
+                    self.current_asset_id, original_image_name)
+                # Add the image to the metadata list
+                self.current_asset_images.append((image_label, original_image_name, image_category_name))
+
+        # Add the images to the horizontal layout
+        for image in self.current_asset_images:
+            self.horizontalLayout.addWidget(image[0])
+
+        print('Current asset images: ', self.current_asset_images)
+
+    def resize_newly_added_image(self, asset_id: int, asset_name: str, image_name: str):
+        """
+        Resize the newly added image to fit the master table and media frame
+        Args:
+            asset_id (int): Example: 1
+            asset_name (str): Example: 'Asset 1'
+            image_name (str): Example: 'image.png'
+        """
+        just_image_name = image_name.split('.')[0]
+        extension = image_name.split('.')[1]
+
+        # Check if the folder image of asset is existed. If not, create it and naming it with asset id_asset name
+        temp_asset_image_folder = os.path.join(self.temp_folder_path, f'{asset_id}_{asset_name}')
+        if not os.path.exists(temp_asset_image_folder):
+            os.mkdir(temp_asset_image_folder)
+
+        # Check whether the image contain "mastertable" is existed in the temp folder or not
+        existed_mastertable_image = False
+        for resized_image_dir in os.listdir(temp_asset_image_folder):
+            if resized_image_dir.find('^mastertable') != -1:
+                existed_mastertable_image = True
+                break
+        if not existed_mastertable_image:
+            self.resizer.fit_master_table(asset_id, asset_name, image_name)
+
+        # Create the image for media frame
+        self.resizer.fit_media_frame(asset_id, asset_name, image_name)
+
     def crud_add_image_event(self):
         # Show a sub window include choose file button and a ComboBox to choose the image category
         # Then add the image to the database
@@ -628,5 +633,3 @@ class AssetCatelogueGUI(BaseGUI):
 
         # TODO: Reload the master table to show the image preview and reload the image horizontal layout
         self.fill_in_media_frame()
-
-    #######################################################################################################################################
