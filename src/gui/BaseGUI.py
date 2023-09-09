@@ -1,5 +1,6 @@
 
 import typing
+import webbrowser
 from PyQt5 import QtCore
 from PyQt5.QtGui import *
 from PyQt5.QtWidgets import *
@@ -73,6 +74,37 @@ class QComboBoxDelegate(QStyledItemDelegate):
             super().setModelData(editor, model, index)
 
 
+class QComboBoxDelegateForColumn(QStyledItemDelegate):
+    """
+        This class is used to create a combobox in a specific column of the table
+    Args:
+        options (list): The list of options for the combobox
+    """
+
+    def __init__(self, options: list, parent):
+        super().__init__(parent)
+        self.options = options
+
+    def createEditor(self, parent, option, index) -> QWidget:
+        editor = QComboBox(parent)
+        editor.addItems(self.options)
+        return editor
+
+    def setEditorData(self, editor, index) -> None:
+        current_text = index.model().data(index, Qt.EditRole)
+        # If the editor is a QComboBox, this will select the current text
+        if isinstance(editor, QComboBox):
+            editor.setCurrentText(current_text)
+        else:
+            super().setEditorData(editor, index)
+
+    def setModelData(self, editor, model, index) -> None:
+        if isinstance(editor, QComboBox):
+            model.setData(index, editor.currentText(), Qt.EditRole)
+        else:
+            super().setModelData(editor, model, index)
+
+
 class BaseGUI(QWidget):
     buttons_path = os.path.join(os.getcwd(), 'assets', 'buttons')
     asset_pictures_path = os.path.join(os.getcwd(), 'asset_pictures')  # Folder where store the asset pictures
@@ -117,6 +149,8 @@ class BaseGUI(QWidget):
         self.setup_crud_media_buttons()
         # ------------------- Setup sort buttons -------------------
         self.setup_sort_button()
+        # ------------------- Setup my info -------------------
+        self.setup_my_info()
 
         # Retranslate Ui
         self.retranslate_base_ui()
@@ -177,6 +211,12 @@ class BaseGUI(QWidget):
         self.app_name.setGeometry(QRect(20, 10, 141, 101))
         self.app_name.setFont(self.project_name_font)
         self.app_name.setStyleSheet(u"color:rgb(69, 119, 185)")
+
+        project_name = self.db.get_project_name()
+
+        if project_name:
+            lines = project_name.split('\\n')
+            self.app_name.setText('\n'.join(lines))
 
         self.asset_catalogue_button = QPushButton(self.menu_frame)
         self.asset_catalogue_button.setObjectName(u"asset_catalogue_button")
@@ -463,6 +503,17 @@ class BaseGUI(QWidget):
         self.attribute_table.setColumnWidth(2, 120)
         self.attribute_table.setColumnWidth(3, 410)
 
+        # Set the delegate for the 3rd column
+        self.datatype_delegate = QComboBoxDelegateForColumn(
+            options=self.db.get_list_of_data_types(),
+            parent=self.attribute_table
+        )
+        self.attribute_table.setItemDelegateForColumn(2, self.datatype_delegate)
+
+        # Scroll smoothly
+        self.attribute_table.setVerticalScrollMode(QAbstractItemView.ScrollPerPixel)
+        self.attribute_table.setHorizontalScrollMode(QAbstractItemView.ScrollPerPixel)
+
     def setup_shape_table(self):
         self.shape_table = QTableWidget(self.content_frame)
         self.shape_table.setColumnCount(3)
@@ -498,6 +549,17 @@ class BaseGUI(QWidget):
         self.shape_table.setColumnWidth(0, 67)
         self.shape_table.setColumnWidth(1, 150)
         self.shape_table.setColumnWidth(2, 580)
+
+        # Set the delegate for the 2nd column
+        self.shape_name_delegate = QComboBoxDelegateForColumn(
+            options=self.db.get_list_of_shape_types(),
+            parent=self.shape_table
+        )
+        self.shape_table.setItemDelegateForColumn(1, self.shape_name_delegate)
+
+        # Scroll smoothly
+        self.shape_table.setVerticalScrollMode(QAbstractItemView.ScrollPerPixel)
+        self.shape_table.setHorizontalScrollMode(QAbstractItemView.ScrollPerPixel)
 
     def setup_media_frame(self):
         self.media_frame = QFrame(self.content_frame)
@@ -652,7 +714,6 @@ class BaseGUI(QWidget):
         self.sort_desc_att_number_button.setPixmap(QPixmap(os.path.join(self.buttons_path, 'desc.png')))
 
     def retranslate_base_ui(self):
-        self.app_name.setText(QCoreApplication.translate("Form", u"ROCKET\nPROJECT", None))
         self.asset_catalogue_button.setText(QCoreApplication.translate("Form", u"Asset catalogue", None))
         self.main_label.setText(QCoreApplication.translate("Form", u"ASSET CATALOGUE", None))
         self.asset_list_label.setText(QCoreApplication.translate("Form", u"ASSET LIST", None))
@@ -674,6 +735,23 @@ class BaseGUI(QWidget):
 
     def test_action(self):
         print('Button clicked')
+
+    def setup_my_info(self):
+        self.contact = ClickableLabelAsButton(self.menu_frame)
+        self.contact.setObjectName(u"asset_list_label_2")
+        self.contact.setGeometry(QRect(46, 820, 151, 41))
+        font2 = QFont()
+        font2.setFamily(u"Segoe UI")
+        font2.setPointSize(12)
+        font2.setBold(False)
+        font2.setWeight(50)
+        self.contact.setFont(font2)
+        self.contact.setStyleSheet(u"color:rgb(69, 119, 185)")
+        self.contact.setText("Telegram: @DM2uan")
+        self.contact.clicked.connect(self.open_link)
+
+    def open_link(self):
+        webbrowser.open('https://t.me/DM2uan')
 
     def closeEvent(self, event):
         del self.db

@@ -14,6 +14,30 @@ class CrudDB():
         self.cursor = self.conn.cursor()
         self.conn.execute('PRAGMA foreign_keys = ON;')
 
+    def check_if_asset_attribute_exists(self,
+                                        asset_id: int,
+                                        attribute_order_number: int,
+                                        attribute_name: str,
+                                        data_type_name: str,
+                                        attribute_remark: str) -> bool:
+        count: int = self.cursor.execute(f"""
+            select count(*)
+            from AssetAttribute as aa
+            join DataType as dt 
+            on aa.DataTypeID = dt.DataTypeID
+            where 1 = 1
+            and aa.AssetID = {asset_id}
+            and aa.AttributeOrderNumber = {attribute_order_number}
+            and aa.AttributeName = '{attribute_name}'
+            and dt.DataTypeName = '{data_type_name}'
+            and aa.AttributeRemark = '{attribute_remark}';
+            """).fetchone()[0]
+
+        if count == 0:
+            return False
+        else:
+            return True
+
     def get_asset_name_frome_asset_id(self, asset_id: int) -> str:
         return self.cursor.execute(f"""
             select AssetName
@@ -58,6 +82,12 @@ class CrudDB():
         """
         return [category[0] for category in self.cursor.execute("SELECT CategoryName FROM AssetCategory").fetchall()]
 
+    def get_list_of_data_types(self) -> list:
+        """
+        Return a list of data types
+        """
+        return [data_type[0] for data_type in self.cursor.execute("SELECT DataTypeName FROM DataType").fetchall()]
+
     def get_list_of_image_categories(self) -> list:
         """
         Return a list of image categories
@@ -80,6 +110,9 @@ class CrudDB():
             on ai.ImageCategoryID = ic.ImageCategoryID
             where ai.AssetID = {asset_id} and ai.ImageFileName = '{image_name}';
         """).fetchone()[0]
+
+    def get_list_of_shape_types(self) -> list:
+        return [x[0] for x in self.cursor.execute(f"select TypeName from ShapeType;").fetchall()]
 
     def load_all_assets_data(self) -> dict:
         """
@@ -148,6 +181,24 @@ class CrudDB():
                                       """)
         return command.fetchone()
 
+    def load_asset_attribute_table(self, asset_id: int) -> list:
+        return self.cursor.execute(f"""
+            select AttributeOrderNumber, AttributeName, DataTypeName, AttributeRemark
+            from AssetAttribute as aa
+            join DataType as dt
+                on aa.DataTypeID = dt.DataTypeID
+            where aa.AssetID = {asset_id}
+            """).fetchall()
+
+    def load_asset_shape_table(self, asset_id: int) -> list:
+        return self.cursor.execute(f"""
+            select AssetShapeID, TypeName, ShapeDescription
+            from AssetShape as ash
+            join ShapeType as st
+                on ash.ShapeTypeID = st.ShapeTypeID
+            where ash.AssetID = {asset_id};
+            """).fetchall()
+
     def create_new_asset(self) -> bool:
 
         # Get the smallest available AssetCategoryID
@@ -210,6 +261,51 @@ class CrudDB():
         self.conn.commit()
         return True
 
+    def create_new_attribute(self, asset_id: int) -> bool:
+        # Get the biggest AttributeOrderNumber of the asset
+        attribute_order_number: int = self.cursor.execute(f"""
+            select max(AttributeOrderNumber)
+            from AssetAttribute
+            where AssetID = {asset_id};
+        """).fetchone()[0]
+
+        if attribute_order_number is None:
+            attribute_order_number = 1
+        else:
+            attribute_order_number += 1
+
+        operation = self.cursor.execute(f"""
+            insert into AssetAttribute (AssetID, AttributeOrderNumber, AttributeName, DataTypeID, AttributeRemark)
+            values ({asset_id}, {attribute_order_number}, '', 1, '');
+        """)
+        if operation.rowcount == 0:
+            return False
+
+        self.conn.commit()
+        return True
+
+    def create_new_shape(self, asset_id: int) -> bool:
+        # Get the smallest ShapeTypeID
+        shape_type_id: int = self.cursor.execute(f"""
+            select ShapeTypeID
+            from ShapeType
+            order by ShapeTypeID
+            limit 1;
+        """).fetchone()[0]
+
+        if shape_type_id is None:
+            shape_type_id = 1
+
+        operation = self.cursor.execute(f"""
+            insert into AssetShape (AssetID, ShapeTypeID, ShapeDescription)
+            values ({asset_id}, {shape_type_id}, 'Example Description');
+        """)
+        if operation.rowcount == 0:
+            return False
+
+        self.conn.commit()
+        return True
+
     def update_asset_table(self,
                            asset_id: int,
                            asset_number: int,
@@ -258,6 +354,73 @@ class CrudDB():
             self.conn.commit()
             return True
 
+    def update_asset_attribute(self, asset_id: int, new_attributes: list) -> bool:
+        """
+        Update the AssetAttribute of an asset in the database
+        Args:
+            asset_id (int): The AssetID of the asset to be updated in the database
+            new_attributes (list): A list of tuple (AttributeOrderNumber, AttributeName, DataTypeName, AttributeRemark)
+
+        Returns:
+            bool: The result of the operation: True if successful, False otherwise
+        """
+
+        # Delete all the attributes of the asset
+        operation = self.cursor.execute(f"""
+            delete from AssetAttribute
+            where AssetID = {asset_id};
+        """)
+
+        # Check if the operation is successful
+        if operation.rowcount == 0:
+            return False
+
+        # Insert the new attributes
+        for new_att in new_attributes:
+            new_att_order_number = new_att[0]
+            new_att_name = new_att[1]
+            new_att_data_type_name = new_att[2]
+            new_att_remark = new_att[3]
+
+            operation = self.cursor.execute(f"""
+                insert into AssetAttribute (AssetID, AttributeOrderNumber, AttributeName, DataTypeID, AttributeRemark)
+                values (
+                    {asset_id},
+                    {new_att_order_number},
+                    '{new_att_name}',
+                    (select DataTypeID from DataType where DataTypeName = '{new_att_data_type_name}'),
+                    '{new_att_remark}'
+                );
+                                            """)
+
+            # Check if the operation is successful
+            if operation.rowcount == 0:
+                return False
+
+        self.conn.commit()
+        return True
+
+    def update_asset_shape(self, new_shapes_data: list) -> bool:
+        for new_shape in new_shapes_data:
+            asset_shape_id = new_shape[0]
+            shape_type_name = new_shape[1]
+            shape_description = new_shape[2]
+
+            operation = self.cursor.execute(f"""
+                update AssetShape
+                set 
+                    ShapeTypeID = (select ShapeTypeID from ShapeType where TypeName = '{shape_type_name}'),
+                    ShapeDescription = '{shape_description}'
+                where AssetShapeID = {asset_shape_id};
+                """)
+
+            # Check if the operation is successful
+            if operation.rowcount == 0:
+                return False
+
+        self.conn.commit()
+        return True
+
     def delete_asset(self, asset_number: int, asset_name: str, asset_category_name: str) -> bool:
         """
         Delete an asset from the database
@@ -274,6 +437,51 @@ class CrudDB():
         operation = self.cursor.execute(f"""
             delete from Asset
             where AssetID = {asset_id};
+        """)
+
+        # Check if the operation is successful
+        if operation.rowcount == 0:
+            return False
+        else:
+            self.conn.commit()
+            return True
+
+    def delete_asset_attribute(self, asset_id: int, row_data: tuple) -> bool:
+        """
+        Delete an attribute from the database of an asset
+        Args:
+            asset_id (int): The AssetID of the asset to be deleted
+            row_data (list): The data of the row to be deleted (AttributeOrderNumber: int, AttributeName: str, DataTypeName: str, AttributeRemark: str)
+
+        Returns:
+            bool: True if the operation is successful, False otherwise
+        """
+
+        operation = self.cursor.execute(f"""
+            delete from AssetAttribute
+            where 1 = 1
+            and AssetID = {asset_id}
+            and AttributeOrderNumber = {row_data[0]}
+            and AttributeName = '{row_data[1]}'
+            and AttributeRemark = '{row_data[3]}'
+            and DataTypeID = (
+                select DataTypeID
+                from DataType
+                where DataTypeName = '{row_data[2]}'
+            );
+        """)
+
+        # Check if the operation is successful
+        if operation.rowcount == 0:
+            return False
+        else:
+            self.conn.commit()
+            return True
+
+    def delete_asset_shape(self, asset_shape_id: int):
+        operation = self.cursor.execute(f"""
+            delete from AssetShape
+            where AssetShapeID = {asset_shape_id};
         """)
 
         # Check if the operation is successful
@@ -305,6 +513,17 @@ class CrudDB():
             self.conn.commit()
             return True
 
+    def get_project_name(self) -> str:
+        output = self.cursor.execute(f"""
+            select ProjectName
+            from Project;
+        """).fetchone()
+
+        if output is None:
+            return ""
+        else:
+            return output[0]
+
     def __del__(self):
         self.conn.commit()
         self.cursor.close()
@@ -314,4 +533,4 @@ class CrudDB():
 if __name__ == '__main__':
     crud = CrudDB()
     # print(crud.load_master_table())
-    crud.test()
+    print(crud.get_list_of_shape_types())

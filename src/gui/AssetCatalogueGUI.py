@@ -61,13 +61,13 @@ class AssetCatelogueGUI(BaseGUI):
         self.crud_save_asset_button.clicked.connect(self.crud_save_asset_event)
         self.crud_delete_asset_button.clicked.connect(self.crud_delete_asset_event)
 
-        self.crud_add_attribute_button.clicked.connect(self.test_action)
-        self.crud_save_attribute_button.clicked.connect(self.test_action)
-        self.crud_delete_attribute_button.clicked.connect(self.test_action)
+        self.crud_add_attribute_button.clicked.connect(self.crud_add_attribute_button_event)
+        self.crud_save_attribute_button.clicked.connect(self.crud_save_attribute_button_event)
+        self.crud_delete_attribute_button.clicked.connect(self.crud_delete_attribute_button_event)
 
-        self.crud_add_shape_button.clicked.connect(self.test_action)
-        self.crud_save_shape_button.clicked.connect(self.test_action)
-        self.crud_delete_shape_button.clicked.connect(self.test_action)
+        self.crud_add_shape_button.clicked.connect(self.crud_add_shape_button_event)
+        self.crud_save_shape_button.clicked.connect(self.crud_save_shape_button_event)
+        self.crud_delete_shape_button.clicked.connect(self.crud_delete_shape_button_event)
 
         self.crud_add_media_button.clicked.connect(self.crud_add_image_event)
         self.crud_delete_media_button.clicked.connect(self.crud_delete_image_event)
@@ -90,8 +90,8 @@ class AssetCatelogueGUI(BaseGUI):
         self.sort_asc_asset_category_button.clicked.connect(self.sort_asc_asset_category_button_event)
         self.sort_desc_asset_category_button.clicked.connect(self.sort_desc_asset_category_button_event)
 
-        self.sort_desc_att_number_button.clicked.connect(self.test_action)
-        self.sort_asc_att_number_button.clicked.connect(self.test_action)
+        self.sort_desc_att_number_button.clicked.connect(self.sort_desc_att_number_button_event)
+        self.sort_asc_att_number_button.clicked.connect(self.sort_asc_att_number_button_event)
 
         # Cell of master table clicked
         self.master_table.cellClicked.connect(self.master_table_row_clicked_event)
@@ -147,6 +147,47 @@ class AssetCatelogueGUI(BaseGUI):
     def sort_desc_asset_category_button_event(self):
         self._sort_master_table(2, "desc")
 
+    def _sort_attribute_table(self, column: int, sort_type: str):
+        """
+            This is a support function for handle sort button event of attribute table
+        Args:
+            column (int): The column to sort in attribute table: 
+
+            - 0: Attribute order number
+            - 1: Attribute name
+            - 2: Attribute data type
+            - 3: Attribute remark
+
+            sort_type (str): "asc" or "desc"
+        """
+        # Get the current attribute data in the attribute table
+        current_attribute_data = []
+        for i in range(self.attribute_table.rowCount()):
+            current_attribute_data.append([])
+            for j in range(self.attribute_table.columnCount()):
+                if j == 0:  # AssetAttributeOrderNumber : int
+                    current_attribute_data[i].append(int(self.attribute_table.item(i, j).text()))
+                else:
+                    current_attribute_data[i].append(self.attribute_table.item(i, j).text())
+
+        # Sort the current attribute data
+        current_attribute_data.sort(key=lambda x: x[column], reverse=True if sort_type == "desc" else False)
+
+        # Then reload the attribute table
+        self.attribute_table.clearContents()
+        self.attribute_table.setRowCount(0)
+
+        self.attribute_table.setRowCount(len(current_attribute_data))
+        for i, attribute in enumerate(current_attribute_data):
+            for j, column in enumerate(attribute):
+                self.attribute_table.setItem(i, j, QTableWidgetItem(str(column)))
+
+    def sort_asc_att_number_button_event(self):
+        self._sort_attribute_table(0, "asc")
+
+    def sort_desc_att_number_button_event(self):
+        self._sort_attribute_table(0, "desc")
+
     # --====================== Action for master table and asset details ======================--
 
     def next_page_button_event(self):
@@ -198,10 +239,10 @@ class AssetCatelogueGUI(BaseGUI):
             # Set the import list 3rd row
             self.import_list_3rd_row_value_item.setText(asset_detail[4])
 
-            # --====================== TODO:Fill the asset attribute table ======================--
-
-            # --====================== TODO:Fill the asset shape table ======================--
-
+            # --====================== Fill the asset attribute table ======================--
+            self.fill_attribute_table(self.current_asset_id)
+            # --====================== Fill the asset shape table ======================--
+            self.fill_shape_table(self.current_asset_id)
             # --====================== Fill in the media frame  ======================--
             self.fill_in_media_frame()
 
@@ -225,11 +266,11 @@ class AssetCatelogueGUI(BaseGUI):
         self.clear_asset_detail_table()
         # Clear the horizontal layout
         self.clear_the_horizontal_layout()
-        # TODO:Clear the Attribute table
-
-        # TODO:Clear the Shape table
-
-        # TODO: Load the image preview of assets in current pages
+        # Clear the Attribute table
+        self.clear_the_attribute_table()
+        # Clear the Shape table
+        self.clear_the_shape_table()
+        # Load the image preview of assets in current pages
         self.fill_preview_image_in_master_table(page=page)
 
     def fill_preview_image_in_master_table(self, page: int):
@@ -270,7 +311,8 @@ class AssetCatelogueGUI(BaseGUI):
             self.fill_in_master_table(self.current_page)  # Reload the master table with all data
             self.clear_asset_detail_table()  # Clear the asset detail table
             self.clear_the_horizontal_layout()  # Clear the horizontal layout
-            # TODO: Add clear the attribute table and shape table
+            self.clear_the_attribute_table()
+            self.clear_the_shape_table()
             return
 
         # Else apply the filter
@@ -297,7 +339,8 @@ class AssetCatelogueGUI(BaseGUI):
         self.fill_in_master_table(self.current_page)
         self.clear_asset_detail_table()  # Clear the asset detail table
         self.clear_the_horizontal_layout()  # Clear the horizontal layout
-        # TODO: Add clear the attribute table and shape table
+        self.clear_the_attribute_table()
+        self.clear_the_shape_table()
 
     def get_read_only_image_label(self, asset_id: int) -> QLabel:
         """
@@ -493,6 +536,228 @@ class AssetCatelogueGUI(BaseGUI):
         self.current_page = self.total_pages
         self.fill_in_master_table(self.current_page)
         self.clear_asset_detail_table()
+
+    # --====================== Action for Attribute table ======================--
+
+    def clear_the_attribute_table(self):
+        self.attribute_table.clearContents()
+        self.attribute_table.setRowCount(0)
+
+    def fill_attribute_table(self, asset_id: int):
+        if asset_id is None:
+            return
+
+        # Clear the attribute table
+        self.attribute_table.clearContents()
+        self.attribute_table.setRowCount(0)
+
+        # Get the attribute data from the database
+        attribute_data: list = self.db.load_asset_attribute_table(asset_id)
+
+        if attribute_data == []:
+            return
+
+        self.attribute_table.setRowCount(len(attribute_data))
+
+        for i, attribute in enumerate(attribute_data):
+            for j, column in enumerate(attribute):
+                self.attribute_table.setItem(i, j, QTableWidgetItem(str(column)))
+
+    def crud_add_attribute_button_event(self):
+        if self.current_asset_id is None:
+            msg.warning_box("Please select an asset to add attribute!", icon_path=self.icon_path)
+            return
+
+        # Create new attribute in the database
+        success = self.db.create_new_attribute(self.current_asset_id)
+        if not success:
+            msg.warning_box("Error occurred when creating a new attribute!", icon_path=self.icon_path)
+            return
+
+        # Reload the attribute table
+        self.fill_attribute_table(self.current_asset_id)
+
+        # Scroll to the last row
+        self.attribute_table.scrollToBottom()
+
+    def crud_save_attribute_button_event(self):
+        if self.current_asset_id is None:
+            msg.warning_box("Please select an asset to update attribute!", icon_path=self.icon_path)
+            return
+
+        # Get the current attribute data
+        new_attribute_data = []
+        for i in range(self.attribute_table.rowCount()):
+            new_attribute_data.append([])
+            for j in range(self.attribute_table.columnCount()):
+                if j == 0:  # AssetAttributeOrderNumber : int
+                    new_attribute_data[i].append(int(self.attribute_table.item(i, j).text()))
+                else:
+                    new_attribute_data[i].append(self.attribute_table.item(i, j).text())
+
+        # Update the the attribute of the current asset in the database
+        success = self.db.update_asset_attribute(self.current_asset_id, new_attribute_data)
+
+        if not success:
+            msg.warning_box("Error occurred when updating attribute!", icon_path=self.icon_path)
+            return
+
+        # Reload the attribute table
+        self.fill_attribute_table(self.current_asset_id)
+
+        msg.information_box("Save attribute successfully!", icon_path=self.icon_path)
+
+    def crud_delete_attribute_button_event(self):
+        if self.current_asset_id is None:
+            msg.warning_box("Please select an asset to delete attribute!", icon_path=self.icon_path)
+            return
+
+        # Get the current clicked attribute data row
+        current_clicked_attribute_row = self.attribute_table.currentRow()
+
+        if current_clicked_attribute_row == -1:
+            msg.warning_box("Please select an attribute to delete!", icon_path=self.icon_path)
+            return
+
+        # Get the current clicked data in the attribute table
+        current_att_order_number: str = self.attribute_table.item(current_clicked_attribute_row, 0).text()
+        current_att_name: str = self.attribute_table.item(current_clicked_attribute_row, 1).text()
+        current_att_datatype: str = self.attribute_table.item(current_clicked_attribute_row, 2).text()
+        current_att_remark: str = self.attribute_table.item(current_clicked_attribute_row, 3).text()
+
+        if not self.db.check_if_asset_attribute_exists(
+                asset_id=self.current_asset_id,
+                attribute_order_number=int(current_att_order_number),
+                attribute_name=current_att_name,
+                data_type_name=current_att_datatype,
+                attribute_remark=current_att_remark):
+            msg.warning_box("This attribute does not exist! Have you saved the changes yet?", icon_path=self.icon_path)
+            return
+
+        user_choice = msg.yes_no_box("Are you sure to delete this attribute?", icon_path=self.icon_path)
+        if user_choice == QMessageBox.No:
+            return
+
+        # Delete the attribute in the database
+        success = self.db.delete_asset_attribute(
+            asset_id=self.current_asset_id,
+            row_data=(int(current_att_order_number), current_att_name, current_att_datatype, current_att_remark))
+
+        if not success:
+            msg.warning_box("Error occurred when deleting attribute!", icon_path=self.icon_path)
+            return
+
+        # Reload the attribute table
+        self.fill_attribute_table(self.current_asset_id)
+
+        msg.information_box("Delete attribute successfully!", icon_path=self.icon_path)
+
+    # --====================== Action for Shape table ======================--
+    def clear_the_shape_table(self):
+        self.shape_table.clearContents()
+        self.shape_table.setRowCount(0)
+
+    def fill_shape_table(self, asset_id: int):
+        if asset_id is None:
+            return
+
+        # Clear the attribute table
+        self.shape_table.clearContents()
+        self.shape_table.setRowCount(0)
+
+        # Get the shape data from the database
+        shape_data: list = self.db.load_asset_shape_table(asset_id)
+
+        print(f'Shape data for AssetID {asset_id}:', shape_data)
+        if shape_data == []:
+            return
+
+        self.shape_table.setRowCount(len(shape_data))
+
+        for i, shape in enumerate(shape_data):
+            for j, column in enumerate(shape):
+                if j == 0:  # AssetShapeID : int (read only)
+                    self.shape_table.setItem(i, j, QTableWidgetItem(str(column)))
+                    self.shape_table.item(i, j).setFlags(Qt.ItemIsEnabled)
+                else:
+                    self.shape_table.setItem(i, j, QTableWidgetItem(str(column)))
+
+    def crud_add_shape_button_event(self):
+        if self.current_asset_id is None:
+            msg.warning_box("Please select an asset to add shape!", icon_path=self.icon_path)
+            return
+
+        # Create new shape in the database
+        success = self.db.create_new_shape(self.current_asset_id)
+        if not success:
+            msg.warning_box("Error occurred when creating a new shape!", icon_path=self.icon_path)
+            return
+
+        # Reload the shape table
+        self.fill_shape_table(self.current_asset_id)
+
+        # Scroll to the last row
+        self.shape_table.scrollToBottom()
+
+    def crud_save_shape_button_event(self):
+        if self.current_asset_id is None:
+            msg.warning_box("Please select an asset to update shape!", icon_path=self.icon_path)
+            return
+
+        # Get the current shape data
+        new_shape_data = []
+        for i in range(self.shape_table.rowCount()):
+            new_shape_data.append([])
+            for j in range(self.shape_table.columnCount()):
+                if j == 0:  # AssetShapeID : int
+                    new_shape_data[i].append(int(self.shape_table.item(i, j).text()))
+                else:
+                    new_shape_data[i].append(self.shape_table.item(i, j).text())
+
+        # Update the the shape of the current asset in the database
+        success = self.db.update_asset_shape(new_shape_data)
+
+        if not success:
+            msg.warning_box("Error occurred when updating shape!", icon_path=self.icon_path)
+            return
+
+        # Reload the shape table
+        self.fill_shape_table(self.current_asset_id)
+
+        msg.information_box("Save shape successfully!", icon_path=self.icon_path)
+
+    def crud_delete_shape_button_event(self):
+        if self.current_asset_id is None:
+            msg.warning_box("Please select an asset to delete shape!", icon_path=self.icon_path)
+            return
+
+        # Get the current clicked shape data row
+        current_clicked_shape_row = self.shape_table.currentRow()
+
+        if current_clicked_shape_row == -1:
+            msg.warning_box("Please select a shape to delete!", icon_path=self.icon_path)
+            return
+
+        user_choice = msg.yes_no_box(
+            "Are you sure to delete this shape? This action cannot be undone!", icon_path=self.icon_path)
+
+        if user_choice == QMessageBox.No:
+            return
+
+        # Get the current clicked data in the shape table
+        current_asset_shape_id: str = self.shape_table.item(current_clicked_shape_row, 0).text()
+
+        # Delete the shape in the database
+        success = self.db.delete_asset_shape(asset_shape_id=int(current_asset_shape_id))
+
+        if not success:
+            msg.warning_box("Error occurred when deleting shape!", icon_path=self.icon_path)
+            return
+
+        # Reload the shape table
+        self.fill_shape_table(self.current_asset_id)
+
+        msg.information_box("Delete shape successfully!", icon_path=self.icon_path)
 
     # --====================== Action for media frame ======================--
 
