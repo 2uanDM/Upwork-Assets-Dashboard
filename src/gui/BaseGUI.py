@@ -5,9 +5,14 @@ from PyQt5.QtGui import *
 from PyQt5.QtWidgets import *
 from PyQt5.QtCore import *
 from PyQt5.QtWidgets import QStyleOptionViewItem, QWidget
-from src.utils.database_crud import CrudDB
+import sys
 import json
 import os
+sys.path.append(os.path.join(os.getcwd()))
+
+from src.utils.database_crud import CrudDB
+from src.utils.image_utils import ImageResize
+
 
 # Import the css json
 css_path = os.path.join(os.getcwd(), 'assets', 'css', 'css.json')
@@ -15,7 +20,7 @@ with open(css_path, "r", encoding='utf8') as f:
     css_dict = json.load(f)
 
 
-class ClickableLabel(QLabel):
+class ClickableLabelAsButton(QLabel):
     clicked = pyqtSignal()
 
     def __init__(self, parent=None):
@@ -70,6 +75,8 @@ class QComboBoxDelegate(QStyledItemDelegate):
 
 class BaseGUI(QWidget):
     buttons_path = os.path.join(os.getcwd(), 'assets', 'buttons')
+    asset_pictures_path = os.path.join(os.getcwd(), 'asset_pictures')  # Folder where store the asset pictures
+    temp_folder_path = os.path.join(os.getcwd(), '.temp')  # Folder where store the temp pictures
 
     def __init__(self, MainWindow) -> None:
         """
@@ -83,6 +90,9 @@ class BaseGUI(QWidget):
 
         # ------------------- Connect the database -------------------
         self.db = CrudDB()
+
+        # ------------------- Setup the image resize -------------------
+        self.resizer = ImageResize()
 
         # ------------------- Setup Fonts -------------------
         self.setup_fonts()
@@ -279,13 +289,13 @@ class BaseGUI(QWidget):
         self.page_label.setAlignment(Qt.AlignCenter)
 
         # --================== Previous button ==================--
-        self.previous_page_button = ClickableLabel(self.content_frame)
+        self.previous_page_button = ClickableLabelAsButton(self.content_frame)
         self.previous_page_button.setObjectName(u"previous_page_button")
         self.previous_page_button.setGeometry(QRect(130, 860, 31, 31))
         self.previous_page_button.setPixmap(QPixmap(os.path.join(self.buttons_path, "previous.png")))
 
         # --================== Next button ==================--
-        self.next_page_button = ClickableLabel(self.content_frame)
+        self.next_page_button = ClickableLabelAsButton(self.content_frame)
         self.next_page_button.setObjectName(u"next_page_button")
         self.next_page_button.setGeometry(QRect(350, 860, 31, 31))
         self.next_page_button.setPixmap(QPixmap(os.path.join(self.buttons_path, "next.png")))
@@ -368,6 +378,7 @@ class BaseGUI(QWidget):
 
         self.asset_description_value_item = QTableWidgetItem()
         self.asset_description_value_item.setText("")
+        self.asset_description_value_item.setTextAlignment(Qt.AlignTop | Qt.AlignLeft)
         self.asset_detail_table.setItem(3, 1, self.asset_description_value_item)
 
         # Change the height of the fourth row
@@ -513,67 +524,74 @@ class BaseGUI(QWidget):
         self.download_dataset_button.setStyleSheet(self.css.get('apply_filter_button'))
         self.download_dataset_button.setText("Download dataset")
 
+        # --================== Image category label ==================--
+        self.image_category_label = QLabel(self.content_frame)
+        self.image_category_label.setObjectName(u"image_category_label")
+        self.image_category_label.setGeometry(QRect(720, 860, 591, 31))
+        self.image_category_label.setFont(self.font_for_page_label)
+        self.image_category_label.setStyleSheet(u"color:rgb(89,89,89)")
+
     def setup_crud_asset_detail_buttons(self):
         # Add asset button
-        self.crud_add_asset_button = ClickableLabel(self.content_frame)
+        self.crud_add_asset_button = ClickableLabelAsButton(self.content_frame)
         self.crud_add_asset_button.setObjectName(u"crud_add_asset_button")
         self.crud_add_asset_button.setGeometry(QRect(1529, 80, 21, 21))
         self.crud_add_asset_button.setPixmap(QPixmap(os.path.join(self.buttons_path, 'add.png')))
 
         # Save/Update asset button
-        self.crud_save_asset_button = ClickableLabel(self.content_frame)
+        self.crud_save_asset_button = ClickableLabelAsButton(self.content_frame)
         self.crud_save_asset_button.setObjectName(u"crud_save_asset_button")
         self.crud_save_asset_button.setGeometry(QRect(1526, 115, 26, 21))
         self.crud_save_asset_button.setPixmap(QPixmap(os.path.join(self.buttons_path, 'update.png')))
 
         # Delete asset button
-        self.crud_delete_asset_button = ClickableLabel(self.content_frame)
+        self.crud_delete_asset_button = ClickableLabelAsButton(self.content_frame)
         self.crud_delete_asset_button.setObjectName(u"crud_delete_asset_button")
         self.crud_delete_asset_button.setGeometry(QRect(1530, 150, 19, 21))
         self.crud_delete_asset_button.setPixmap(QPixmap(os.path.join(self.buttons_path, 'delete.png')))
 
     def setup_crud_attribute_buttons(self):
         # Add attribute button
-        self.crud_add_attribute_button = ClickableLabel(self.content_frame)
+        self.crud_add_attribute_button = ClickableLabelAsButton(self.content_frame)
         self.crud_add_attribute_button.setObjectName(u"crud_add_attribute_button")
         self.crud_add_attribute_button.setGeometry(QRect(1529, 350, 21, 21))
         self.crud_add_attribute_button.setPixmap(QPixmap(os.path.join(self.buttons_path, 'add.png')))
 
         # Save/Update attribute button
-        self.crud_save_attribute_button = ClickableLabel(self.content_frame)
+        self.crud_save_attribute_button = ClickableLabelAsButton(self.content_frame)
         self.crud_save_attribute_button.setObjectName(u"crud_save_attribute_button")
         self.crud_save_attribute_button.setGeometry(QRect(1526, 385, 26, 21))
         self.crud_save_attribute_button.setPixmap(QPixmap(os.path.join(self.buttons_path, 'update.png')))
 
         # Delete attribute button
-        self.crud_delete_attribute_button = ClickableLabel(self.content_frame)
+        self.crud_delete_attribute_button = ClickableLabelAsButton(self.content_frame)
         self.crud_delete_attribute_button.setObjectName(u"crud_delete_attribute_button")
         self.crud_delete_attribute_button.setGeometry(QRect(1530, 420, 19, 21))
         self.crud_delete_attribute_button.setPixmap(QPixmap(os.path.join(self.buttons_path, 'delete.png')))
 
     def setup_crud_shape_buttons(self):
-        self.crud_add_shape_button = ClickableLabel(self.content_frame)
+        self.crud_add_shape_button = ClickableLabelAsButton(self.content_frame)
         self.crud_add_shape_button.setObjectName(u"crud_add_shape_button")
         self.crud_add_shape_button.setGeometry(QRect(1529, 540, 21, 21))
         self.crud_add_shape_button.setPixmap(QPixmap(QPixmap(os.path.join(self.buttons_path, 'add.png'))))
 
-        self.crud_save_shape_button = ClickableLabel(self.content_frame)
+        self.crud_save_shape_button = ClickableLabelAsButton(self.content_frame)
         self.crud_save_shape_button.setObjectName(u"crud_save_shape_button")
         self.crud_save_shape_button.setGeometry(QRect(1526, 575, 26, 21))
         self.crud_save_shape_button.setPixmap(QPixmap(QPixmap(os.path.join(self.buttons_path, 'update.png'))))
 
-        self.crud_delete_shape_button = ClickableLabel(self.content_frame)
+        self.crud_delete_shape_button = ClickableLabelAsButton(self.content_frame)
         self.crud_delete_shape_button.setObjectName(u"crud_delete_shape_button")
         self.crud_delete_shape_button.setGeometry(QRect(1530, 610, 19, 21))
         self.crud_delete_shape_button.setPixmap(QPixmap(QPixmap(os.path.join(self.buttons_path, 'delete.png'))))
 
     def setup_crud_media_buttons(self):
-        self.crud_add_media_button = ClickableLabel(self.content_frame)
+        self.crud_add_media_button = ClickableLabelAsButton(self.content_frame)
         self.crud_add_media_button.setObjectName(u"crud_add_media_button")
         self.crud_add_media_button.setGeometry(QRect(1529, 720, 21, 21))
         self.crud_add_media_button.setPixmap(QPixmap(os.path.join(self.buttons_path, 'add.png')))
 
-        self.crud_delete_media_button = ClickableLabel(self.content_frame)
+        self.crud_delete_media_button = ClickableLabelAsButton(self.content_frame)
         self.crud_delete_media_button.setObjectName(u"crud_delete_media_button")
         self.crud_delete_media_button.setGeometry(QRect(1530, 760, 19, 21))
         self.crud_delete_media_button.setPixmap(QPixmap(os.path.join(self.buttons_path, 'delete.png')))
@@ -582,52 +600,52 @@ class BaseGUI(QWidget):
         # ------------------- Master Table -------------------
 
         # --================== Sort by asset number button ==================--
-        self.sort_asc_asset_number_button = ClickableLabel(self.content_frame)
+        self.sort_asc_asset_number_button = ClickableLabelAsButton(self.content_frame)
         self.sort_asc_asset_number_button.setObjectName(u"sort_asc_asset_number_button")
         self.sort_asc_asset_number_button.setGeometry(QRect(306, 170, 13, 14))
         self.sort_asc_asset_number_button.setStyleSheet(u"background-color: rgb(231, 231, 231);")
         self.sort_asc_asset_number_button.setPixmap(QPixmap(os.path.join(self.buttons_path, 'asc.png')))
 
-        self.sort_desc_asset_number_button = ClickableLabel(self.content_frame)
+        self.sort_desc_asset_number_button = ClickableLabelAsButton(self.content_frame)
         self.sort_desc_asset_number_button.setObjectName(u"sort_desc_asset_number_button")
         self.sort_desc_asset_number_button.setGeometry(QRect(290, 170, 13, 14))
         self.sort_desc_asset_number_button.setStyleSheet(u"background-color: rgb(231, 231, 231);")
         self.sort_desc_asset_number_button.setPixmap(QPixmap(os.path.join(self.buttons_path, 'desc.png')))
 
         # --================== Sort by asset name button ==================--
-        self.sort_desc_asset_name_button = ClickableLabel(self.content_frame)
+        self.sort_desc_asset_name_button = ClickableLabelAsButton(self.content_frame)
         self.sort_desc_asset_name_button.setObjectName(u"sort_desc_asset_name_button")
         self.sort_desc_asset_name_button.setGeometry(QRect(514, 170, 13, 14))
         self.sort_desc_asset_name_button.setStyleSheet(u"background-color: rgb(231, 231, 231);")
         self.sort_desc_asset_name_button.setPixmap(QPixmap(os.path.join(self.buttons_path, 'desc.png')))
 
-        self.sort_asc_asset_name_button = ClickableLabel(self.content_frame)
+        self.sort_asc_asset_name_button = ClickableLabelAsButton(self.content_frame)
         self.sort_asc_asset_name_button.setObjectName(u"sort_asc_asset_name_button")
         self.sort_asc_asset_name_button.setGeometry(QRect(530, 170, 13, 14))
         self.sort_asc_asset_name_button.setStyleSheet(u"background-color: rgb(231, 231, 231);")
         self.sort_asc_asset_name_button.setPixmap(QPixmap(os.path.join(self.buttons_path, 'asc.png')))
 
         # --================== Sort by category button ==================--
-        self.sort_desc_asset_category_button = ClickableLabel(self.content_frame)
+        self.sort_desc_asset_category_button = ClickableLabelAsButton(self.content_frame)
         self.sort_desc_asset_category_button.setObjectName(u"sort_desc_asset_category_button")
         self.sort_desc_asset_category_button.setGeometry(QRect(664, 170, 13, 14))
         self.sort_desc_asset_category_button.setStyleSheet(u"background-color: rgb(231, 231, 231);")
         self.sort_desc_asset_category_button.setPixmap(QPixmap(os.path.join(self.buttons_path, 'desc.png')))
 
-        self.sort_asc_asset_category_button = ClickableLabel(self.content_frame)
+        self.sort_asc_asset_category_button = ClickableLabelAsButton(self.content_frame)
         self.sort_asc_asset_category_button.setObjectName(u"sort_asc_asset_category_button")
         self.sort_asc_asset_category_button.setGeometry(QRect(680, 170, 13, 14))
         self.sort_asc_asset_category_button.setStyleSheet(u"background-color: rgb(231, 231, 231);")
         self.sort_asc_asset_category_button.setPixmap(QPixmap(os.path.join(self.buttons_path, 'asc.png')))
 
         # ------------------- Attribute Table -------------------
-        self.sort_asc_att_number_button = ClickableLabel(self.content_frame)
+        self.sort_asc_att_number_button = ClickableLabelAsButton(self.content_frame)
         self.sort_asc_att_number_button.setObjectName(u"sort_asc_att_number_button")
         self.sort_asc_att_number_button.setGeometry(QRect(806 - 40, 350, 13, 14))
         self.sort_asc_att_number_button.setStyleSheet(u"background-color: rgb(231, 231, 231);")
         self.sort_asc_att_number_button.setPixmap(QPixmap(os.path.join(self.buttons_path, 'asc.png')))
 
-        self.sort_desc_att_number_button = ClickableLabel(self.content_frame)
+        self.sort_desc_att_number_button = ClickableLabelAsButton(self.content_frame)
         self.sort_desc_att_number_button.setObjectName(u"sort_desc_att_number_button")
         self.sort_desc_att_number_button.setGeometry(QRect(790 - 40, 350, 13, 14))
         self.sort_desc_att_number_button.setStyleSheet(u"background-color: rgb(231, 231, 231);")
