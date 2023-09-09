@@ -90,8 +90,8 @@ class AssetCatelogueGUI(BaseGUI):
         self.sort_asc_asset_category_button.clicked.connect(self.sort_asc_asset_category_button_event)
         self.sort_desc_asset_category_button.clicked.connect(self.sort_desc_asset_category_button_event)
 
-        self.sort_desc_att_number_button.clicked.connect(self.test_action)
-        self.sort_asc_att_number_button.clicked.connect(self.test_action)
+        self.sort_desc_att_number_button.clicked.connect(self.sort_desc_att_number_button_event)
+        self.sort_asc_att_number_button.clicked.connect(self.sort_asc_att_number_button_event)
 
         # Cell of master table clicked
         self.master_table.cellClicked.connect(self.master_table_row_clicked_event)
@@ -147,6 +147,46 @@ class AssetCatelogueGUI(BaseGUI):
     def sort_desc_asset_category_button_event(self):
         self._sort_master_table(2, "desc")
 
+    def _sort_attribute_table(self, column: int, sort_type: str):
+        """
+            This is a support function for handle sort button event of attribute table
+        Args:
+            column (int): The column to sort in attribute table: 
+
+            - 0: Attribute order number
+            - 1: Attribute name
+            - 2: Attribute data type
+            - 3: Attribute remark
+
+            sort_type (str): "asc" or "desc"
+        """
+        # Get the current attribute data in the attribute table
+        current_attribute_data = []
+        for i in range(self.attribute_table.rowCount()):
+            current_attribute_data.append([])
+            for j in range(self.attribute_table.columnCount()):
+                if j == 0:  # AssetAttributeOrderNumber : int
+                    current_attribute_data[i].append(int(self.attribute_table.item(i, j).text()))
+                else:
+                    current_attribute_data[i].append(self.attribute_table.item(i, j).text())
+
+        # Sort the current attribute data
+        current_attribute_data.sort(key=lambda x: x[column], reverse=True if sort_type == "desc" else False)
+
+        # Then reload the attribute table
+        self.attribute_table.clearContents()
+        self.attribute_table.setRowCount(0)
+
+        self.attribute_table.setRowCount(len(current_attribute_data))
+        for i, attribute in enumerate(current_attribute_data):
+            for j, column in enumerate(attribute):
+                self.attribute_table.setItem(i, j, QTableWidgetItem(str(column)))
+
+    def sort_asc_att_number_button_event(self):
+        self._sort_attribute_table(0, "asc")
+
+    def sort_desc_att_number_button_event(self):
+        self._sort_attribute_table(0, "desc")
     # --====================== Action for master table and asset details ======================--
 
     def next_page_button_event(self):
