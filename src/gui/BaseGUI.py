@@ -501,6 +501,10 @@ class BaseGUI(QWidget):
         )
         self.attribute_table.setItemDelegateForColumn(2, self.datatype_delegate)
 
+        # Scroll smoothly
+        self.attribute_table.setVerticalScrollMode(QAbstractItemView.ScrollPerPixel)
+        self.attribute_table.setHorizontalScrollMode(QAbstractItemView.ScrollPerPixel)
+
     def setup_shape_table(self):
         self.shape_table = QTableWidget(self.content_frame)
         self.shape_table.setColumnCount(3)
@@ -543,6 +547,10 @@ class BaseGUI(QWidget):
             parent=self.shape_table
         )
         self.shape_table.setItemDelegateForColumn(1, self.shape_name_delegate)
+
+        # Scroll smoothly
+        self.shape_table.setVerticalScrollMode(QAbstractItemView.ScrollPerPixel)
+        self.shape_table.setHorizontalScrollMode(QAbstractItemView.ScrollPerPixel)
 
     def setup_media_frame(self):
         self.media_frame = QFrame(self.content_frame)

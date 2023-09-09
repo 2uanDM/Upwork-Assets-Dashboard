@@ -676,7 +676,11 @@ class AssetCatelogueGUI(BaseGUI):
 
         for i, shape in enumerate(shape_data):
             for j, column in enumerate(shape):
-                self.shape_table.setItem(i, j, QTableWidgetItem(str(column)))
+                if j == 0:  # AssetShapeID : int (read only)
+                    self.shape_table.setItem(i, j, QTableWidgetItem(str(column)))
+                    self.shape_table.item(i, j).setFlags(Qt.ItemIsEnabled)
+                else:
+                    self.shape_table.setItem(i, j, QTableWidgetItem(str(column)))
 
     def crud_add_shape_button_event(self):
         if self.current_asset_id is None:
@@ -696,7 +700,31 @@ class AssetCatelogueGUI(BaseGUI):
         self.shape_table.scrollToBottom()
 
     def crud_save_shape_button_event(self):
-        pass
+        if self.current_asset_id is None:
+            msg.warning_box("Please select an asset to update shape!", icon_path=self.icon_path)
+            return
+
+        # Get the current shape data
+        new_shape_data = []
+        for i in range(self.shape_table.rowCount()):
+            new_shape_data.append([])
+            for j in range(self.shape_table.columnCount()):
+                if j == 0:  # AssetShapeID : int
+                    new_shape_data[i].append(int(self.shape_table.item(i, j).text()))
+                else:
+                    new_shape_data[i].append(self.shape_table.item(i, j).text())
+
+        # Update the the shape of the current asset in the database
+        success = self.db.update_asset_shape(new_shape_data)
+
+        if not success:
+            msg.warning_box("Error occurred when updating shape!", icon_path=self.icon_path)
+            return
+
+        # Reload the shape table
+        self.fill_shape_table(self.current_asset_id)
+
+        msg.information_box("Save shape successfully!", icon_path=self.icon_path)
 
     def crud_delete_shape_button_event(self):
         pass

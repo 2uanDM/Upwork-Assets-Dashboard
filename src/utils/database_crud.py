@@ -400,6 +400,27 @@ class CrudDB():
         self.conn.commit()
         return True
 
+    def update_asset_shape(self, new_shapes_data: list) -> bool:
+        for new_shape in new_shapes_data:
+            asset_shape_id = new_shape[0]
+            shape_type_name = new_shape[1]
+            shape_description = new_shape[2]
+
+            operation = self.cursor.execute(f"""
+                update AssetShape
+                set 
+                    ShapeTypeID = (select ShapeTypeID from ShapeType where TypeName = '{shape_type_name}'),
+                    ShapeDescription = '{shape_description}'
+                where AssetShapeID = {asset_shape_id};
+                """)
+
+            # Check if the operation is successful
+            if operation.rowcount == 0:
+                return False
+
+        self.conn.commit()
+        return True
+
     def delete_asset(self, asset_number: int, asset_name: str, asset_category_name: str) -> bool:
         """
         Delete an asset from the database
