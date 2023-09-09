@@ -478,6 +478,19 @@ class CrudDB():
             self.conn.commit()
             return True
 
+    def delete_asset_shape(self, asset_shape_id: int):
+        operation = self.cursor.execute(f"""
+            delete from AssetShape
+            where AssetShapeID = {asset_shape_id};
+        """)
+
+        # Check if the operation is successful
+        if operation.rowcount == 0:
+            return False
+        else:
+            self.conn.commit()
+            return True
+
     def delete_asset_image(self, asset_id: int, asset_image_name: str) -> bool:
         """
         Delete an image from the database

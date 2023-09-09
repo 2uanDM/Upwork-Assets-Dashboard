@@ -727,7 +727,37 @@ class AssetCatelogueGUI(BaseGUI):
         msg.information_box("Save shape successfully!", icon_path=self.icon_path)
 
     def crud_delete_shape_button_event(self):
-        pass
+        if self.current_asset_id is None:
+            msg.warning_box("Please select an asset to delete shape!", icon_path=self.icon_path)
+            return
+
+        # Get the current clicked shape data row
+        current_clicked_shape_row = self.shape_table.currentRow()
+
+        if current_clicked_shape_row == -1:
+            msg.warning_box("Please select a shape to delete!", icon_path=self.icon_path)
+            return
+
+        user_choice = msg.yes_no_box(
+            "Are you sure to delete this shape? This action cannot be undone!", icon_path=self.icon_path)
+
+        if user_choice == QMessageBox.No:
+            return
+
+        # Get the current clicked data in the shape table
+        current_asset_shape_id: str = self.shape_table.item(current_clicked_shape_row, 0).text()
+
+        # Delete the shape in the database
+        success = self.db.delete_asset_shape(asset_shape_id=int(current_asset_shape_id))
+
+        if not success:
+            msg.warning_box("Error occurred when deleting shape!", icon_path=self.icon_path)
+            return
+
+        # Reload the shape table
+        self.fill_shape_table(self.current_asset_id)
+
+        msg.information_box("Delete shape successfully!", icon_path=self.icon_path)
 
     # --====================== Action for media frame ======================--
 

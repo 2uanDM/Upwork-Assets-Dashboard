@@ -1,5 +1,6 @@
 
 import typing
+import webbrowser
 from PyQt5 import QtCore
 from PyQt5.QtGui import *
 from PyQt5.QtWidgets import *
@@ -148,6 +149,8 @@ class BaseGUI(QWidget):
         self.setup_crud_media_buttons()
         # ------------------- Setup sort buttons -------------------
         self.setup_sort_button()
+        # ------------------- Setup my info -------------------
+        self.setup_my_info()
 
         # Retranslate Ui
         self.retranslate_base_ui()
@@ -727,6 +730,23 @@ class BaseGUI(QWidget):
 
     def test_action(self):
         print('Button clicked')
+
+    def setup_my_info(self):
+        self.contact = ClickableLabelAsButton(self.menu_frame)
+        self.contact.setObjectName(u"asset_list_label_2")
+        self.contact.setGeometry(QRect(46, 820, 151, 41))
+        font2 = QFont()
+        font2.setFamily(u"Segoe UI")
+        font2.setPointSize(12)
+        font2.setBold(False)
+        font2.setWeight(50)
+        self.contact.setFont(font2)
+        self.contact.setStyleSheet(u"color:rgb(69, 119, 185)")
+        self.contact.setText("Telegram: @DM2uan")
+        self.contact.clicked.connect(self.open_link)
+
+    def open_link(self):
+        webbrowser.open('https://t.me/DM2uan')
 
     def closeEvent(self, event):
         del self.db
