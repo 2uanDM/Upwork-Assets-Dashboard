@@ -567,9 +567,6 @@ class AssetCatelogueGUI(BaseGUI):
         # Show the window
         self.image_window.show()
 
-    def crud_delete_image_event(self):
-        pass
-
     def store_asset_image_to_database(self, image_path: str, image_category: str):
         # Get the image name from image_path
         image_name = image_path.split('/')[-1]
@@ -633,3 +630,6 @@ class AssetCatelogueGUI(BaseGUI):
 
         # TODO: Reload the master table to show the image preview and reload the image horizontal layout
         self.fill_in_media_frame()
+
+    def crud_delete_image_event(self):
+        pass
