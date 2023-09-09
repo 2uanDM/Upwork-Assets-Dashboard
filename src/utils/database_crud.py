@@ -296,6 +296,52 @@ class CrudDB():
             self.conn.commit()
             return True
 
+    def update_asset_attribute(self, asset_id: int, new_attributes: list) -> bool:
+        """
+        Update the AssetAttribute of an asset in the database
+        Args:
+            asset_id (int): The AssetID of the asset to be updated in the database
+            new_attributes (list): A list of tuple (AttributeOrderNumber, AttributeName, DataTypeName, AttributeRemark)
+
+        Returns:
+            bool: The result of the operation: True if successful, False otherwise
+        """
+
+        # Delete all the attributes of the asset
+        operation = self.cursor.execute(f"""
+            delete from AssetAttribute
+            where AssetID = {asset_id};
+        """)
+
+        # Check if the operation is successful
+        if operation.rowcount == 0:
+            return False
+
+        # Insert the new attributes
+        for new_att in new_attributes:
+            new_att_order_number = new_att[0]
+            new_att_name = new_att[1]
+            new_att_data_type_name = new_att[2]
+            new_att_remark = new_att[3]
+
+            operation = self.cursor.execute(f"""
+                insert into AssetAttribute (AssetID, AttributeOrderNumber, AttributeName, DataTypeID, AttributeRemark)
+                values (
+                    {asset_id},
+                    {new_att_order_number},
+                    '{new_att_name}',
+                    (select DataTypeID from DataType where DataTypeName = '{new_att_data_type_name}'),
+                    '{new_att_remark}'
+                );
+                                            """)
+
+            # Check if the operation is successful
+            if operation.rowcount == 0:
+                return False
+
+        self.conn.commit()
+        return True
+
     def delete_asset(self, asset_number: int, asset_name: str, asset_category_name: str) -> bool:
         """
         Delete an asset from the database

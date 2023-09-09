@@ -540,7 +540,31 @@ class AssetCatelogueGUI(BaseGUI):
         self.attribute_table.scrollToBottom()
 
     def crud_save_attribute_button_event(self):
-        pass
+        if self.current_asset_id is None:
+            msg.warning_box("Please select an asset to update attribute!", icon_path=self.icon_path)
+            return
+
+        # Get the current attribute data
+        new_attribute_data = []
+        for i in range(self.attribute_table.rowCount()):
+            new_attribute_data.append([])
+            for j in range(self.attribute_table.columnCount()):
+                if j == 0:  # AssetAttributeOrderNumber : int
+                    new_attribute_data[i].append(int(self.attribute_table.item(i, j).text()))
+                else:
+                    new_attribute_data[i].append(self.attribute_table.item(i, j).text())
+
+        # Update the the attribute of the current asset in the database
+        success = self.db.update_asset_attribute(self.current_asset_id, new_attribute_data)
+
+        if not success:
+            msg.warning_box("Error occurred when updating attribute!", icon_path=self.icon_path)
+            return
+
+        # Reload the attribute table
+        self.fill_attribute_table(self.current_asset_id)
+
+        msg.information_box("Save attribute successfully!", icon_path=self.icon_path)
 
     def crud_delete_attribute_button_event(self):
         pass
