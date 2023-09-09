@@ -14,6 +14,13 @@ class CrudDB():
         self.cursor = self.conn.cursor()
         self.conn.execute('PRAGMA foreign_keys = ON;')
 
+    def get_asset_name_frome_asset_id(self, asset_id: int) -> str:
+        return self.cursor.execute(f"""
+            select AssetName
+            from Asset
+            where AssetID = {asset_id};
+        """).fetchone()[0]
+
     def get_category_id(self, category_name: str) -> int:
         return self.cursor.execute(f"""
             select AssetCategoryID

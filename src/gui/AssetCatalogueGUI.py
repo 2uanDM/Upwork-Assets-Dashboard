@@ -398,6 +398,20 @@ class AssetCatelogueGUI(BaseGUI):
             msg.warning_box("Please select an asset to update!", icon_path=self.icon_path)
             return
 
+        # Get the name of asset in the database
+        asset_name_in_database = self.db.get_asset_name_frome_asset_id(self.current_asset_id)
+
+        if asset_name_in_database != self.asset_name_item.text():
+            old_asset_folder_name = f'{self.current_asset_id}_{asset_name_in_database}'
+            new_asset_folder_name = f'{self.current_asset_id}_{self.asset_name_item.text()}'
+            # Rename the asset folder in the asset pictures folder
+            os.rename(os.path.join(self.asset_pictures_path, old_asset_folder_name),
+                      os.path.join(self.asset_pictures_path, new_asset_folder_name))
+
+            # Rename the asset folder in the temp folder
+            os.rename(os.path.join(self.temp_folder_path, old_asset_folder_name),
+                      os.path.join(self.temp_folder_path, new_asset_folder_name))
+
         # Get the current asset information
         asset_number = self.asset_number_item.text()
         asset_name = self.asset_name_item.text()
