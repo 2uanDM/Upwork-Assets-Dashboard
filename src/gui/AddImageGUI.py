@@ -185,10 +185,8 @@ class AddImageGUI(QWidget):
             # Save the latest browser folder
             config['latest_browser_folder'] = os.path.dirname(image_path[0])
             # Save the config file
-            json.dump(config,
-                      open(os.path.join(os.getcwd(), 'configuration', 'application.json'), "w"),
-                      indent=4,
-                      ensure_ascii=False)
+            with open(os.path.join(os.getcwd(), 'configuration', 'application.json'), "w", encoding='utf8') as f:
+                json.dump(config, f, indent=4, ensure_ascii=False)
 
     def add_image(self):
         image_path = self.path_input.text().strip()

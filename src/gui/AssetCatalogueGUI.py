@@ -354,6 +354,9 @@ class AssetCatelogueGUI(BaseGUI):
 
         asset_image_dir = os.path.join(self.temp_folder_path, f'{asset_id}_{asset_name}')
 
+        if not os.path.exists(asset_image_dir):
+            os.mkdir(asset_image_dir)
+
         has_preview_image = False
         for temp_image in os.listdir(asset_image_dir):
             if temp_image.find('^mastertable') != -1:
@@ -442,6 +445,9 @@ class AssetCatelogueGUI(BaseGUI):
 
         if asset_name_in_database != self.asset_name_item.text():
             old_asset_folder_name = f'{self.current_asset_id}_{asset_name_in_database}'
+            if not os.path.exists(os.path.join(self.asset_pictures_path, old_asset_folder_name)):
+                os.mkdir(os.path.join(self.asset_pictures_path, old_asset_folder_name))
+
             new_asset_folder_name = f'{self.current_asset_id}_{self.asset_name_item.text()}'
             # Rename the asset folder in the asset pictures folder
             os.rename(os.path.join(self.asset_pictures_path, old_asset_folder_name),
@@ -591,6 +597,10 @@ class AssetCatelogueGUI(BaseGUI):
             new_attribute_data.append([])
             for j in range(self.attribute_table.columnCount()):
                 if j == 0:  # AssetAttributeOrderNumber : int
+                    # If not a number
+                    if not self.attribute_table.item(i, j).text().isdigit():
+                        msg.warning_box("Attribute order number must be a number!", icon_path=self.icon_path)
+                        return
                     new_attribute_data[i].append(int(self.attribute_table.item(i, j).text()))
                 else:
                     new_attribute_data[i].append(self.attribute_table.item(i, j).text())

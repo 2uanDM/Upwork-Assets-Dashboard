@@ -2,7 +2,7 @@ import json
 import sqlite3
 import os
 
-with open(os.path.join(os.getcwd(), 'configuration', 'application.json'), "r") as f:
+with open(os.path.join(os.getcwd(), 'configuration', 'application.json'), "r", encoding='utf8') as f:
     config = json.load(f)
 
 
@@ -215,7 +215,12 @@ class CrudDB():
             from Asset
             order by AssetNumber desc
             limit 1;
-            """).fetchone()[0]
+            """).fetchone()
+
+        if asset_number is None:
+            asset_number = 10000
+        else:
+            asset_number = asset_number[0] + 1
 
         # Insert a new row into Asset table
         operation = self.cursor.execute(f"""
