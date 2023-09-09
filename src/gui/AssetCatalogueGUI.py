@@ -11,15 +11,29 @@ from src.gui.MessageBoxDialog import MessageBox as msg
 from src.gui.AddImageGUI import AddImageGUI
 
 
-class ClickableLabel(QLabel):
-    clicked = pyqtSignal()
+class ClickableImage(QLabel):
+    clicked = pyqtSignal(object)
+    double_clicked = pyqtSignal()
 
     def __init__(self, parent=None):
+        self.parent = parent
         super().__init__(parent)
 
     def mousePressEvent(self, event):
         if event.button() == Qt.LeftButton:
-            self.clicked.emit()
+            # First, iterate through all the images in the horizontal layout to set the background color to white
+            for i in range(self.parent.layout().count()):
+                if isinstance(self.parent.layout().itemAt(i).widget(), ClickableImage):
+                    self.parent.layout().itemAt(i).widget().setStyleSheet("border: none")
+
+            # Second, set the background color of the image to rgb(89,89,89)
+            self.setStyleSheet("border: 1.5px solid red")
+            self.clicked.emit(self)
+
+    # Handle double click event
+    def mouseDoubleClickEvent(self, event):
+        if event.button() == Qt.LeftButton:
+            self.double_clicked.emit()
 
 
 class AssetCatelogueGUI(BaseGUI):
@@ -29,7 +43,7 @@ class AssetCatelogueGUI(BaseGUI):
         super().__init__(MainWindow)
         self.current_page = 1
         self.current_asset_id = None
-        # Store the information of images of current asset (image: ClickableLabel with Pixmap,'image_name', 'image_category_name')
+        # Store the information of images of current asset (image: ClickableImage with Pixmap,'image_name', 'image_category_name')
         self.current_asset_images = None
 
         # Initial data from the database
@@ -229,8 +243,8 @@ class AssetCatelogueGUI(BaseGUI):
                 extension = image_name.split('.')[1]
                 just_image_name = image_name.split('.')[0]
                 original_image_name = f'{just_image_name.replace("^mediaframe","")}.{extension}'
-                # Create a ClickableLabel
-                image_label: ClickableLabel = self.get_clickable_image_label(just_image_name, extension)
+                # Create a ClickableImage
+                image_label: ClickableImage = self.get_clickable_image_label(just_image_name, extension)
                 # Get the image category name
                 image_category_name = self.db.get_asset_image_category_name(
                     self.current_asset_id, original_image_name)
@@ -248,13 +262,13 @@ class AssetCatelogueGUI(BaseGUI):
         for i in reversed(range(self.horizontalLayout.count())):
             self.horizontalLayout.itemAt(i).widget().setParent(None)  # Auto garbage collection
 
-    def get_clickable_image_label(self, just_image_name: str, extension: str) -> ClickableLabel:
+    def get_clickable_image_label(self, just_image_name: str, extension: str) -> ClickableImage:
         """
         Arg:
             just_image_name (str): Example: 'image^mediaframe'
             extension (str): Example: 'png'
         Return:
-            This function return a ClickableLabel with the image_path_resized and set to the action show the original image when clicked
+            This function return a ClickableImage with the image_path_resized and set to the action show the original image when clicked
         """
         # Get the original image name
         orignal_image_name = f"{just_image_name.replace('^mediaframe', '')}.{extension}"
@@ -267,11 +281,11 @@ class AssetCatelogueGUI(BaseGUI):
         image_path_original = os.path.join(
             self.asset_pictures_path, f'{asset_id}_{self.asset_name_item.text()}', orignal_image_name)
 
-        # Create a ClickableLabel
-        image_label = ClickableLabel(self.horizontalLayoutWidget)
+        # Create a ClickableImage
+        image_label = ClickableImage(self.horizontalLayoutWidget)
         image_label.setPixmap(QPixmap(image_path_resized))
         image_label.setAlignment(Qt.AlignCenter)
-        image_label.clicked.connect(lambda: os.startfile(image_path_original))
+        image_label.double_clicked.connect(lambda: os.startfile(image_path_original))
 
         return image_label
 
@@ -373,6 +387,15 @@ class AssetCatelogueGUI(BaseGUI):
             "Are you sure to delete this asset? This action cannot be undone!", icon_path=self.icon_path)
         if user_choice == QMessageBox.No:
             return
+
+        # Remove the asset folder in the asset pictures folder
+        asset_folder_name = f'{self.current_asset_id}_{asset_name}'
+        if os.path.exists(os.path.join(self.asset_pictures_path, asset_folder_name)):
+            shutil.rmtree(os.path.join(self.asset_pictures_path, asset_folder_name))
+
+        # Remove the asset folder in the temp folder
+        if os.path.exists(os.path.join(self.temp_folder_path, asset_folder_name)):
+            shutil.rmtree(os.path.join(self.temp_folder_path, asset_folder_name))
 
         # Delete the asset
         success = self.db.delete_asset(int(asset_number), asset_name, asset_category_name)
