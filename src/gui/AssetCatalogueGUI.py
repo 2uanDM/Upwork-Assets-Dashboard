@@ -28,6 +28,7 @@ class ClickableImage(QLabel):
 
             # Second, set the background color of the image to rgb(89,89,89)
             self.setStyleSheet("border: 1.5px solid red")
+            print(self)
             self.clicked.emit(self)
 
     # Handle double click event
@@ -262,6 +263,9 @@ class AssetCatelogueGUI(BaseGUI):
         for i in reversed(range(self.horizontalLayout.count())):
             self.horizontalLayout.itemAt(i).widget().setParent(None)  # Auto garbage collection
 
+        # Clear the image category label
+        self.image_category_label.setText("")
+
     def get_clickable_image_label(self, just_image_name: str, extension: str) -> ClickableImage:
         """
         Arg:
@@ -286,8 +290,16 @@ class AssetCatelogueGUI(BaseGUI):
         image_label.setPixmap(QPixmap(image_path_resized))
         image_label.setAlignment(Qt.AlignCenter)
         image_label.double_clicked.connect(lambda: os.startfile(image_path_original))
+        image_label.clicked.connect(self.show_image_detail)
 
         return image_label
+
+    def show_image_detail(self, image_label: ClickableImage):
+        for image in self.current_asset_images:
+            if image[0] == image_label:
+                image_name = image[1]
+                image_category_name = image[2]
+                self.image_category_label.setText(f'Category: {image_category_name}')
 
     def apply_filter_button_event(self):
         # Get the filter value (number)

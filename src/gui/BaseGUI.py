@@ -523,6 +523,13 @@ class BaseGUI(QWidget):
         self.download_dataset_button.setStyleSheet(self.css.get('apply_filter_button'))
         self.download_dataset_button.setText("Download dataset")
 
+        # --================== Image category label ==================--
+        self.image_category_label = QLabel(self.content_frame)
+        self.image_category_label.setObjectName(u"image_category_label")
+        self.image_category_label.setGeometry(QRect(720, 860, 591, 31))
+        self.image_category_label.setFont(self.font_for_page_label)
+        self.image_category_label.setStyleSheet(u"color:rgb(89,89,89)")
+
     def setup_crud_asset_detail_buttons(self):
         # Add asset button
         self.crud_add_asset_button = ClickableLabelAsButton(self.content_frame)
