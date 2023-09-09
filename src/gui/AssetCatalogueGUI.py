@@ -230,7 +230,28 @@ class AssetCatelogueGUI(BaseGUI):
         # TODO:Clear the Shape table
 
         # TODO: Load the image preview of assets in current pages
-        print(data)
+        self.fill_preview_image_in_master_table(page=page)
+
+    def fill_preview_image_in_master_table(self, page: int):
+        if self.total_assets == 0:
+            return
+
+        data = self.table_data[(page - 1) * 10: page * 10]  # Ten rows per page
+
+        for i, row in enumerate(data):
+            asset_number = row[0]
+            asset_name = row[1]
+            asset_category_name = row[2]
+
+            # Get the asset id
+            asset_id: int = self.db.get_asset_id(asset_number, asset_name, asset_category_name)
+
+            # Get the preview image related to the asset
+            preview_image_path = self.get_read_only_image_label(asset_id)
+            if preview_image_path is None:
+                continue
+            else:
+                self.master_table.setCellWidget(i, 0, preview_image_path)
 
     def apply_filter_button_event(self):
         # Get the filter value (number)
@@ -277,6 +298,38 @@ class AssetCatelogueGUI(BaseGUI):
         self.clear_asset_detail_table()  # Clear the asset detail table
         self.clear_the_horizontal_layout()  # Clear the horizontal layout
         # TODO: Add clear the attribute table and shape table
+
+    def get_read_only_image_label(self, asset_id: int) -> QLabel:
+        """
+        Arg:
+            asset_id (int): Example: 1
+        Return:
+            This function return a QLabel with the image_path_resized for master table read only related to the asset_id
+        """
+        # Get the AssetName from the database
+        asset_name = self.db.get_asset_name_frome_asset_id(asset_id)
+
+        asset_image_dir = os.path.join(self.temp_folder_path, f'{asset_id}_{asset_name}')
+
+        has_preview_image = False
+        for temp_image in os.listdir(asset_image_dir):
+            if temp_image.find('^mastertable') != -1:
+                has_preview_image = True
+                extension = temp_image.split('.')[1]
+                just_image_name = temp_image.split('.')[0]
+                break
+
+        if not has_preview_image:
+            return None
+
+        image_path_resized = os.path.join(asset_image_dir, f'{just_image_name}.{extension}')
+
+        # Create a QLabel
+        image_label = QLabel(self.horizontalLayoutWidget)
+        image_label.setPixmap(QPixmap(image_path_resized))
+        image_label.setAlignment(Qt.AlignCenter)
+
+        return image_label
 
     def clear_asset_detail_table(self):
         self.asset_number_item.setText("")
@@ -454,16 +507,13 @@ class AssetCatelogueGUI(BaseGUI):
     def get_clickable_image_label(self, just_image_name: str, extension: str) -> ClickableImage:
         """
         Arg:
-            just_image_name (str): Example: 'image^mediaframe' or 'image^mastertable'
+            just_image_name (str): Example: 'image^mediaframe'
             extension (str): Example: 'png'
         Return:
-            This function return a ClickableImage with the image_path_resized and set to the action show the original image when clicked
+            This function return a ClickableImage with the image_path_resized for media frame and set to the action show the original image when clicked
         """
         # Get the original image name
-        if '^mediaframe' in just_image_name:
-            orignal_image_name = f"{just_image_name.replace('^mediaframe', '')}.{extension}"
-        else:
-            orignal_image_name = f"{just_image_name.replace('^mastertable', '')}.{extension}"
+        orignal_image_name = f"{just_image_name.replace('^mediaframe', '')}.{extension}"
 
         # Get the current AssetID
         asset_id: int = self.current_asset_id
@@ -640,8 +690,8 @@ class AssetCatelogueGUI(BaseGUI):
             f'Add image "{image_name}" successfully!')
         print(f'Add image "{image_name}" to the asset with id = {asset_id} successfully!')
 
-        # TODO: Reload the master table to show the image preview and reload the image horizontal layout
         self.fill_in_media_frame()
+        self.fill_preview_image_in_master_table(self.current_page)
 
     def crud_delete_image_event(self):
         if self.current_clicked_image is None:

@@ -378,6 +378,7 @@ class BaseGUI(QWidget):
 
         self.asset_description_value_item = QTableWidgetItem()
         self.asset_description_value_item.setText("")
+        self.asset_description_value_item.setTextAlignment(Qt.AlignTop | Qt.AlignLeft)
         self.asset_detail_table.setItem(3, 1, self.asset_description_value_item)
 
         # Change the height of the fourth row
