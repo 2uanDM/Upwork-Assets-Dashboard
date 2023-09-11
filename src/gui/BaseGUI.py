@@ -275,7 +275,7 @@ class BaseGUI(QWidget):
 
         self.apply_filter_button = QPushButton(self.content_frame)
         self.apply_filter_button.setObjectName(u"apply_filter_button")
-        self.apply_filter_button.setGeometry(QRect(520, 120, 151, 31))
+        self.apply_filter_button.setGeometry(QRect(520, 117, 151, 36))
         self.apply_filter_button.setFont(self.filter_label_font)
         self.apply_filter_button.setLayoutDirection(Qt.LeftToRight)
         self.apply_filter_button.setStyleSheet(self.css.get('apply_filter_button'))
@@ -318,6 +318,8 @@ class BaseGUI(QWidget):
         self.master_table.setSelectionBehavior(QAbstractItemView.SelectRows)
         # Cannot edit the cells
         self.master_table.setEditTriggers(QAbstractItemView.NoEditTriggers)
+        # Cannot resize the columns
+        self.master_table.horizontalHeader().setSectionResizeMode(QHeaderView.Fixed)
 
         # --================== Pagination ==================--
         self.page_label = QLabel(self.content_frame)
@@ -551,7 +553,7 @@ class BaseGUI(QWidget):
         # Change the width of the columns
         self.shape_table.setColumnWidth(0, 67)
         self.shape_table.setColumnWidth(1, 150)
-        self.shape_table.setColumnWidth(2, 580)
+        self.shape_table.setColumnWidth(2, 575)
 
         # Set the delegate for the 2nd column
         self.shape_name_delegate = QComboBoxDelegateForColumn(
@@ -581,13 +583,13 @@ class BaseGUI(QWidget):
         self.horizontalLayout.setContentsMargins(2, 0, 0, 0)
 
         # --================== Download dataset button ==================--
-        self.download_dataset_button = QPushButton(self.content_frame)
-        self.download_dataset_button.setObjectName(u"download_dataset_button")
-        self.download_dataset_button.setGeometry(QRect(1320, 860, 201, 31))
-        self.download_dataset_button.setFont(self.filter_label_font)
-        self.download_dataset_button.setLayoutDirection(Qt.LeftToRight)
-        self.download_dataset_button.setStyleSheet(self.css.get('apply_filter_button'))
-        self.download_dataset_button.setText("Download dataset")
+        # self.download_dataset_button = QPushButton(self.content_frame)
+        # self.download_dataset_button.setObjectName(u"download_dataset_button")
+        # self.download_dataset_button.setGeometry(QRect(1320, 860, 201, 31))
+        # self.download_dataset_button.setFont(self.filter_label_font)
+        # self.download_dataset_button.setLayoutDirection(Qt.LeftToRight)
+        # self.download_dataset_button.setStyleSheet(self.css.get('apply_filter_button'))
+        # self.download_dataset_button.setText("Download dataset")
 
         # --================== Image category label ==================--
         self.image_category_label = QLabel(self.content_frame)

@@ -569,6 +569,10 @@ class AssetCatelogueGUI(BaseGUI):
             for j, column in enumerate(attribute):
                 self.attribute_table.setItem(i, j, QTableWidgetItem(str(column)))
 
+        # Set the height of the row
+        for i in range(self.attribute_table.rowCount()):
+            self.attribute_table.setRowHeight(i, 40)
+
     def crud_add_attribute_button_event(self):
         if self.current_asset_id is None:
             msg.warning_box("Please select an asset to add attribute!", icon_path=self.icon_path)
@@ -691,6 +695,10 @@ class AssetCatelogueGUI(BaseGUI):
                     self.shape_table.item(i, j).setFlags(Qt.ItemIsEnabled)
                 else:
                     self.shape_table.setItem(i, j, QTableWidgetItem(str(column)))
+
+        # Set the height of the row
+        for i in range(self.shape_table.rowCount()):
+            self.shape_table.setRowHeight(i, 40)
 
     def crud_add_shape_button_event(self):
         if self.current_asset_id is None:
