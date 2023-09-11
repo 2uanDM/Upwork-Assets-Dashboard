@@ -150,7 +150,7 @@ class BaseGUI(QWidget):
         # ------------------- Setup sort buttons -------------------
         self.setup_sort_button()
         # ------------------- Setup my info -------------------
-        self.setup_my_info()
+        # self.setup_my_info()
 
         # Retranslate Ui
         self.retranslate_base_ui()
@@ -160,41 +160,41 @@ class BaseGUI(QWidget):
         self.project_name_font = QFont()
         self.project_name_font = QFont()
         self.project_name_font.setFamily(u"Segoe UI")
-        self.project_name_font.setPointSize(18)
+        self.project_name_font.setPointSize(14)
         self.project_name_font.setBold(True)
         self.project_name_font.setWeight(75)
 
         self.view_button_font = QFont()
         self.view_button_font.setFamily(u"Segoe UI")
-        self.view_button_font.setPointSize(16)
+        self.view_button_font.setPointSize(11)
 
         self.main_label_font = QFont()
         self.main_label_font.setFamily(u"Segoe UI")
-        self.main_label_font.setPointSize(24)
+        self.main_label_font.setPointSize(16)
         self.main_label_font.setBold(True)
         self.main_label_font.setWeight(75)
 
         self.sub_header_font = QFont()
         self.sub_header_font.setFamily(u"Segoe UI")
-        self.sub_header_font.setPointSize(20)
+        self.sub_header_font.setPointSize(14)
         self.sub_header_font.setBold(False)
         self.sub_header_font.setWeight(50)
 
         self.filter_label_font = QFont()
         self.filter_label_font.setFamily(u"Segoe UI")
-        self.filter_label_font.setPointSize(14)
+        self.filter_label_font.setPointSize(10)
         self.filter_label_font.setBold(True)
         self.filter_label_font.setWeight(70)
 
         self.font_for_table_header = QFont()
         self.font_for_table_header.setFamily(u"Segoe UI")
-        self.font_for_table_header.setPointSize(13)
+        self.font_for_table_header.setPointSize(10)
         self.font_for_table_header.setBold(True)
         self.font_for_table_header.setWeight(68)
 
         self.font_for_page_label = QFont()
         self.font_for_page_label.setFamily(u"Segoe UI")
-        self.font_for_page_label.setPointSize(14)
+        self.font_for_page_label.setPointSize(10)
         self.font_for_page_label.setBold(False)
         self.font_for_page_label.setWeight(50)
 
@@ -248,13 +248,13 @@ class BaseGUI(QWidget):
     def setup_master_table(self):
         self.asset_list_label = QLabel(self.content_frame)
         self.asset_list_label.setObjectName(u"asset_list_label")
-        self.asset_list_label.setGeometry(QRect(30, 60, 131, 41))
+        self.asset_list_label.setGeometry(QRect(30, 60, 150, 41))
         self.asset_list_label.setFont(self.sub_header_font)
         self.asset_list_label.setStyleSheet(u"color:rgb(69, 119, 185)")
 
         self.filter_label = QLabel(self.content_frame)
         self.filter_label.setObjectName(u"filter_label")
-        self.filter_label.setGeometry(QRect(100, 120, 51, 31))
+        self.filter_label.setGeometry(QRect(100, 120, 51, 30))
         self.filter_label.setFont(self.filter_label_font)
         self.filter_label.setStyleSheet(u"color:rgb(89, 89, 89)")
 
@@ -322,7 +322,7 @@ class BaseGUI(QWidget):
         # --================== Pagination ==================--
         self.page_label = QLabel(self.content_frame)
         self.page_label.setObjectName(u"page_label")
-        self.page_label.setGeometry(QRect(160, 859, 191, 31))
+        self.page_label.setGeometry(QRect(160, 857, 191, 31))
         self.page_label.setText("Page 1/1")
         self.page_label.setFont(self.font_for_page_label)
         self.page_label.setStyleSheet(u"color:rgb(89, 89, 89)")
@@ -341,13 +341,13 @@ class BaseGUI(QWidget):
         self.next_page_button.setPixmap(QPixmap(os.path.join(self.buttons_path, "next.png")))
 
         # --================== Download catalogue button ==================--
-        self.download_catalogue_button = QPushButton(self.content_frame)
-        self.download_catalogue_button.setObjectName(u"download_catalogue_button")
-        self.download_catalogue_button.setGeometry(QRect(500, 860, 201, 31))
-        self.download_catalogue_button.setFont(self.filter_label_font)
-        self.download_catalogue_button.setLayoutDirection(Qt.LeftToRight)
-        self.download_catalogue_button.setStyleSheet(self.css.get('apply_filter_button'))
-        self.download_catalogue_button.setText("Download catalogue")
+        # self.download_catalogue_button = QPushButton(self.content_frame)
+        # self.download_catalogue_button.setObjectName(u"download_catalogue_button")
+        # self.download_catalogue_button.setGeometry(QRect(500, 860, 201, 31))
+        # self.download_catalogue_button.setFont(self.filter_label_font)
+        # self.download_catalogue_button.setLayoutDirection(Qt.LeftToRight)
+        # self.download_catalogue_button.setStyleSheet(self.css.get('apply_filter_button'))
+        # self.download_catalogue_button.setText("Download catalogue")
 
     def setup_detail_table(self):
         self.asset_detail_label = QLabel(self.content_frame)
@@ -359,6 +359,9 @@ class BaseGUI(QWidget):
         self.asset_detail_table = QTableWidget(self.content_frame)
         self.asset_detail_table.setColumnCount(2)
         self.asset_detail_table.setRowCount(7)
+        # Set the height of the rows
+        for i in range(7):
+            self.asset_detail_table.setRowHeight(i, 40)
 
         # Hide the horizontal header
         self.asset_detail_table.horizontalHeader().hide()
@@ -366,27 +369,27 @@ class BaseGUI(QWidget):
 
         # Set the width of column
         self.asset_detail_table.setColumnWidth(0, 150)
-        self.asset_detail_table.setColumnWidth(1, 630)
+        self.asset_detail_table.setColumnWidth(1, 620)
 
         # First row: Asset number and Asset Name
         self.asset_number_item = QTableWidgetItem()
         self.asset_number_item.setBackground(QColor(231, 231, 231))  # Set your desired background color
-        self.asset_number_item.setFont(QFont('Segoe UI', 14, 68))
-        self.asset_number_item.setTextAlignment(Qt.AlignCenter)
+        self.asset_number_item.setFont(QFont('Segoe UI', 11, 68))
+        self.asset_number_item.setTextAlignment(Qt.AlignLeft | Qt.AlignVCenter)
         self.asset_number_item.setForeground(QColor(69, 119, 185))
         self.asset_detail_table.setItem(0, 0, self.asset_number_item)
 
         self.asset_name_item = QTableWidgetItem()
         self.asset_name_item.setBackground(QColor(231, 231, 231))
-        self.asset_name_item.setFont(QFont('Segoe UI', 14, 68))
-        self.asset_name_item.setTextAlignment(Qt.AlignCenter)
+        self.asset_name_item.setFont(QFont('Segoe UI', 11, 68))
+        self.asset_name_item.setTextAlignment(Qt.AlignLeft | Qt.AlignVCenter)
         self.asset_name_item.setForeground(QColor(69, 119, 185))
         self.asset_detail_table.setItem(0, 1, self.asset_name_item)
 
         # Second row: Asset variant and its value
         self.asset_variant_item = QTableWidgetItem()
         self.asset_variant_item.setText("Asset variant")
-        self.asset_variant_item.setTextAlignment(Qt.AlignCenter)
+        self.asset_variant_item.setTextAlignment(Qt.AlignLeft | Qt.AlignVCenter)
         self.asset_variant_item.setFlags(self.asset_variant_item.flags() & ~Qt.ItemIsEditable)
         self.asset_detail_table.setItem(1, 0, self.asset_variant_item)
 
@@ -397,7 +400,7 @@ class BaseGUI(QWidget):
         # Third row: Asset category and its value
         self.asset_category_item = QTableWidgetItem()
         self.asset_category_item.setText("Asset category")
-        self.asset_category_item.setTextAlignment(Qt.AlignCenter)
+        self.asset_category_item.setTextAlignment(Qt.AlignLeft | Qt.AlignVCenter)
         self.asset_category_item.setFlags(self.asset_category_item.flags() & ~Qt.ItemIsEditable)
         self.asset_detail_table.setItem(2, 0, self.asset_category_item)
 
@@ -412,7 +415,7 @@ class BaseGUI(QWidget):
         # Fourth row: Description and its value
         self.asset_description_item = QTableWidgetItem()
         self.asset_description_item.setText("Description")
-        self.asset_description_item.setTextAlignment(Qt.AlignCenter)
+        self.asset_description_item.setTextAlignment(Qt.AlignTop | Qt.AlignLeft)
         self.asset_description_item.setFlags(self.asset_description_item.flags() & ~Qt.ItemIsEditable)
         self.asset_detail_table.setItem(3, 0, self.asset_description_item)
 
@@ -427,7 +430,7 @@ class BaseGUI(QWidget):
         # Fifth row: Importlist header and its value
         self.import_list_header_item = QTableWidgetItem()
         self.import_list_header_item.setText("Importlist header")
-        self.import_list_header_item.setTextAlignment(Qt.AlignCenter)
+        self.import_list_header_item.setTextAlignment(Qt.AlignLeft | Qt.AlignVCenter)
         self.import_list_header_item.setFlags(self.import_list_header_item.flags() & ~Qt.ItemIsEditable)
         self.asset_detail_table.setItem(4, 0, self.import_list_header_item)
 
@@ -438,7 +441,7 @@ class BaseGUI(QWidget):
         # Sixth row: Importlist 2nd row and its value
         self.import_list_2nd_row_item = QTableWidgetItem()
         self.import_list_2nd_row_item.setText("Importlist 2nd row")
-        self.import_list_2nd_row_item.setTextAlignment(Qt.AlignCenter)
+        self.import_list_2nd_row_item.setTextAlignment(Qt.AlignLeft | Qt.AlignVCenter)
         self.import_list_2nd_row_item.setFlags(self.import_list_2nd_row_item.flags() & ~Qt.ItemIsEditable)
         self.asset_detail_table.setItem(5, 0, self.import_list_2nd_row_item)
 
@@ -449,7 +452,7 @@ class BaseGUI(QWidget):
         # Seventh row: Importlist 3rd row and its value
         self.import_list_3rd_row_item = QTableWidgetItem()
         self.import_list_3rd_row_item.setText("Importlist 3rd row")
-        self.import_list_3rd_row_item.setTextAlignment(Qt.AlignCenter)
+        self.import_list_3rd_row_item.setTextAlignment(Qt.AlignLeft | Qt.AlignVCenter)
         self.import_list_3rd_row_item.setFlags(self.import_list_3rd_row_item.flags() & ~Qt.ItemIsEditable)
         self.asset_detail_table.setItem(6, 0, self.import_list_3rd_row_item)
 

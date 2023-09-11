@@ -76,9 +76,9 @@ class AssetCatelogueGUI(BaseGUI):
         self.previous_page_button.clicked.connect(self.previous_page_button_event)
         self.next_page_button.clicked.connect(self.next_page_button_event)
 
-        # Download buttons
-        self.download_catalogue_button.clicked.connect(self.test_action)
-        self.download_dataset_button.clicked.connect(self.test_action)
+        # # Download buttons
+        # self.download_catalogue_button.clicked.connect(self.test_action)
+        # self.download_dataset_button.clicked.connect(self.test_action)
 
         # Sort buttons
         self.sort_asc_asset_number_button.clicked.connect(self.sort_asc_asset_number_button_event)
