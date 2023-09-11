@@ -342,14 +342,14 @@ class BaseGUI(QWidget):
         self.next_page_button.setGeometry(QRect(350, 860, 31, 31))
         self.next_page_button.setPixmap(QPixmap(os.path.join(self.buttons_path, "next.png")))
 
-        # --================== Download catalogue button ==================--
-        # self.download_catalogue_button = QPushButton(self.content_frame)
-        # self.download_catalogue_button.setObjectName(u"download_catalogue_button")
-        # self.download_catalogue_button.setGeometry(QRect(500, 860, 201, 31))
-        # self.download_catalogue_button.setFont(self.filter_label_font)
-        # self.download_catalogue_button.setLayoutDirection(Qt.LeftToRight)
-        # self.download_catalogue_button.setStyleSheet(self.css.get('apply_filter_button'))
-        # self.download_catalogue_button.setText("Download catalogue")
+        #--================== Download catalogue button ==================--
+        self.download_catalogue_button = QPushButton(self.content_frame)
+        self.download_catalogue_button.setObjectName(u"download_catalogue_button")
+        self.download_catalogue_button.setGeometry(QRect(500, 860, 201, 31))
+        self.download_catalogue_button.setFont(self.filter_label_font)
+        self.download_catalogue_button.setLayoutDirection(Qt.LeftToRight)
+        self.download_catalogue_button.setStyleSheet(self.css.get('apply_filter_button'))
+        self.download_catalogue_button.setText("Download catalogue")
 
     def setup_detail_table(self):
         self.asset_detail_label = QLabel(self.content_frame)
@@ -582,14 +582,14 @@ class BaseGUI(QWidget):
         self.horizontalLayout.setObjectName(u"horizontalLayout")
         self.horizontalLayout.setContentsMargins(2, 0, 0, 0)
 
-        # --================== Download dataset button ==================--
-        # self.download_dataset_button = QPushButton(self.content_frame)
-        # self.download_dataset_button.setObjectName(u"download_dataset_button")
-        # self.download_dataset_button.setGeometry(QRect(1320, 860, 201, 31))
-        # self.download_dataset_button.setFont(self.filter_label_font)
-        # self.download_dataset_button.setLayoutDirection(Qt.LeftToRight)
-        # self.download_dataset_button.setStyleSheet(self.css.get('apply_filter_button'))
-        # self.download_dataset_button.setText("Download dataset")
+        #--================== Download dataset button ==================--
+        self.download_dataset_button = QPushButton(self.content_frame)
+        self.download_dataset_button.setObjectName(u"download_dataset_button")
+        self.download_dataset_button.setGeometry(QRect(1320, 860, 201, 31))
+        self.download_dataset_button.setFont(self.filter_label_font)
+        self.download_dataset_button.setLayoutDirection(Qt.LeftToRight)
+        self.download_dataset_button.setStyleSheet(self.css.get('apply_filter_button'))
+        self.download_dataset_button.setText("Download dataset")
 
         # --================== Image category label ==================--
         self.image_category_label = QLabel(self.content_frame)
