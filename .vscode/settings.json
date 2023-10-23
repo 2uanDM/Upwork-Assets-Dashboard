@@ -2,7 +2,7 @@
   "autopep8.args": ["--max-line-length=120", "--indent-size=4", "--ignore=E4"],
   "git.ignoreLimitWarning": true,
   "files.exclude": {
-    ".venv": true,
+    ".venv": false,
     "**/__pycache__": true
   },
   "explorer.excludeGitIgnore": false,
