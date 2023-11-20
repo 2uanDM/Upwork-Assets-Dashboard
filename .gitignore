@@ -153,6 +153,8 @@ cython_debug/
 *.rar
 *.exe
 
+.vscode
+
 FINAL_Asset_Management
 
 FINAL_Asset_Management.rar
