@@ -34,3 +34,5 @@ You should create a virtual environment and install all the dependencies in requ
 ```
 pyinstaller --onefile --noconsole --icon=quan.ico main.py
 ```
+
+Sample build: [Link](https://husteduvn-my.sharepoint.com/:u:/g/personal/quan_dm210710_sis_hust_edu_vn/EbjKoqAn0QBJifwIRjV0VuwBsehLuDUrQGK4wKjG2L6vlw?e=ljt1Kg)
