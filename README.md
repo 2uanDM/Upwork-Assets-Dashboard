@@ -10,13 +10,17 @@ This is a project for my client on Upwork
 
 Develop a windows desktop application with PyQt5:
 • UX design with QT-Designer according Mockup on page 2
+
 • Application development in python, including testing
+
 • Connectivity to an existing asset database to create, update and delete data
 
 ## Tech Stack:
 
 • SQLite3 for database management
+
 • PyQT5 for GUI
+
 • Adobe Illustrator for UX design (Mockup)
 
 ## How to run:
