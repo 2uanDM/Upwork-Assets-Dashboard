@@ -1,25 +1,10 @@
 {
-  "autopep8.args": ["--max-line-length=120", "--indent-size=4", "--ignore=E4"],
+  "autopep8.args": ["--max-line-length=120", "--indent-size=4"],
   "git.ignoreLimitWarning": true,
   "files.exclude": {
-    ".venv": false,
+    ".venv": true,
     "**/__pycache__": true
   },
   "explorer.excludeGitIgnore": false,
-  "prettier.printWidth": 120,
-  "sqltools.connections": [
-    {
-      "previewLimit": 50,
-      "driver": "SQLite",
-      "name": "test",
-      "group": "test",
-      "database": "${workspaceFolder:Upwork-Assets-Dashboard}/new_assetDB.db"
-    }
-  ],
-  "sqltools.useNodeRuntime": true,
-  "sqltools.format": {
-    "uppercase": true,
-    "printWidth": 120
-  },
-  "hediet.vscode-drawio.theme": "Kennedy"
+  "prettier.printWidth": 120
 }

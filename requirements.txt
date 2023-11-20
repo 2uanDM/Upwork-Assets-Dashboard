@@ -2,3 +2,5 @@ PyQt5==5.15.9
 pyqt5-tools==5.15.9.3.3
 pandas==2.0.3
 pyinstaller==5.13.2
+Pillow
+sqlite3
