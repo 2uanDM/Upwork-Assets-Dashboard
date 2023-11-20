@@ -1,5 +1,7 @@
 # Upwork-Assets-Dashboard
 
+[![](https://img.shields.io/badge/python-3670A0?style=for-the-badge&logo=&logoColor=ffdd54)](#) [![](https://img.shields.io/badge/sqllite-%23013243.svg?style=for-the-badge&logo=&logoColor=white)](#) [![](https://img.shields.io/badge/pyqt-%23150458.svg?style=for-the-badge&logo=pyqt&logoColor=white)](#)
+
 This is a project for my client on Upwork
 
 [Link](https://www.upwork.com/freelancers/duongminhq?p=1707054523755089920)
